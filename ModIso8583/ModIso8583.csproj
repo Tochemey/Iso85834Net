@@ -1,10 +1,10 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>3dd089cf-6495-4274-a812-eb2277cbedb8</ProjectGuid>
+    <ProjectGuid>{3DD089CF-6495-4274-A812-EB2277CBEDB8}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>ModIso8583</RootNamespace>
@@ -30,24 +30,44 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="System"/>
-    
-    <Reference Include="System.Core"/>
-    <Reference Include="System.Xml.Linq"/>
-    <Reference Include="System.Data.DataSetExtensions"/>
-    
-    
-    <Reference Include="Microsoft.CSharp"/>
-    
-    <Reference Include="System.Data"/>
-    
-    <Reference Include="System.Net.Http"/>
-    
-    <Reference Include="System.Xml"/>
+    <Reference Include="C5, Version=2.4.5947.17248, Culture=neutral, PublicKeyToken=282361b99ded7e8e, processorArchitecture=MSIL">
+      <HintPath>..\packages\C5.2.4.5947.17249\lib\net45\C5.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Numerics" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Class1.cs" />
+    <Compile Include="Codecs\BigIntBcdCodec.cs" />
+    <Compile Include="Codecs\CompositeField.cs" />
+    <Compile Include="Codecs\LongBcdCodec.cs" />
+    <Compile Include="ICustomBinaryField.cs" />
+    <Compile Include="ICustomField.cs" />
+    <Compile Include="IsoMessage.cs" />
+    <Compile Include="IsoType.cs" />
+    <Compile Include="IsoValue.cs" />
+    <Compile Include="ITraceNumberGenerator.cs" />
+    <Compile Include="Parse\AlphaNumericParseInfo.cs" />
+    <Compile Include="Parse\AlphaParseInfo.cs" />
+    <Compile Include="Parse\AmountParseInfo.cs" />
+    <Compile Include="Parse\BinaryParseInfo.cs" />
+    <Compile Include="Parse\Date10ParseInfo.cs" />
+    <Compile Include="Parse\Date4ParseInfo.cs" />
+    <Compile Include="Parse\DateTimeParseInfo.cs" />
+    <Compile Include="Parse\FieldParseInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Util\Bcd.cs" />
+    <Compile Include="Util\DateUtil.cs" />
+    <Compile Include="Util\HexCodec.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
- </Project>
+</Project>
