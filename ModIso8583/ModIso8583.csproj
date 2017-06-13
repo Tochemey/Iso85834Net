@@ -58,6 +58,7 @@
     <Compile Include="Parse\AmountParseInfo.cs" />
     <Compile Include="Parse\BinaryParseInfo.cs" />
     <Compile Include="Parse\Date10ParseInfo.cs" />
+    <Compile Include="Parse\Date12ParseInfo.cs" />
     <Compile Include="Parse\Date4ParseInfo.cs" />
     <Compile Include="Parse\DateTimeParseInfo.cs" />
     <Compile Include="Parse\FieldParseInfo.cs" />
