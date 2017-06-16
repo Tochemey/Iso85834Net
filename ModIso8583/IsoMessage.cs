@@ -36,7 +36,7 @@ namespace ModIso8583
         /// </summary>
         private readonly IsoValue[] fields = new IsoValue[129];
 
-        private bool forceStringEncoding;
+        public bool ForceStringEncoding { get; set; } = false;
 
         public IsoMessage() { }
 
@@ -268,9 +268,9 @@ namespace ModIso8583
         ///     Creates a BitSet for the bitmap.
         /// </summary>
         /// <returns></returns>
-        protected BitArray CreateBitmapBitSet()
+        protected BitSet CreateBitmapBitSet()
         {
-            var bs = new BitArray(Forceb2 ? 128 : 64);
+            var bs = new BitSet(Forceb2 ? 128 : 64);
             for (var i = 2; i < 129; i++)
                 if (fields[i] != null)
                     bs.Set(i - 1,
@@ -283,7 +283,7 @@ namespace ModIso8583
             else if (bs.Length > 64)
             {
                 //Extend to 128 if needed
-                var b2 = new BitArray(128);
+                var b2 = new BitSet(128);
                 b2.Or(bs);
                 bs = b2;
                 bs.Set(0,
@@ -364,7 +364,7 @@ namespace ModIso8583
             else
             {
                 MemoryStream stream2 = null;
-                if (forceStringEncoding)
+                if (ForceStringEncoding)
                 {
                     stream2 = stream;
                     stream = new MemoryStream();
@@ -381,7 +381,7 @@ namespace ModIso8583
                     stream.WriteByte(Hex[nibble]);
                 }
 
-                if (forceStringEncoding)
+                if (ForceStringEncoding)
                 {
                     var hb = Encoding.GetString(stream.ToArray());
                     stream = stream2;
@@ -408,7 +408,7 @@ namespace ModIso8583
                 {
                     v.Write(stream,
                         Binary,
-                        forceStringEncoding);
+                        ForceStringEncoding);
                 }
                 catch (IOException)
                 {

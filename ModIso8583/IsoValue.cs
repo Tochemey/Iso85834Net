@@ -6,7 +6,7 @@ using ModIso8583.Util;
 
 namespace ModIso8583
 {
-    public class IsoValue
+    public class IsoValue : ICloneable
     {
         public IsoValue(IsoType t,
             object value,
@@ -177,6 +177,8 @@ namespace ModIso8583
             }
             return Encoder == null ? Value.ToString() : Encoder.EncodeField(Value);
         }
+
+        public object Clone() { return MemberwiseClone(); }
 
         protected void WriteLengthHeader(int l,
             Stream outs,

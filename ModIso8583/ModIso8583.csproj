@@ -33,7 +33,17 @@
     <Reference Include="C5, Version=2.4.5947.17248, Culture=neutral, PublicKeyToken=282361b99ded7e8e, processorArchitecture=MSIL">
       <HintPath>..\packages\C5.2.4.5947.17249\lib\net45\C5.dll</HintPath>
     </Reference>
+    <Reference Include="Serilog, Version=2.0.0.0, Culture=neutral, PublicKeyToken=24c2f752a8e58a10, processorArchitecture=MSIL">
+      <HintPath>..\packages\Serilog.2.4.0\lib\net46\Serilog.dll</HintPath>
+    </Reference>
+    <Reference Include="Serilog.Sinks.ColoredConsole, Version=2.0.0.0, Culture=neutral, PublicKeyToken=24c2f752a8e58a10, processorArchitecture=MSIL">
+      <HintPath>..\packages\Serilog.Sinks.ColoredConsole.2.0.0\lib\net45\Serilog.Sinks.ColoredConsole.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Collections.Immutable, Version=1.2.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Collections.Immutable.1.3.1\lib\portable-net45+win8+wp8+wpa81\System.Collections.Immutable.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System.Core" />
     <Reference Include="System.Numerics" />
     <Reference Include="System.Xml.Linq" />
@@ -53,19 +63,35 @@
     <Compile Include="IsoType.cs" />
     <Compile Include="IsoValue.cs" />
     <Compile Include="ITraceNumberGenerator.cs" />
-    <Compile Include="Parse\AlphaNumericParseInfo.cs" />
+    <Compile Include="MessageFactory.cs" />
+    <Compile Include="Parse\AlphaNumericFieldParseInfo.cs" />
     <Compile Include="Parse\AlphaParseInfo.cs" />
     <Compile Include="Parse\AmountParseInfo.cs" />
     <Compile Include="Parse\BinaryParseInfo.cs" />
+    <Compile Include="Parse\ConfigParser.cs" />
     <Compile Include="Parse\Date10ParseInfo.cs" />
     <Compile Include="Parse\Date12ParseInfo.cs" />
+    <Compile Include="Parse\Date14ParseInfo.cs" />
     <Compile Include="Parse\Date4ParseInfo.cs" />
+    <Compile Include="Parse\DateExpParseInfo.cs" />
     <Compile Include="Parse\DateTimeParseInfo.cs" />
     <Compile Include="Parse\FieldParseInfo.cs" />
+    <Compile Include="Parse\LlbinParseInfo.cs" />
+    <Compile Include="Parse\LllbinParseInfo.cs" />
+    <Compile Include="Parse\LlllbinParseInfo.cs" />
+    <Compile Include="Parse\LlllvarParseInfo.cs" />
+    <Compile Include="Parse\LllvarParseInfo.cs" />
+    <Compile Include="Parse\LlvarParseInfo.cs" />
+    <Compile Include="Parse\NumericParseInfo.cs" />
+    <Compile Include="Parse\TimeParseInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Util\Arrays.cs" />
     <Compile Include="Util\Bcd.cs" />
+    <Compile Include="Util\BitSet.cs" />
     <Compile Include="Util\DateUtil.cs" />
     <Compile Include="Util\HexCodec.cs" />
+    <Compile Include="Util\ObjectCopier.cs" />
+    <Compile Include="Util\StringUtil.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

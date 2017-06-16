@@ -5,7 +5,7 @@ namespace ModIso8583.Parse
     /// <summary>
     ///     This is the class used to parse ALPHA fields.
     /// </summary>
-    public class AlphaParseInfo : AlphaNumericParseInfo
+    public class AlphaParseInfo : AlphaNumericFieldParseInfo
     {
         public AlphaParseInfo(int length) : base(IsoType.ALPHA,
             length)

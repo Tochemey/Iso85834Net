@@ -16,7 +16,7 @@ namespace ModIso8583.Parse
             if (pos < 0) throw new Exception($"Invalid DATE12 field {field} position {pos}");
             if (pos + 12 > buf.Length) throw new Exception($"Insufficient data for DATE12 field {field}, pos {pos}");
 
-            DateTimeOffset calendar;
+            DateTime calendar;
             int year;
             if (ForceStringDecoding)
             {
@@ -25,7 +25,7 @@ namespace ModIso8583.Parse
                     2));
                 if (year > 50) year = 1900 + year;
                 else year = 2000 + year;
-                calendar = new DateTimeOffset(year,
+                calendar = new DateTime(year,
                     int.Parse(Encoding.GetString(buf,
                         pos,
                         2)),
@@ -40,32 +40,28 @@ namespace ModIso8583.Parse
                         2)),
                     int.Parse(Encoding.GetString(buf,
                         pos + 8,
-                        2)),
-                    0,
-                    TimeSpan.Zero);
+                        2)));
             }
             else
             {
                 year = (buf[pos] - 48) * 10 + buf[pos + 1] - 48;
                 if (year > 50) year = 1900 + year;
                 else year = 2000 + year;
-                calendar = new DateTimeOffset(year,
+                calendar = new DateTime(year,
                     (buf[pos + 2] - 48) * 10 + buf[pos + 3] - 49,
                     (buf[pos + 4] - 48) * 10 + buf[pos + 5] - 48,
                     (buf[pos + 6] - 48) * 10 + buf[pos + 7] - 48,
                     (buf[pos + 8] - 48) * 10 + buf[pos + 9] - 48,
-                    (buf[pos + 10] - 48) * 10 + buf[pos + 11] - 48,
-                    0,
-                    TimeSpan.Zero);
+                    (buf[pos + 10] - 48) * 10 + buf[pos + 11] - 48);
             }
 
             if (TimeZoneInfo != null)
                 calendar = TimeZoneInfo.ConvertTime(calendar,
                     TimeZoneInfo);
-
-            calendar = AdjustWithFutureTolerance(calendar);
+            calendar.AddMilliseconds(0);
+            var ajusted = AdjustWithFutureTolerance(new DateTimeOffset(calendar));
             return new IsoValue(IsoType,
-                calendar.DateTime);
+                ajusted.DateTime);
         }
 
         public override IsoValue ParseBinary(int field,
@@ -83,21 +79,19 @@ namespace ModIso8583.Parse
             int year;
             if (tens[0] > 50) year = 1900 + tens[0];
             else year = 2000 + tens[0];
-            var calendar = new DateTimeOffset(year,
+            var calendar = new DateTime(year,
                 tens[1] - 1,
                 tens[2],
                 tens[3],
                 tens[4],
-                tens[5],
-                0,
-                TimeSpan.Zero);
+                tens[5]).AddMilliseconds(0);
             if (TimeZoneInfo != null)
                 calendar = TimeZoneInfo.ConvertTime(calendar,
                     TimeZoneInfo);
 
-            calendar = AdjustWithFutureTolerance(calendar);
+            var ajusted = AdjustWithFutureTolerance(new DateTimeOffset(calendar));
             return new IsoValue(IsoType,
-                calendar.DateTime);
+                ajusted.DateTime);
         }
     }
 }

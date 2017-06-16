@@ -5,9 +5,9 @@ namespace ModIso8583.Parse
     /// <summary>
     ///     This is the common abstract superclass to parse ALPHA and NUMERIC field types.
     /// </summary>
-    public abstract class AlphaNumericParseInfo : FieldParseInfo
+    public abstract class AlphaNumericFieldParseInfo : FieldParseInfo
     {
-        public AlphaNumericParseInfo(IsoType isoType,
+        public AlphaNumericFieldParseInfo(IsoType isoType,
             int length) : base(isoType,
             length)
         { }
