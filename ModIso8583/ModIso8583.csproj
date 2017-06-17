@@ -89,6 +89,7 @@
     <Compile Include="Util\Bcd.cs" />
     <Compile Include="Util\BitSet.cs" />
     <Compile Include="Util\DateUtil.cs" />
+    <Compile Include="Util\Enumm.cs" />
     <Compile Include="Util\HexCodec.cs" />
     <Compile Include="Util\ObjectCopier.cs" />
     <Compile Include="Util\StringUtil.cs" />

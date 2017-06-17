@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System;
+using System.Text;
 
 namespace ModIso8583.Parse
 {
@@ -6,8 +7,6 @@ namespace ModIso8583.Parse
     ///     This class stores the necessary information for parsing an ISO8583 field
     ///     inside a message.
     /// </summary>
-    /// <typeparam name="T"></typeparam>
-    /// <typeparam name="TR"></typeparam>
     public abstract class FieldParseInfo
     {
         public FieldParseInfo(IsoType isoType,
@@ -74,6 +73,70 @@ namespace ModIso8583.Parse
                 case 4: return (buf[pos] - 48) * 1000 + (buf[pos + 1] - 48) * 100 + (buf[pos + 2] - 48) * 10 + (buf[pos + 3] - 48);
             }
             return -1;
+        }
+
+        public static FieldParseInfo GetInstance(IsoType t,
+            int len,
+            Encoding encoding)
+        {
+            FieldParseInfo fpi = null;
+            switch (t)
+            {
+                case IsoType.ALPHA:
+                    fpi = new AlphaParseInfo(len);
+                    break;
+                case IsoType.AMOUNT:
+                    fpi = new AmountParseInfo();
+                    break;
+                case IsoType.BINARY:
+                    fpi = new BinaryParseInfo(len);
+                    break;
+                case IsoType.DATE10:
+                    fpi = new Date10ParseInfo();
+                    break;
+                case IsoType.DATE12:
+                    fpi = new Date12ParseInfo();
+                    break;
+                case IsoType.DATE14:
+                    fpi = new Date14ParseInfo();
+                    break;
+                case IsoType.DATE4:
+                    fpi = new Date4ParseInfo();
+                    break;
+                case IsoType.DATE_EXP:
+                    fpi = new DateExpParseInfo();
+                    break;
+                case IsoType.LLBIN:
+                    fpi = new LlbinParseInfo();
+                    break;
+                case IsoType.LLLBIN:
+                    fpi = new LllbinParseInfo();
+                    break;
+                case IsoType.LLLVAR:
+                    fpi = new LllvarParseInfo();
+                    break;
+                case IsoType.LLVAR:
+                    fpi = new LlvarParseInfo();
+                    break;
+                case IsoType.NUMERIC:
+                    fpi = new NumericParseInfo(len);
+                    break;
+                case IsoType.TIME:
+                    fpi = new TimeParseInfo();
+                    break;
+                case IsoType.LLLLVAR:
+                    fpi = new LlllvarParseInfo();
+                    break;
+                case IsoType.LLLLBIN:
+                    fpi = new LlllbinParseInfo();
+                    break;
+            }
+            if (fpi == null)
+            {
+                throw new ArgumentException(String.Format("Cannot parse type {0}", t));
+            }
+            fpi.Encoding = (encoding);
+            return fpi;
         }
     }
 }

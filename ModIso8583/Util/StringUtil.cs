@@ -13,8 +13,6 @@ namespace ModIso8583.Util
         private const string SAFE = ":~!@#$%^&*()-_+=/\\,.[]{}|?<>";
         private const string PRINTABLE = ": ~`!@#$%^&*()-_+=/\\,.[]{}|?<>\"'";
 
-        private static readonly PhoneNumberUtil phoneNumberUtil = PhoneNumberUtil.GetInstance();
-
         private static readonly Dictionary<string, string> IpPatterns = new Dictionary<string, string>(0);
 
 
@@ -373,25 +371,6 @@ namespace ModIso8583.Util
         {
             const string regex = "^(?:[0-9] ?){6,14}[0-9]$";
             return new Regex(regex).IsMatch(string0);
-        }
-
-        /// <summary>
-        ///     checks whether a phone number is a valid number
-        /// </summary>
-        /// <param name="string0">the phone number</param>
-        /// <param name="countryCode">the country code</param>
-        /// <returns></returns>
-        public static bool IsTruePhoneNumber(this string string0,
-            string countryCode)
-        {
-            try
-            {
-                var number = phoneNumberUtil.Parse(string0,
-                    countryCode);
-                return phoneNumberUtil.IsValidNumberForRegion(number,
-                    countryCode);
-            }
-            catch (Exception) { return false; }
         }
 
         /// <summary>
