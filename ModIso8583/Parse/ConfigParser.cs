@@ -19,7 +19,7 @@ namespace ModIso8583.Parse
     {
         private static readonly Logger logger = new LoggerConfiguration().WriteTo.ColoredConsole().CreateLogger();
 
-        public static MessageFactory<IsoMessage> createDefault() { throw new NotImplementedException(); }
+        public static MessageFactory<IsoMessage> CreateDefault() { throw new NotImplementedException(); }
 
         private static void ParseHeaders<T>(XmlNodeList nodes,
             MessageFactory<T> mfact) where T : IsoMessage
@@ -27,7 +27,7 @@ namespace ModIso8583.Parse
             C5.ArrayList<XmlElement> refs = null;
             for (var i = 0; i < nodes.Count; i++)
             {
-                var elem = (XmlElement) nodes.Item(i);
+                var elem = (XmlElement)nodes.Item(i);
                 if (elem != null)
                 {
                     var type = ParseType(elem.GetAttribute("type"));
@@ -89,7 +89,7 @@ namespace ModIso8583.Parse
             ArrayList<XmlElement> subs = null;
             for (var i = 0; i < nodes.Count; i++)
             {
-                var elem = (XmlElement) nodes.Item(i);
+                var elem = (XmlElement)nodes.Item(i);
                 if (elem == null) continue;
                 var type = ParseType(elem.GetAttribute("type"));
                 if (type == -1) throw new IOException("Invalid ISO8583 type for template: " + elem.GetAttribute("type"));
@@ -99,13 +99,13 @@ namespace ModIso8583.Parse
                     subs.Add(elem);
                     continue;
                 }
-                var m = (T) new IsoMessage();
+                var m = (T)new IsoMessage();
                 m.Type = type;
                 m.Encoding = mfact.Encoding;
                 var fields = elem.GetElementsByTagName("field");
                 for (var j = 0; j < fields.Count; j++)
                 {
-                    var f = (XmlElement) fields.Item(j);
+                    var f = (XmlElement)fields.Item(j);
                     if (f.ParentNode != elem) continue;
                     var num = int.Parse(f.GetAttribute("num"));
                     var v = GetTemplateField(f,
@@ -126,6 +126,17 @@ namespace ModIso8583.Parse
             return ((type[0] - 48) << 12) | ((type[1] - 48) << 8) | ((type[2] - 48) << 4) | (type[3] - 48);
         }
 
+        /// <summary>
+        /// Creates an IsoValue from the XML definition in a message template.
+        /// If it's for a toplevel field and the message factory has a codec for this field,
+        /// that codec is assigned to that field. For nested fields, a CompositeField is
+        /// created and populated.
+        /// </summary>
+        /// <returns>The template field.</returns>
+        /// <param name="f">xml element</param>
+        /// <param name="mfact">message factory</param>
+        /// <param name="toplevel">If set to <c>true</c> toplevel.</param>
+        /// <typeparam name="T">The 1st type parameter.</typeparam>
         private static IsoValue GetTemplateField<T>(XmlElement f,
             MessageFactory<T> mfact,
             bool toplevel) where T : IsoMessage
@@ -142,7 +153,7 @@ namespace ModIso8583.Parse
                 var cf = new CompositeField();
                 for (var j = 0; j < subs.Count; j++)
                 {
-                    var sub = (XmlElement) subs.Item(j);
+                    var sub = (XmlElement)subs.Item(j);
                     if (sub != null && sub.ParentNode != f) continue;
                     var sv = GetTemplateField(sub,
                         mfact,
@@ -198,7 +209,7 @@ namespace ModIso8583.Parse
                 var combo = new CompositeField();
                 for (var i = 0; i < subs.Count; i++)
                 {
-                    var sf = (XmlElement) subs.Item(i);
+                    var sf = (XmlElement)subs.Item(i);
                     Debug.Assert(sf != null,
                         "sf != null");
                     if (sf.ParentNode == f)
@@ -209,5 +220,111 @@ namespace ModIso8583.Parse
             }
             return fpi;
         }
+
+        private static void ParseGuides<T>(XmlNodeList nodes,
+            MessageFactory<T> mfact) where T : IsoMessage
+        {
+            ArrayList<XmlElement> subs = null;
+            HashDictionary<int, HashDictionary<int, FieldParseInfo>> guides = new HashDictionary<int, HashDictionary<int, FieldParseInfo>>();
+            for (int i = 0; i < nodes.Count; i++)
+            {
+                XmlElement elem = (XmlElement)nodes.Item(i);
+                if (elem != null)
+                {
+                    int type = ParseType(elem.GetAttribute("type"));
+                    if (type == -1)
+                    {
+                        throw new IOException("Invalid ISO8583 type for parse guide: " + elem.GetAttribute("type"));
+                    }
+                    if (elem.GetAttribute("extends") != null && !elem.GetAttribute("extends").IsEmpty())
+                    {
+                        if (subs == null)
+                        {
+                            subs = new ArrayList<XmlElement>(nodes.Count - i);
+                        }
+                        subs.Add(elem);
+                        continue;
+                    }
+                    HashDictionary<int, FieldParseInfo> parseMap = new HashDictionary<int, FieldParseInfo>();
+                    XmlNodeList fields = elem.GetElementsByTagName("field");
+                    for (int j = 0; j < fields.Count; j++)
+                    {
+                        XmlElement f = (XmlElement)fields.Item(j);
+                        if (f != null && f.ParentNode == elem)
+                        {
+                            int num = int.Parse(f.GetAttribute("num"));
+                            parseMap.Add(num, GetParser(f, mfact));
+                        }
+                    }
+
+                    mfact.SetParseMap(type, parseMap);
+                    guides.Add(type, parseMap);
+                }
+            }
+            if (subs != null)
+            {
+                foreach (XmlElement elem in subs)
+                {
+                    int type = ParseType(elem.GetAttribute("type"));
+                    int @ref = ParseType(elem.GetAttribute("extends"));
+                    if (@ref == -1)
+                    {
+                        throw new ArgumentException("Message template "
+                                + elem.GetAttribute("type") + " extends invalid template "
+                                + elem.GetAttribute("extends"));
+                    }
+                    HashDictionary<int, FieldParseInfo> parent = guides[@ref];
+                    if (parent == null)
+                    {
+                        throw new ArgumentException("Parsing guide "
+                                + elem.GetAttribute("type") + " extends nonexistent guide "
+                                + elem.GetAttribute("extends"));
+                    }
+                    HashDictionary<int, FieldParseInfo> child = new HashDictionary<int, FieldParseInfo>();
+                    child.AddAll(parent);
+                    ArrayList<XmlElement> fields = GetDirectChildrenByTagName(elem, "field");
+                    foreach (XmlElement f in fields)
+                    {
+                        int num = int.Parse(f.GetAttribute("num"));
+                        string typedef = f.GetAttribute("type");
+                        if ("exclude".Equals(typedef))
+                        {
+                            child.Remove(num);
+                        }
+                        else
+                        {
+                            child.Add(num, GetParser(f, mfact));
+                        }
+                    }
+                    mfact.SetParseMap(type, child);
+                    guides.Add(type, child);
+                }
+            }
+        }
+
+        private static ArrayList<XmlElement> GetDirectChildrenByTagName(XmlElement elem, string tagName)
+        {
+            ArrayList<XmlElement> childElementsByTagName = new ArrayList<XmlElement>();
+            var childNodes = elem.ChildNodes;
+            for (int i = 0; i < childNodes.Count; i++)
+            {
+                if (childNodes.Item(i).NodeType == XmlNodeType.Element)
+                {
+                    XmlElement childElem = (XmlElement)childNodes.Item(i);
+                    if (childElem.Name.Equals(tagName))
+                    {
+                        childElementsByTagName.Add(childElem);
+                    }
+                }
+            }
+            return childElementsByTagName;
+        }
+
+        private static void Parse<T>(MessageFactory<T> mfact) where T : IsoMessage
+        {
+            XmlDocument xmldoc = new XmlDocument();
+            //todo continue the implementation of the parse method
+        }
+
     }
 }
