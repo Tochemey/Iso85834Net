@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Text;
 using C5;
 using ModIso8583.Parse;
@@ -111,9 +109,9 @@ namespace ModIso8583
 
         public ICustomField GetCustomField(int index) { return customFields[index]; }
 
-        protected T CreateIsoMessageWithBinaryHeader(byte[] binHeader) { return (T) new IsoMessage(binHeader); }
+        protected T CreateIsoMessageWithBinaryHeader(byte[] binHeader) { return (T)new IsoMessage(binHeader); }
 
-        protected T CreateIsoMessage(string isoHeader) { return (T) new IsoMessage(isoHeader); }
+        protected T CreateIsoMessage(string isoHeader) { return (T)new IsoMessage(isoHeader); }
 
         /// <summary>
         ///     Creates a new message of the specified type, with optional trace and date values as well
@@ -139,7 +137,7 @@ namespace ModIso8583
                 for (var i = 2; i < 128; i++)
                     if (templ.HasField(i))
                         m.SetField(i,
-                            (IsoValue) templ.GetField(i).Clone());
+                            (IsoValue)templ.GetField(i).Clone());
             if (TraceGenerator != null)
                 m.SetValue(11,
                     TraceGenerator.NextTrace(),
@@ -619,7 +617,7 @@ namespace ModIso8583
             parseMap.Add(type, map);
             ArrayList<int> index = new ArrayList<int>();
             index.AddAll(map.Keys);
-            
+
             logger.Warning($"ISO8583 MessageFactory adding parse map for type {type:X} with fields {index}");
             parseOrder.Add(type, index);
         }

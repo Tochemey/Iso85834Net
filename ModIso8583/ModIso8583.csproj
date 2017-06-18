@@ -93,9 +93,13 @@
     <Compile Include="Util\HexCodec.cs" />
     <Compile Include="Util\ObjectCopier.cs" />
     <Compile Include="Util\StringUtil.cs" />
+    <Compile Include="Impl\SimpleTraceGenerator.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Impl\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
