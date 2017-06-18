@@ -8,6 +8,8 @@ using ModIso8583.Util;
 using Serilog;
 using Serilog.Events;
 using Logger = Serilog.Core.Logger;
+using System.Net.Http;
+using System.Net;
 
 namespace ModIso8583.Parse
 {
@@ -19,7 +21,29 @@ namespace ModIso8583.Parse
     {
         private static readonly Logger logger = new LoggerConfiguration().WriteTo.ColoredConsole().CreateLogger();
 
-        public static MessageFactory<IsoMessage> CreateDefault() { throw new NotImplementedException(); }
+        /// <summary>
+        /// Creates a message factory configured from the default file, which is n8583.xml
+        /// located in the app domain base directory.
+        /// </summary>
+        /// <returns>The default.</returns>
+        public static MessageFactory<IsoMessage> CreateDefault()
+        {
+            MessageFactory<IsoMessage> mfact = new MessageFactory<IsoMessage>();
+            ConfigureFromDefault(mfact);
+            return mfact;
+        }
+
+        /// <summary>
+        /// Creates a message factory from the file located at the specified URL
+        /// </summary>
+        /// <returns>The url of the config file</returns>
+        /// <param name="url">URL.</param>
+        public static async System.Threading.Tasks.Task<MessageFactory<IsoMessage>> CreateFromUrlAsync(Uri url)
+        {
+            MessageFactory<IsoMessage> mfact = new MessageFactory<IsoMessage>();
+            await ConfigureFromUrlAsync(mfact, url);
+            return mfact;
+        }
 
         private static void ParseHeaders<T>(XmlNodeList nodes,
             MessageFactory<T> mfact) where T : IsoMessage
@@ -320,11 +344,109 @@ namespace ModIso8583.Parse
             return childElementsByTagName;
         }
 
-        private static void Parse<T>(MessageFactory<T> mfact) where T : IsoMessage
+        /// <summary>
+        /// Reads the XML from the stream and configures the message factory with its values.
+        /// </summary>
+        /// <returns></returns>
+        /// <param name="mfact">The message factory to be configured with the values read from the XML.</param>
+        /// <param name="source">The InputSource containing the XML configuration</param>
+        /// <typeparam name="T"></typeparam>
+        private static void Parse<T>(MessageFactory<T> mfact, Stream source) where T : IsoMessage
         {
-            XmlDocument xmldoc = new XmlDocument();
-            //todo continue the implementation of the parse method
+            try
+            {
+                XmlDocument xmlDoc = new XmlDocument();
+                xmlDoc.Load(source);
+                XmlElement root = xmlDoc.DocumentElement;
+                ParseHeaders(root.GetElementsByTagName("header"), mfact);
+                ParseTemplates(root.GetElementsByTagName("template"), mfact);
+                //Read the parsing guides
+                ParseGuides(root.GetElementsByTagName("parse"), mfact);
+            }
+            catch (Exception e)
+            {
+                logger.Error($"ISO8583 Cannot parse XML configuration {e.ToString()}");
+                return;
+            }
         }
 
+        /// <summary>
+        /// Configures a MessageFactory using the configuration file at the path specified (will be searched
+        /// from the application domain
+        /// </summary>
+        /// <param name="mfact">The message factory to be configured with the values read from the XML.</param>
+        /// <param name="path">Path.</param>
+        /// <typeparam name="T"></typeparam>
+        public static void ConfigureFromClasspathConfig<T>(MessageFactory<T> mfact, string path) where T : IsoMessage
+        {
+            try
+            {
+                string f = AppDomain.CurrentDomain.BaseDirectory + path;
+                using (FileStream fsSource = new FileStream(f, FileMode.Open, FileAccess.Read))
+                {
+                    logger.Debug("ISO8583 Parsing config from classpath file {Path}", path);
+                    Parse(mfact, fsSource);
+                }
+            }
+            catch (FileNotFoundException)
+            {
+                logger.Warning("ISO8583 File not found in classpath: {Path}", path);
+            }
+        }
+
+        /// <summary>
+        /// This method attempts to open a stream from the XML configuration in the specified URL and
+        /// configure the message factory from that config.
+        /// </summary>
+        /// <param name="mfact">The message factory to be configured with the values read from the XML.</param>
+        /// <param name="url">The URL of the config file</param>
+        /// <typeparam name="T"></typeparam>
+        public static async System.Threading.Tasks.Task ConfigureFromUrlAsync<T>(MessageFactory<T> mfact, Uri url) where T : IsoMessage
+        {
+            try
+            {
+                HttpClient client = new HttpClient();
+                using (client)
+                {
+                    var stream = await client.GetStreamAsync(url);
+                    logger.Debug("ISO8583 Parsing config from classpath file {Path}", url.ToString());
+                    Parse(mfact, stream);
+                }
+            }
+            catch (Exception e)
+            {
+                logger.Warning("ISO8583 File not found in classpath: {Path}", url.ToString());
+                throw e;
+            }
+        }
+
+        /// <summary>
+        /// Configures a MessageFactory using the default configuration file n8583.xml.
+        /// This is useful if you have a MessageFactory created
+        /// </summary>
+        /// <param name="mfact">The message factory to be configured with the values read from the XML.</param>
+        /// <typeparam name="T"></typeparam>
+        public static void ConfigureFromDefault<T>(MessageFactory<T> mfact) where T : IsoMessage
+        {
+            string configFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "n8583.xml");
+            if (!File.Exists(configFile))
+            {
+                logger.Warning("ISO8583 config file n8583.xml not found!");
+                throw new FileNotFoundException("n8583.xml not found!");
+            }
+            try
+            {
+                using (FileStream fsSource = new FileStream(configFile, FileMode.Open, FileAccess.Read))
+                {
+                    logger.Debug("ISO8583 Parsing config from classpath file {Path}", configFile);
+                    Parse(mfact, fsSource);
+                }
+            }
+            catch (Exception e)
+            {
+                logger.Error("Error while parsing the config file" + e.ToString());
+                throw e;
+            }
+        }
     }
 }
