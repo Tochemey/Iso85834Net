@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using ModIso8583.Util;
+using C5;
 
 namespace ModIso8583
 {
@@ -120,7 +121,7 @@ namespace ModIso8583
         /// </summary>
         /// <param name="values"></param>
         /// <returns></returns>
-        public IsoMessage SetFields(Dictionary<int, IsoValue> values)
+        public IsoMessage SetFields(HashDictionary<int, IsoValue> values)
         {
             foreach (var isoValue in values)
                 SetField(isoValue.Key,
