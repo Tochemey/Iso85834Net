@@ -138,7 +138,7 @@ namespace ModIso8583.Codecs
 
         public CompositeField AddValue(IsoValue value)
         {
-            if (value == null) Values = new ArrayList<IsoValue>(4);
+            if (Values == null) Values = new ArrayList<IsoValue>(4);
             Values.Add(value);
             return this;
         }
