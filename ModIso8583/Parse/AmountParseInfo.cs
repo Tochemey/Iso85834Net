@@ -25,8 +25,8 @@ namespace ModIso8583.Parse
 
             try
             {
-                var d = double.Parse(v) / 100;
-                var dec = new decimal(d);
+                var d = decimal.Parse(v) / 100;
+                var dec = d;
                 return new IsoValue(IsoType,
                     dec,
                     Length);

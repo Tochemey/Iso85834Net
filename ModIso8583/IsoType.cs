@@ -157,115 +157,148 @@ namespace ModIso8583
             }
         }
 
-        /// <summary>
-        ///     Formats the string to the given length (length is only useful if type is ALPHA, NUMERIC or BINARY).
-        /// </summary>
-        /// <param name="isoType">the IsoType</param>
-        /// <param name="value">the IsoType value</param>
-        /// <param name="length">the IsoType length</param>
-        /// <returns></returns>
-        public static string Format(this IsoType isoType,
-            string value,
-            int length)
+
+        public static string Format(this IsoType isoType, string value, int length)
         {
             if (isoType == IsoType.ALPHA)
             {
-                var c = new char[length];
+                char[] c = new char[length];
+                if (value == null)
+                {
+                    value = string.Empty;
+                }
                 if (value.Length > length)
-                    return value.Substring(0,
-                        length);
-                if (value.Length == length) return value;
-                Array.Copy(value.ToCharArray(),
-                    c,
-                    value.Length);
-                for (var i = value.Length; i < length; i++) c[i] = ' ';
+                {
+                    return value.Substring(0, length);
+                }
+                if (value.Length == length)
+                {
+                    return value;
+                }
+                Array.Copy(value.ToCharArray(), c, value.Length);
+                for (int i = value.Length; i < length; i++)
+                {
+                    c[i] = ' ';
+                }
                 return new string(c);
             }
-
-            if (isoType == IsoType.LLLVAR || isoType == IsoType.LLVAR || isoType == IsoType.LLLLVAR) return value;
-
+            if (isoType == IsoType.LLVAR || isoType == IsoType.LLLVAR || isoType == IsoType.LLLLVAR)
+            {
+                return value;
+            }
             if (isoType == IsoType.NUMERIC)
             {
-                if (value.Length == length) return value;
-                var c = new char[length];
-                var x = value.ToCharArray();
-                if (x.Length > length) throw new ArgumentOutOfRangeException("Numeric value is larger than intended length");
-                var lim = c.Length - x.Length;
-                for (var i = 0; i < lim; i++) c[i] = '0';
-                Array.Copy(x,
-                    0,
-                    c,
-                    lim,
-                    x.Length);
+                char[] c = new char[length];
+                char[] x = value.ToCharArray();
+                if (x.Length > length)
+                {
+                    throw new ArgumentException("Numeric value is larger than intended length: " + value + " LEN " + length);
+                }
+                int lim = c.Length - x.Length;
+                for (int i = 0; i < lim; i++)
+                {
+                    c[i] = '0';
+                }
+                Array.Copy(x, 0, c, lim, x.Length);
                 return new string(c);
             }
-            throw new ArgumentException("IsoType must be ALPHA, LLVAR, LLLVAR, LLLLVAR or NUMERIC");
+
+            if (isoType == IsoType.AMOUNT)
+            {
+                return isoType.Format(
+                    (Convert.ToInt64(decimal.Parse(value) * 100)), 12);
+            }
+
+            if (isoType == IsoType.BINARY)
+            {
+
+                if (value == null)
+                {
+                    value = "";
+                }
+                if (value.Length > length)
+                {
+                    return value.Substring(0, length);
+                }
+                char[] c = new char[length];
+                int end = value.Length;
+                if (value.Length % 2 == 1)
+                {
+                    c[0] = '0';
+                    Array.Copy(value.ToCharArray(), 0, c, 1, value.Length);
+                    end++;
+                }
+                else
+                {
+                    Array.Copy(value.ToCharArray(), 0, c, 0, value.Length);
+                }
+                for (int i = end; i < c.Length; i++)
+                {
+                    c[i] = '0';
+                }
+                return new string(c);
+
+            }
+
+            if (isoType == IsoType.LLBIN || isoType == IsoType.LLLBIN || isoType == IsoType.LLLLBIN)
+            {
+                return value;
+            }
+            throw new ArgumentException("Cannot format String as " + isoType);
         }
 
-        /// <summary>
-        ///     Formats a number as an ISO8583 type.
-        /// </summary>
-        /// <param name="value">The number to format.</param>
-        /// <param name="t">The ISO8583 type to format the value as.</param>
-        /// <param name="length">The length to format to (in case of ALPHA or NUMERIC)</param>
-        /// <returns>The formatted string representation of the value.</returns>
-        public static string Format(this IsoType t,
-            long value,
-            int length)
+        public static string Format(this IsoType isoType, long value, int length)
         {
-            switch (t)
+            if (isoType == IsoType.NUMERIC)
             {
-                case IsoType.NUMERIC:
-                case IsoType.ALPHA:
-                    return Format(t,
-                        value.ToString(),
-                        length);
-                case IsoType.LLLVAR:
-                case IsoType.LLVAR:
-                case IsoType.LLLLVAR:
-                    return value.ToString();
-                case IsoType.AMOUNT:
-                    return value.ToString("0000000000") + "00";
+                string x = value.ToString().PadLeft(length,
+                    '0');
+                if (x.Length > length)
+                {
+                    throw new ArgumentException("Numeric value is larger than intended length: " + value + " LEN " + length);
+                }
+                return x;
             }
-            throw new ArgumentException("IsoType must be AMOUNT, NUMERIC, ALPHA, LLLVAR, LLLLVAR or LLVAR");
+            if (isoType == IsoType.ALPHA || isoType == IsoType.LLVAR || isoType == IsoType.LLLVAR || isoType == IsoType.LLLLVAR)
+            {
+                return   isoType.Format(Convert.ToString(value), length);
+            }
+            if (isoType == IsoType.AMOUNT)
+            {
+                string x = value.ToString().PadLeft(10,
+                    '0');
+                return $"{x}00";
+            }
+            if (isoType == IsoType.BINARY || isoType == IsoType.LLBIN || isoType == IsoType.LLLBIN || isoType == IsoType.LLLLBIN)
+            {
+                //TODO
+            }
+            throw new ArgumentException("Cannot format number as " + isoType);
         }
 
-        /// <summary>
-        ///     Formats a decimal value as an ISO8583 type.
-        /// </summary>
-        /// <param name="value">The decimal value to format.</param>
-        /// <param name="t">The ISO8583 type to format the value as.</param>
-        /// <param name="length">The length for the formatting, useful if the type is NUMERIC or ALPHA.</param>
-        /// <returns>The formatted string representation of the value.</returns>
-        public static string Format(this IsoType t,
-            decimal value,
-            int length)
+        public static string Format(this IsoType isoType,decimal value, int length)
         {
-            switch (t)
+            if (isoType == IsoType.AMOUNT)
             {
-                case IsoType.AMOUNT:
-                    var x = value.ToString("0000000000.00").ToCharArray();
-                    var digits = new char[12];
-                    Array.Copy(x,
-                        digits,
-                        10);
-                    Array.Copy(x,
-                        11,
-                        digits,
-                        10,
-                        2);
-                    return new string(digits);
-                case IsoType.NUMERIC:
-                case IsoType.ALPHA:
-                    return Format(t,
-                        value.ToString(CultureInfo.InvariantCulture),
-                        length);
-                case IsoType.LLVAR:
-                case IsoType.LLLVAR:
-                case IsoType.LLLLVAR:
-                    return value.ToString(CultureInfo.InvariantCulture);
+                char[] x = value.ToString("0000000000.00").ToCharArray();
+                char[] digits = new char[12];
+                Array.Copy(x, digits, 10);
+                Array.Copy(x, 11, digits, 10, 2);
+                return new string(digits);
             }
-            throw new ArgumentException("IsoType must be AMOUNT, NUMERIC, ALPHA, LLLLVAR, LLLVAR or LLVAR");
+            if (isoType == IsoType.NUMERIC)
+            {
+                return isoType.Format(Convert.ToInt64(value), length);
+            }
+            if (isoType == IsoType.ALPHA || isoType == IsoType.LLVAR || isoType == IsoType.LLLVAR || isoType == IsoType.LLLLVAR)
+            {
+                return isoType.Format(Convert.ToString(value), length);
+            }
+            if (isoType == IsoType.BINARY || isoType == IsoType.LLBIN || isoType == IsoType.LLLBIN || isoType == IsoType.LLLLBIN)
+            {
+                //TODO
+            }
+            throw new ArgumentException("Cannot format decimal as " + isoType);
         }
     }
 }

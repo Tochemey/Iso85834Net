@@ -20,7 +20,7 @@ namespace ModIso8583.Parse
         public int Length { get; }
         public bool ForceStringDecoding { get; }
         public ICustomField Decoder { get; set; }
-        public Encoding Encoding { get; set; }
+        public Encoding Encoding { get; set; } = Encoding.UTF8;
 
         /// <summary>
         ///     Parses the character data from the buffer and returns the IsoValue with the correct data type in it.
@@ -61,7 +61,7 @@ namespace ModIso8583.Parse
         {
             if (ForceStringDecoding)
             {
-                var string0 = Encoding.ASCII.GetString(buf,
+                var string0 = Encoding.GetString(buf,
                     pos,
                     digits);
                 return int.Parse(string0);
@@ -131,11 +131,8 @@ namespace ModIso8583.Parse
                     fpi = new LlllbinParseInfo();
                     break;
             }
-            if (fpi == null)
-            {
-                throw new ArgumentException(String.Format("Cannot parse type {0}", t));
-            }
-            fpi.Encoding = (encoding);
+            if (fpi == null) throw new ArgumentException($"Cannot parse type {t}");
+            fpi.Encoding = encoding;
             return fpi;
         }
     }

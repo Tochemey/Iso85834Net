@@ -12,7 +12,7 @@ namespace ModIso8583.Codecs
     /// </summary>
     public class CompositeField : ICustomBinaryField
     {
-        private List<FieldParseInfo> parsers;
+        private ArrayList<FieldParseInfo> parsers;
         public ArrayList<IsoValue> Values { get; set; }
 
         public object DecodeField(string value)
@@ -170,12 +170,12 @@ namespace ModIso8583.Codecs
 
         public CompositeField AddParser(FieldParseInfo fpi)
         {
-            if (parsers == null) parsers = new List<FieldParseInfo>(4);
+            if (parsers == null) parsers = new ArrayList<FieldParseInfo>(4);
             parsers.Add(fpi);
             return this;
         }
 
-        public List<FieldParseInfo> GetParsers() { return parsers; }
+        public ArrayList<FieldParseInfo> GetParsers() { return parsers; }
 
         public override string ToString()
         {

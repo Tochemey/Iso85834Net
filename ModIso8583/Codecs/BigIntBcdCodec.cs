@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Numerics;
 using ModIso8583.Util;
 
@@ -30,7 +31,7 @@ namespace ModIso8583.Codecs
         public byte[] EncodeBinaryField(object val)
         {
             var value = (BigInteger) val;
-            var s = value.ToString();
+            var s = value.ToString(NumberFormatInfo.InvariantInfo);
             var buf = new byte[s.Length / 2 + s.Length % 2];
             Bcd.Encode(s,
                 buf);

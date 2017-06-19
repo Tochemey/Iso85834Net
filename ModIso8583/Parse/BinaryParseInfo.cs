@@ -19,14 +19,18 @@ namespace ModIso8583.Parse
             ICustomField custom)
         {
             if (pos < 0) throw new Exception($"Invalid BINARY field {field} position {pos}");
-            if (pos + Length * 2 > buf.Length) throw new Exception($"Insufficient data for BINARY field {field} of length {Length}, pos {pos}");
+
+            if (pos + (Length * 2) > buf.Length) throw new Exception($"Insufficient data for BINARY field {field} of length {Length}, pos {pos}");
+
             var binval = HexCodec.HexDecode(Encoding.ASCII.GetString(buf,
                 pos,
                 Length * 2));
+
             if (custom == null)
                 return new IsoValue(IsoType,
                     binval,
                     binval.Length);
+
             var dec = custom.DecodeField(Encoding.GetString(buf,
                 pos,
                 Length * 2));

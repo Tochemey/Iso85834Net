@@ -25,34 +25,34 @@ namespace ModIso8583
 
         /// <summary>
         /// </summary>
-        private readonly HashDictionary<int, byte[]> binIsoHeaders = new HashDictionary<int, byte[]>();
+        private readonly HashDictionary<int, byte[]> _binIsoHeaders = new HashDictionary<int, byte[]>();
 
         /// <summary>
         ///     A map for the custom field encoder/decoders, keyed by field number.
         /// </summary>
-        private readonly HashDictionary<int, ICustomField> customFields = new HashDictionary<int, ICustomField>();
+        private readonly HashDictionary<int, ICustomField> _customFields = new HashDictionary<int, ICustomField>();
 
         /// <summary>
         ///     The ISO header to be included in each message type
         /// </summary>
-        private readonly HashDictionary<int, string> isoHeaders = new HashDictionary<int, string>();
+        private readonly HashDictionary<int, string> _isoHeaders = new HashDictionary<int, string>();
 
         /// <summary>
         ///     This map stores the message template for each message type.
         /// </summary>
-        private readonly HashDictionary<int, T> typeTemplates = new HashDictionary<int, T>();
+        private readonly HashDictionary<int, T> _typeTemplates = new HashDictionary<int, T>();
 
-        private Encoding encoding;
+        private Encoding _encoding;
 
         /// <summary>
         ///     Stores the information needed to parse messages sorted by type
         /// </summary>
-        protected HashDictionary<int, HashDictionary<int, FieldParseInfo>> parseMap = new HashDictionary<int, HashDictionary<int, FieldParseInfo>>();
+        protected HashDictionary<int, HashDictionary<int, FieldParseInfo>> ParseMap = new HashDictionary<int, HashDictionary<int, FieldParseInfo>>();
 
         /// <summary>
         ///     Stores the field numbers to be parsed, in order of appearance.
         /// </summary>
-        protected HashDictionary<int, ArrayList<int>> parseOrder = new HashDictionary<int, ArrayList<int>>();
+        protected HashDictionary<int, ArrayList<int>> ParseOrder = new HashDictionary<int, ArrayList<int>>();
 
         public ITraceNumberGenerator TraceGenerator { get; set; }
 
@@ -77,23 +77,23 @@ namespace ModIso8583
 
         public Encoding Encoding
         {
-            get => encoding;
+            get => _encoding;
             set
             {
-                encoding = value;
-                if (encoding == null) throw new ArgumentException("Cannot set null encoding.");
+                _encoding = value;
+                if (_encoding == null) throw new ArgumentException("Cannot set null encoding.");
 
-                if (!parseMap.IsEmpty) foreach (var mapValue in parseMap.Values) foreach (var fpi in mapValue.Values) fpi.Encoding = encoding;
+                if (!ParseMap.IsEmpty) foreach (var mapValue in ParseMap.Values) foreach (var fpi in mapValue.Values) fpi.Encoding = _encoding;
 
-                if (typeTemplates.IsEmpty) return;
+                if (_typeTemplates.IsEmpty) return;
 
-                foreach (var tmpl in typeTemplates.Values)
+                foreach (var tmpl in _typeTemplates.Values)
                 {
-                    tmpl.Encoding = encoding;
+                    tmpl.Encoding = _encoding;
                     for (var i = 2; i < 129; i++)
                     {
                         var v = tmpl.GetField(i);
-                        if (v != null) v.Encoding = encoding;
+                        if (v != null) v.Encoding = _encoding;
                     }
                 }
             }
@@ -103,11 +103,11 @@ namespace ModIso8583
         public void SetCustomField(int index,
             ICustomField value)
         {
-            customFields.Add(index,
+            _customFields.Add(index,
                 value);
         }
 
-        public ICustomField GetCustomField(int index) { return customFields[index]; }
+        public ICustomField GetCustomField(int index) { return _customFields[index]; }
 
         protected T CreateIsoMessageWithBinaryHeader(byte[] binHeader) { return (T)new IsoMessage(binHeader); }
 
@@ -122,7 +122,21 @@ namespace ModIso8583
         /// <returns></returns>
         public T NewIsoMessage(int type)
         {
-            var m = binIsoHeaders[type] != null ? CreateIsoMessageWithBinaryHeader(binIsoHeaders[type]) : CreateIsoMessage(isoHeaders[type]);
+            bool keyPresent = _binIsoHeaders.Contains(type);
+            byte[] val = null;
+            string valStr = string.Empty;
+
+            if (keyPresent)
+            {
+                _binIsoHeaders.Find(ref type,
+                    out val);
+            }
+            else
+            {
+                _isoHeaders.Find(ref type,
+                    out valStr);
+            }
+            var m = keyPresent? CreateIsoMessageWithBinaryHeader(val) : CreateIsoMessage(valStr);
             m.Type = type;
             m.Etx = Etx;
             m.Binary = UseBinary;
@@ -132,7 +146,7 @@ namespace ModIso8583
             m.ForceStringEncoding = ForceStringEncoding;
 
             //Copy the values from the template
-            IsoMessage templ = typeTemplates[type];
+            IsoMessage templ = _typeTemplates[type];
             if (templ != null)
                 for (var i = 2; i < 128; i++)
                     if (templ.HasField(i))
@@ -160,14 +174,14 @@ namespace ModIso8583
         /// <returns></returns>
         public T CreateResponse(T request)
         {
-            var resp = CreateIsoMessage(isoHeaders[request.Type + 16]);
+            var resp = CreateIsoMessage(_isoHeaders[request.Type + 16]);
             resp.Encoding = request.Encoding;
             resp.Binary = request.Binary;
             resp.BinBitmap = request.BinBitmap;
             resp.Type = request.Type + 16;
             resp.Etx = request.Etx;
             resp.Forceb2 = request.Forceb2;
-            IsoMessage templ = typeTemplates[resp.Type];
+            IsoMessage templ = _typeTemplates[resp.Type];
             if (templ == null)
             {
                 for (var i = 2; i < 128; i++)
@@ -198,7 +212,7 @@ namespace ModIso8583
             int field,
             TimeZoneInfo tz)
         {
-            var guide = parseMap[messageType];
+            var guide = ParseMap[messageType];
             if (guide != null)
             {
                 var fpi = guide[field];
@@ -248,12 +262,12 @@ namespace ModIso8583
             }
             else
             {
-                var string0 = encoding.GetString(buf,
+                var string0 = _encoding.GetString(buf,
                     0,
                     isoHeaderLength);
                 m = CreateIsoMessage(isoHeaderLength > 0 ? string0 : null);
             }
-            m.Encoding = encoding;
+            m.Encoding = _encoding;
             int type;
             if (UseBinary) { type = ((buf[isoHeaderLength] & 0xff) << 8) | (buf[isoHeaderLength + 1] & 0xff); }
             else if (ForceStringEncoding)
@@ -263,7 +277,13 @@ namespace ModIso8583
                     4);
                 type = short.Parse(string0);
             }
-            else { type = ((buf[isoHeaderLength] - 48) << 12) | ((buf[isoHeaderLength + 1] - 48) << 8) | ((buf[isoHeaderLength + 2] - 48) << 4) | (buf[isoHeaderLength + 3] - 48); }
+            else
+            {
+                type = ((buf[isoHeaderLength] - 48) << 12)
+                       | ((buf[isoHeaderLength + 1] - 48) << 8)
+                       | ((buf[isoHeaderLength + 2] - 48) << 4)
+                       | (buf[isoHeaderLength + 3] - 48);
+            }
             m.Type = type;
             //Parse the bitmap (primary first)
             var bs = new BitSet(64);
@@ -307,11 +327,11 @@ namespace ModIso8583
                     byte[] bitmapBuffer;
                     if (ForceStringEncoding)
                     {
-                        var _bb = Encoding.GetBytes(Encoding.GetString(buf,
+                        var bb = Encoding.GetBytes(Encoding.GetString(buf,
                             isoHeaderLength + 4,
                             16));
                         bitmapBuffer = new byte[36 + isoHeaderLength];
-                        Array.Copy(_bb,
+                        Array.Copy(bb,
                             0,
                             bitmapBuffer,
                             4 + isoHeaderLength,
@@ -414,8 +434,8 @@ namespace ModIso8583
             }
 
             //Parse each field
-            var parseGuide = parseMap[type];
-            var index = parseOrder[type];
+            var parseGuide = ParseMap[type];
+            var index = ParseOrder[type];
             if (index == null)
             {
                 logger.Error($"ISO8583 MessageFactory has no parsing guide for message type {type:X} [{Encoding.ASCII.GetString(buf)}]");
@@ -521,8 +541,8 @@ namespace ModIso8583
         /// <param name="value">A map where the keys are the message types and the values are the ISO headers.</param>
         public void SetIsoHeaders(HashDictionary<int, string> value)
         {
-            isoHeaders.Clear();
-            isoHeaders.AddAll(value);
+            _isoHeaders.Clear();
+            _isoHeaders.AddAll(value);
         }
 
         /// <summary>
@@ -533,12 +553,12 @@ namespace ModIso8583
         public void SetIsoHeader(int type,
             string value)
         {
-            if (string.IsNullOrEmpty(value)) { isoHeaders.Remove(type); }
+            if (string.IsNullOrEmpty(value)) { _isoHeaders.Remove(type); }
             else
             {
-                isoHeaders.Add(type,
+                _isoHeaders.Add(type,
                     value);
-                binIsoHeaders.Remove(type);
+                _binIsoHeaders.Remove(type);
             }
         }
 
@@ -549,7 +569,7 @@ namespace ModIso8583
         /// <returns></returns>
         public string GetIsoHeader(int type)
         {
-            return isoHeaders[type];
+            return _isoHeaders[type];
         }
 
         /// <summary>
@@ -560,12 +580,12 @@ namespace ModIso8583
         public void SetBinaryIsoHeader(int type,
             byte[] value)
         {
-            if (value == null) { binIsoHeaders.Remove(type); }
+            if (value == null) { _binIsoHeaders.Remove(type); }
             else
             {
-                binIsoHeaders.Add(type,
+                _binIsoHeaders.Add(type,
                     value);
-                isoHeaders.Remove(type);
+                _isoHeaders.Remove(type);
             }
         }
 
@@ -576,7 +596,7 @@ namespace ModIso8583
         /// <returns></returns>
         public byte[] GetBinaryIsoHeader(int type)
         {
-            return binIsoHeaders[type];
+            return _binIsoHeaders[type];
         }
 
         /// <summary>
@@ -587,7 +607,7 @@ namespace ModIso8583
         public void AddMessageTemplate(T templ)
         {
             if (templ != null)
-                typeTemplates.Add(templ.Type,
+                _typeTemplates.Add(templ.Type,
                     templ);
         }
 
@@ -597,7 +617,7 @@ namespace ModIso8583
         /// <param name="type"></param>
         public void RemoveMessageTemplate(int type)
         {
-            typeTemplates.Remove(type);
+            _typeTemplates.Remove(type);
         }
 
         /// <summary>
@@ -608,18 +628,18 @@ namespace ModIso8583
         /// <returns></returns>
         public T GetMessageTemplate(int type)
         {
-            return typeTemplates[type];
+            return _typeTemplates[type];
         }
 
         public void SetParseMap(int type,
             HashDictionary<int, FieldParseInfo> map)
         {
-            parseMap.Add(type, map);
+            ParseMap.Add(type, map);
             ArrayList<int> index = new ArrayList<int>();
             index.AddAll(map.Keys);
-
+            index.Sort();
             logger.Warning($"ISO8583 MessageFactory adding parse map for type {type:X} with fields {index}");
-            parseOrder.Add(type, index);
+            ParseOrder.Add(type, index);
         }
     }
 }

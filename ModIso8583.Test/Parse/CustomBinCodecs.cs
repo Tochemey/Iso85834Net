@@ -1,100 +1,218 @@
 ﻿using System;
 using System.Numerics;
-using ModIso8583.Codecs;
-using Xunit;
 using C5;
+using ModIso8583.Codecs;
 using ModIso8583.Parse;
 using ModIso8583.Util;
+using Xunit;
 
 namespace ModIso8583.Test.Parse
 {
     public class CustomBinCodecs
     {
-        private BigInteger b29 = BigInteger.Parse("12345678901234567890123456789");
-        byte[] longData2 = new byte[] { 0x12, 0x34, 0x56, 0x78, (byte)0x90, 00, 00, 00, 00, 00 };
-        byte[] bigintData1 = new byte[] { 1, 0x23, 0x45, 0x67, (byte)0x89, 1, 0x23, 0x45, 0x67, (byte)0x89, 1, 0x23, 0x45, 0x67, (byte)0x89, 00, 00, 00, 00, 00 };
+        private readonly BigInteger b29 = BigInteger.Parse("12345678901234567890123456789");
 
-
-        [Fact]
-        public void TestLongCodec()
+        private readonly byte[] longData2 =
         {
-            LongBcdCodec longCodec = new LongBcdCodec();
-            byte[] data1 = new byte[] { 1, 0x23, 0x45, (byte)0x67, (byte)0x89, 00, 00, 00, 00, 00 };
-            Assert.Equal(123456789L, (long)longCodec.DecodeBinaryField(data1, 0, 5));
-            Assert.Equal(1234567890L, (long)longCodec.DecodeBinaryField(longData2, 0, 5));
-            byte[] cod1 = longCodec.EncodeBinaryField(123456789L);
-            byte[] cod2 = longCodec.EncodeBinaryField(1234567890L);
-            for (int i = 0; i < 5; i++)
+            0x12,
+            0x34,
+            0x56,
+            0x78,
+            0x90,
+            00,
+            00,
+            00,
+            00,
+            00
+        };
+
+        private readonly byte[] bigintData1 =
+        {
+            1,
+            0x23,
+            0x45,
+            0x67,
+            0x89,
+            1,
+            0x23,
+            0x45,
+            0x67,
+            0x89,
+            1,
+            0x23,
+            0x45,
+            0x67,
+            0x89,
+            00,
+            00,
+            00,
+            00,
+            00
+        };
+
+        private void TestFieldType(IsoType type,
+            FieldParseInfo fieldParser,
+            int offset1,
+            int offset2)
+        {
+            var bigintCodec = new BigIntBcdCodec();
+            var longCodec = new LongBcdCodec();
+            var mfact = new MessageFactory<IsoMessage>();
+            var tmpl = new IsoMessage
             {
-                Assert.Equal(data1[i], cod1[i]);
-                Assert.Equal(longData2[i], cod2[i]);
+                Binary = true,
+                Type = 0x200
+            };
+            tmpl.SetValue(2,
+                1234567890L,
+                longCodec,
+                type,
+                0);
+            tmpl.SetValue(3,
+                b29,
+                bigintCodec,
+                type,
+                0);
+            mfact.AddMessageTemplate(tmpl);
+            mfact.SetCustomField(2,
+                longCodec);
+            mfact.SetCustomField(3,
+                bigintCodec);
+            var parser = new HashDictionary<int, FieldParseInfo>
+            {
+                {2, fieldParser},
+                {3, fieldParser}
+            };
+            mfact.SetParseMap(0x200,
+                parser);
+            mfact.UseBinary = true;
+
+            //Test encoding
+            tmpl = mfact.NewIsoMessage(0x200);
+            var buf = tmpl.WriteData();
+            var message = HexCodec.HexEncode(buf,
+                0,
+                buf.Length);
+            Console.WriteLine("MESSAGE: " + message);
+            for (var i = 0; i < 5; i++)
+            {
+                var b = longData2[i];
+                Assert.Equal(b,
+                    buf[i + offset1]);
             }
+            for (var i = 0; i < 15; i++)
+                Assert.Equal(bigintData1[i],
+                    buf[i + offset2]);
+
+            //Test parsing
+            tmpl = mfact.ParseMessage(buf,
+                0);
+            Assert.Equal(1234567890L,
+                tmpl.GetObjectValue(2));
+            Assert.Equal(b29,
+                tmpl.GetObjectValue(3));
         }
 
         [Fact]
         public void TestBigIntCodec()
         {
-            BigInteger b30 = BigInteger.Parse("123456789012345678901234567890");
-            BigIntBcdCodec bigintCodec = new BigIntBcdCodec();
-            byte[] data2 = new byte[] { 0x12, 0x34, 0x56, 0x78, (byte)0x90, 0x12, 0x34, 0x56, 0x78, (byte)0x90, 0x12, 0x34, 0x56, (byte)0x78, (byte)0x90, 00, 00, 00, 00, 00 };
-            Assert.Equal(b29, bigintCodec.DecodeBinaryField(bigintData1, 0, 15));
-            Assert.Equal(b30, bigintCodec.DecodeBinaryField(data2, 0, 15));
-            byte[] cod1 = bigintCodec.EncodeBinaryField(b29);
-            byte[] cod2 = bigintCodec.EncodeBinaryField(b30);
-            for (int i = 0; i < 15; i++)
+            var b30 = BigInteger.Parse("123456789012345678901234567890");
+            var bigintCodec = new BigIntBcdCodec();
+            byte[] data2 =
             {
-                Assert.Equal(bigintData1[i], cod1[i]);
-                Assert.Equal(data2[i], cod2[i]);
-            }
-        }
-
-        private void TestFieldType(IsoType type, ModIso8583.Parse.FieldParseInfo fieldParser, int offset1, int offset2)
-        {
-            BigIntBcdCodec bigintCodec = new BigIntBcdCodec();
-            LongBcdCodec longCodec = new LongBcdCodec();
-            MessageFactory<IsoMessage> mfact = new MessageFactory<IsoMessage>();
-            IsoMessage tmpl = new IsoMessage()
-            {
-                Binary = true,
-                Type = 0x200
+                0x12,
+                0x34,
+                0x56,
+                0x78,
+                0x90,
+                0x12,
+                0x34,
+                0x56,
+                0x78,
+                0x90,
+                0x12,
+                0x34,
+                0x56,
+                0x78,
+                0x90,
+                00,
+                00,
+                00,
+                00,
+                00
             };
-            tmpl.SetValue(2, 1234567890L, longCodec, type, 0);
-            tmpl.SetValue(3, b29, bigintCodec, type, 0);
-            mfact.AddMessageTemplate(tmpl);
-            mfact.SetCustomField(2, longCodec);
-            mfact.SetCustomField(3, bigintCodec);
-            HashDictionary<int, FieldParseInfo> parser = new HashDictionary<int, FieldParseInfo>();
-            parser.Add(2, fieldParser);
-            parser.Add(3, fieldParser);
-            mfact.SetParseMap(0x200, parser);
-            mfact.UseBinary = true;
-
-            //Test encoding
-            tmpl = mfact.NewIsoMessage(0x200);
-            byte[] buf = tmpl.WriteData();
-            Console.WriteLine("MESSAGE: " + HexCodec.HexEncode(buf, 0, buf.Length));
-            for (int i = 0; i < 5; i++)
+            Assert.Equal(b29,
+                bigintCodec.DecodeBinaryField(bigintData1,
+                    0,
+                    15));
+            Assert.Equal(b30,
+                bigintCodec.DecodeBinaryField(data2,
+                    0,
+                    15));
+            var cod1 = bigintCodec.EncodeBinaryField(b29);
+            var cod2 = bigintCodec.EncodeBinaryField(b30);
+            for (var i = 0; i < 15; i++)
             {
-                Assert.Equal(longData2[i], buf[i + offset1]);
+                Assert.Equal(bigintData1[i],
+                    cod1[i]);
+                Assert.Equal(data2[i],
+                    cod2[i]);
             }
-            for (int i = 0; i < 15; i++)
-            {
-                Assert.Equal(bigintData1[i], buf[i + offset2]);
-            }
-            //Test parsing
-            tmpl = mfact.ParseMessage(buf, 0);
-            Assert.Equal(1234567890L, tmpl.GetObjectValue(2));
-            Assert.Equal(b29, tmpl.GetObjectValue(3));
         }
 
         [Fact]
-        public void TestLLBIN(){
-            TestFieldType(IsoType.LLBIN, new LlbinParseInfo(), 11, 17);
+        public void TestLLBIN()
+        {
+            TestFieldType(IsoType.LLBIN,
+                new LlbinParseInfo(),
+                11,
+                17);
         }
 
         [Fact]
-        public void TestLLLBIN(){
-            TestFieldType(IsoType.LLLBIN, new LlbinParseInfo(), 12, 19);
+        public void TestLLLBIN()
+        {
+            TestFieldType(IsoType.LLLBIN,
+                new LllbinParseInfo(),
+                12,
+                19);
+        }
+
+
+        [Fact]
+        public void TestLongCodec()
+        {
+            var longCodec = new LongBcdCodec();
+            byte[] data1 =
+            {
+                1,
+                0x23,
+                0x45,
+                0x67,
+                0x89,
+                00,
+                00,
+                00,
+                00,
+                00
+            };
+            Assert.Equal(123456789L,
+                (long) longCodec.DecodeBinaryField(data1,
+                    0,
+                    5));
+            Assert.Equal(1234567890L,
+                (long) longCodec.DecodeBinaryField(longData2,
+                    0,
+                    5));
+            var cod1 = longCodec.EncodeBinaryField(123456789L);
+            var cod2 = longCodec.EncodeBinaryField(1234567890L);
+            for (var i = 0; i < 5; i++)
+            {
+                Assert.Equal(data1[i],
+                    cod1[i]);
+                Assert.Equal(longData2[i],
+                    cod2[i]);
+            }
         }
     }
 }

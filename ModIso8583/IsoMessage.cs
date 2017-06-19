@@ -12,7 +12,7 @@ namespace ModIso8583
 {
     public class IsoMessage
     {
-        private static readonly byte[] Hex = Encoding.ASCII.GetBytes(new[]
+        private static readonly byte[] Hex = Encoding.UTF8.GetBytes(new[]
         {
             '0',
             '1',
@@ -75,7 +75,7 @@ namespace ModIso8583
 
         public bool BinBitmap { get; set; }
 
-        public Encoding Encoding { get; set; }
+        public Encoding Encoding { get; set; } = Encoding.UTF8;
 
         /// <summary>
         ///     Returns the stored object value in a specified field. Fields
@@ -274,12 +274,10 @@ namespace ModIso8583
             var bs = new BitSet(Forceb2 ? 128 : 64);
             for (var i = 2; i < 129; i++)
                 if (fields[i] != null)
-                    bs.Set(i - 1,
-                        true);
+                    bs.Set(i - 1);
             if (Forceb2)
             {
-                bs.Set(0,
-                    true);
+                bs.Set(0);
             }
             else if (bs.Length > 64)
             {
@@ -287,8 +285,7 @@ namespace ModIso8583
                 var b2 = new BitSet(128);
                 b2.Or(bs);
                 bs = b2;
-                bs.Set(0,
-                    true);
+                bs.Set(0);
             }
             return bs;
         }

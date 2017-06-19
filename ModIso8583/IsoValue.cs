@@ -26,7 +26,7 @@ namespace ModIso8583
                     if (Encoder == null) { Length = value.ToString().Length; }
                     else
                     {
-                        var enc = Encoder.EncodeField(value) ?? (value == null ? string.Empty : value.ToString());
+                        var enc = Encoder.EncodeField(value) ?? (value?.ToString() ?? string.Empty);
                         Length = enc.Length;
                     }
                     if (t == IsoType.LLVAR && Length > 99) throw new ArgumentException("LLVAR can only hold values up to 99 chars");
@@ -40,7 +40,7 @@ namespace ModIso8583
                     {
                         if (value.GetType() == typeof(byte[]))
                         {
-                            object obj = value;
+                            var obj = value;
                             Length = ((byte[]) obj).Length;
                         }
                         else { Length = value.ToString().Length / 2 + value.ToString().Length % 2; }
@@ -48,7 +48,7 @@ namespace ModIso8583
                     else if (Encoder is ICustomBinaryField) { Length = ((ICustomBinaryField) Encoder).EncodeBinaryField(value).Length; }
                     else
                     {
-                        var enc = Encoder.EncodeField(value) ?? (value == null ? string.Empty : value.ToString());
+                        var enc = Encoder.EncodeField(value) ?? (value?.ToString() ?? string.Empty);
                         Length = enc.Length;
                     }
                     if (t == IsoType.LLBIN && Length > 99) throw new ArgumentException("LLBIN can only hold values up to 99 chars");
@@ -70,16 +70,13 @@ namespace ModIso8583
             Value = val;
             Length = len;
             Encoder = custom;
-            if (Length == 0 && t.NeedsLength())
-                throw new ArgumentException(string.Format("Length must be greater than zero for type {0} (value '{1}')",
-                    t,
-                    val));
+            if (Length == 0 && t.NeedsLength()) throw new ArgumentException($"Length must be greater than zero for type {t} (value '{val}')");
             switch (t)
             {
                 case IsoType.LLVAR:
                 case IsoType.LLLVAR:
                 case IsoType.LLLLVAR:
-                    if (len == 0) Length = Encoder?.EncodeField(Value).Length ?? val.ToString().Length;
+                    if (len == 0) Length = Encoder?.EncodeField(val).Length ?? val.ToString().Length;
                     if (t == IsoType.LLVAR && Length > 99) throw new ArgumentException("LLVAR can only hold values up to 99 chars");
                     if (t == IsoType.LLLVAR && Length > 999) throw new ArgumentException("LLLVAR can only hold values up to 999 chars");
                     if (t == IsoType.LLLLVAR && Length > 9999) throw new ArgumentException("LLLLVAR can only hold values up to 9999 chars");
@@ -91,12 +88,16 @@ namespace ModIso8583
                     {
                         if (Encoder == null)
                         {
-                            object obj = val;
+                            var obj = val;
                             Length = ((byte[]) obj).Length;
                         }
-                        else if (Encoder is ICustomBinaryField) { Length = ((ICustomBinaryField) custom).EncodeBinaryField(Value).Length; }
+                        else if (Encoder is ICustomBinaryField)
+                        {
+                            var customBinaryField = (ICustomBinaryField) custom;
+                            if (customBinaryField != null) Length = customBinaryField.EncodeBinaryField(Value).Length;
+                        }
                         else { Length = Encoder.EncodeField(Value).Length; }
-                        Length = Encoder?.EncodeField(Value).Length ?? ((byte[]) (object) val).Length;
+                        Length = Encoder?.EncodeField(Value).Length ?? ((byte[]) val).Length;
                     }
                     if (t == IsoType.LLBIN && Length > 99) throw new ArgumentException("LLBIN can only hold values up to 99 chars");
                     if (t == IsoType.LLLBIN && Length > 999) throw new ArgumentException("LLLBIN can only hold values up to 999 chars");
@@ -108,8 +109,10 @@ namespace ModIso8583
         public ICustomField Encoder { get; }
         public IsoType Type { get; }
         public int Length { get; }
-        public Encoding Encoding { get; set; }
+        public Encoding Encoding { get; set; } = Encoding.UTF8;
         public object Value { get; }
+
+        public object Clone() { return MemberwiseClone(); }
 
         public override string ToString()
         {
@@ -120,7 +123,7 @@ namespace ModIso8583
                 case IsoType.AMOUNT:
                     if (Type == IsoType.AMOUNT)
                         if (Value is decimal)
-                            return Type.Format((decimal) (object) Value,
+                            return Type.Format((decimal) Value,
                                 12);
                         else
                             return Type.Format(Value.ToString(),
@@ -129,7 +132,7 @@ namespace ModIso8583
                         return Type.Format(Encoder == null ? Value.ToString() : Encoder.EncodeField(Value),
                             Length);
                     else if (Value is long)
-                        return Type.Format((long) (object) Value,
+                        return Type.Format((long) Value,
                             Length);
                     else
                         return Type.Format(Encoder == null ? Value.ToString() : Encoder.EncodeField(Value),
@@ -141,13 +144,13 @@ namespace ModIso8583
                 case IsoType.LLLVAR:
                 case IsoType.LLLLVAR: return Encoder == null ? Value.ToString() : Encoder.EncodeField(Value);
             }
-            if (Value is DateTime) return Type.Format((DateTime) (object) Value);
+            if (Value is DateTime) return Type.Format((DateTime) Value);
             switch (Type)
             {
                 case IsoType.BINARY:
                     if (Value is byte[])
                     {
-                        var v = (byte[]) (object) Value;
+                        var v = (byte[]) Value;
                         return Type.Format(Encoder == null ? HexCodec.HexEncode(v,
                                 0,
                                 v.Length) : Encoder.EncodeField(Value),
@@ -163,22 +166,20 @@ namespace ModIso8583
                 case IsoType.LLLLBIN:
                     if (Value is byte[])
                     {
-                        var v = (byte[]) (object) Value;
+                        var v = (byte[]) Value;
                         return Encoder == null ? HexCodec.HexEncode(v,
                             0,
                             v.Length) : Encoder.EncodeField(Value);
                     }
                     else
                     {
-                        var _s = Encoder == null ? Value.ToString() : Encoder.EncodeField(Value);
-                        return _s.Length % 2 == 1 ? string.Format("0{0}",
-                            _s) : _s;
+                        var s = Encoder == null ? Value.ToString() : Encoder.EncodeField(Value);
+                        return s.Length % 2 == 1 ? string.Format("0{0}",
+                            s) : s;
                     }
             }
             return Encoder == null ? Value.ToString() : Encoder.EncodeField(Value);
         }
-
-        public object Clone() { return MemberwiseClone(); }
 
         protected void WriteLengthHeader(int l,
             Stream outs,
@@ -320,7 +321,7 @@ namespace ModIso8583
                 var missing = 0;
                 if (Value is byte[])
                 {
-                    var bytes = (byte[]) (object) Value;
+                    var bytes = (byte[]) Value;
                     outs.Write(bytes,
                         0,
                         bytes.Length);

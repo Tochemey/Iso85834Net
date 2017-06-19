@@ -68,7 +68,7 @@ namespace ModIso8583.Parse
             if (pos < 0) throw new Exception($"Invalid bin LLBIN field {field} position {pos}");
             if (pos + 1 > buf.Length) throw new Exception($"Insufficient bin LLBIN header field {field}");
 
-            var l = ((buf[pos] & 0xf0) >> 4) * 10 + (buf[pos] & 0x0f);
+            var l = (((buf[pos] & 0xf0) >> 4) * 10) + (buf[pos] & 0x0f);
             if (l < 0)
                 throw new Exception($"Invalid bin LLBIN length {l} pos {pos}");
             if (l + pos + 1 > buf.Length)
