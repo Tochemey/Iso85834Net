@@ -269,23 +269,23 @@ namespace ModIso8583
         ///     Creates a BitSet for the bitmap.
         /// </summary>
         /// <returns></returns>
-        protected BitSet CreateBitmapBitSet()
+        protected BitArray CreateBitmapBitSet()
         {
-            var bs = new BitSet(Forceb2 ? 128 : 64);
+            var bs = new BitArray(Forceb2 ? 128 : 64);
             for (var i = 2; i < 129; i++)
                 if (fields[i] != null)
-                    bs.Set(i - 1);
+                    bs.Set(i - 1, true);
             if (Forceb2)
             {
-                bs.Set(0);
+                bs.Set(0, true);
             }
             else if (bs.Length > 64)
             {
                 //Extend to 128 if needed
-                var b2 = new BitSet(128);
+                var b2 = new BitArray(128);
                 b2.Or(bs);
                 bs = b2;
-                bs.Set(0);
+                bs.Set(0, true);
             }
             return bs;
         }
@@ -332,9 +332,10 @@ namespace ModIso8583
                 try
                 {
                     var x = Type.ToString("x4");
-                    stream.Write(Encoding.GetBytes(x),
+                    byte[] bytes = Encoding.GetBytes(x);
+                    stream.Write(bytes,
                         0,
-                        4);
+                        bytes.Length);
                 }
                 catch (IOException)
                 {
@@ -361,7 +362,7 @@ namespace ModIso8583
             }
             else
             {
-                MemoryStream stream2 = null;
+                MemoryStream stream2 = new MemoryStream();
                 if (ForceStringEncoding)
                 {
                     stream2 = stream;
@@ -381,7 +382,7 @@ namespace ModIso8583
 
                 if (ForceStringEncoding)
                 {
-                    var hb = Encoding.GetString(stream.ToArray());
+                    var hb = Encoding.ASCII.GetString(stream.ToArray());
                     stream = stream2;
                     try
                     {

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Text;
 using C5;
 using ModIso8583.Parse;
@@ -42,7 +43,7 @@ namespace ModIso8583
         /// </summary>
         private readonly HashDictionary<int, T> _typeTemplates = new HashDictionary<int, T>();
 
-        private Encoding _encoding;
+        private Encoding _encoding = Encoding.UTF8;
 
         /// <summary>
         ///     Stores the information needed to parse messages sorted by type
@@ -148,7 +149,7 @@ namespace ModIso8583
             //Copy the values from the template
             IsoMessage templ = _typeTemplates[type];
             if (templ != null)
-                for (var i = 2; i < 128; i++)
+                for (var i = 2; i <= 128; i++)
                     if (templ.HasField(i))
                         m.SetField(i,
                             (IsoValue)templ.GetField(i).Clone());
@@ -286,7 +287,7 @@ namespace ModIso8583
             }
             m.Type = type;
             //Parse the bitmap (primary first)
-            var bs = new BitSet(64);
+            var bs = new BitArray(64);
             var pos = 0;
             if (UseBinary || BinBitmap)
             {
@@ -462,7 +463,8 @@ namespace ModIso8583
                         logger.Warning("Field {Index} is not really in the message even though it's in the bitmap",
                             i);
 
-                        bs.Clear(i - 1);
+                        bs.Set(i -1, false);
+                        //bs.Clear(i - 1);
                     }
                     else
                     {
@@ -500,7 +502,8 @@ namespace ModIso8583
                         {
                             logger.Warning("Field {FieldId} is not really in the message even though it's in the bitmap",
                                 i);
-                            bs.Clear(i - 1);
+                            //bs.Clear(i - 1);
+                            bs.Set(i - 1, false);
                         }
                         else
                         {

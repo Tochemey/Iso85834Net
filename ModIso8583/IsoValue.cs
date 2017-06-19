@@ -174,8 +174,7 @@ namespace ModIso8583
                     else
                     {
                         var s = Encoder == null ? Value.ToString() : Encoder.EncodeField(Value);
-                        return s.Length % 2 == 1 ? string.Format("0{0}",
-                            s) : s;
+                        return s.Length % 2 == 1 ? $"0{s}" : s;
                     }
             }
             return Encoder == null ? Value.ToString() : Encoder.EncodeField(Value);
@@ -233,7 +232,7 @@ namespace ModIso8583
                         lhead = "000" + lhead;
                         break;
                 }
-                var bytes = Encoding == null ? Encoding.ASCII.GetBytes(lhead) : Encoding.GetBytes(lhead);
+                var bytes = Encoding?.GetBytes(lhead) ?? Encoding.ASCII.GetBytes(lhead);
                 outs.Write(bytes,
                     0,
                     bytes.Length);
@@ -345,11 +344,14 @@ namespace ModIso8583
                 }
 
                 if (Type != IsoType.BINARY || missing <= 0) return;
-                for (var i = 0; i < missing; i++) outs.WriteByte(0);
+                for (int i = 0; i < missing; i++)
+                {
+                    outs.WriteByte(0);
+                }
             }
             else
             {
-                var bytes = Encoding == null ? Encoding.ASCII.GetBytes(ToString()) : Encoding.GetBytes(ToString());
+                var bytes = Encoding?.GetBytes(ToString()) ?? Encoding.ASCII.GetBytes(ToString());
                 outs.Write(bytes,
                     0,
                     bytes.Length);
