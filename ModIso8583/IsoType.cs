@@ -143,7 +143,7 @@ namespace ModIso8583
         /// <param name="dateTime">the IsoType value</param>
         /// <returns></returns>
         public static string Format(this IsoType isoType,
-            DateTime dateTime)
+            DateTimeOffset dateTime)
         {
             switch (isoType)
             {

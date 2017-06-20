@@ -20,7 +20,8 @@ namespace ModIso8583.Parse
             if (pos + 4 > buf.Length) throw new Exception($"Insufficient data for DATE4 field {field}, pos {pos}");
 
             var calendar = new DateTime();
-            calendar = calendar.AddHours(0).AddMinutes(0).AddSeconds(0).AddMilliseconds(0);
+            calendar = calendar.AddYears(DateTime.Today.Year);
+            
             //Set the month in the date
             if (ForceStringDecoding)
             {
@@ -38,6 +39,8 @@ namespace ModIso8583.Parse
                 calendar = calendar.AddMonths((buf[pos] - 48) * 10 + buf[pos + 1] - 49);
                 calendar = calendar.AddDays((buf[pos + 2] - 48) * 10 + buf[pos + 3] - 48);
             }
+
+            calendar = calendar.AddHours(0).AddMinutes(0).AddSeconds(0).AddMilliseconds(0);
 
             if (TimeZoneInfo != null)
                 calendar = TimeZoneInfo.ConvertTime(calendar,
