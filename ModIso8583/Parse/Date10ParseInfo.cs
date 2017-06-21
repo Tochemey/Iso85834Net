@@ -22,7 +22,7 @@ namespace ModIso8583.Parse
                 calendar = new DateTime(DateTime.Now.Year,
                     int.Parse(Encoding.GetString(buf,
                         pos,
-                        2)) - 1,
+                        2)),
                     int.Parse(Encoding.GetString(buf,
                         pos + 2,
                         2)),
@@ -37,7 +37,7 @@ namespace ModIso8583.Parse
                         2)));
             else
                 calendar = new DateTime(DateTime.Now.Year,
-                    (buf[pos] - 48) * 10 + buf[pos + 1] - 49,
+                    (buf[pos] - 48) * 10 + buf[pos + 1] - 48,
                     (buf[pos + 2] - 48) * 10 + buf[pos + 3] - 48,
                     (buf[pos + 4] - 48) * 10 + buf[pos + 5] - 48,
                     (buf[pos + 6] - 48) * 10 + buf[pos + 7] - 48,
@@ -66,7 +66,7 @@ namespace ModIso8583.Parse
             for (var i = pos; i < pos + tens.Length; i++) tens[start++] = ((buf[i] & 0xf0) >> 4) * 10 + (buf[i] & 0x0f);
 
             var calendar = new DateTime(DateTime.Now.Year,
-                tens[0] - 1,
+                tens[0],
                 tens[1],
                 tens[2],
                 tens[3],

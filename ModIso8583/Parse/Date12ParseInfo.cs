@@ -48,7 +48,7 @@ namespace ModIso8583.Parse
                 if (year > 50) year = 1900 + year;
                 else year = 2000 + year;
                 calendar = new DateTime(year,
-                    (buf[pos + 2] - 48) * 10 + buf[pos + 3] - 49,
+                    (buf[pos + 2] - 48) * 10 + buf[pos + 3] - 48,
                     (buf[pos + 4] - 48) * 10 + buf[pos + 5] - 48,
                     (buf[pos + 6] - 48) * 10 + buf[pos + 7] - 48,
                     (buf[pos + 8] - 48) * 10 + buf[pos + 9] - 48,
@@ -80,7 +80,7 @@ namespace ModIso8583.Parse
             if (tens[0] > 50) year = 1900 + tens[0];
             else year = 2000 + tens[0];
             var calendar = new DateTime(year,
-                tens[1] - 1,
+                tens[1],
                 tens[2],
                 tens[3],
                 tens[4],
