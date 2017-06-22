@@ -68,6 +68,7 @@
     <Compile Include="TestConfigParser.cs" />
     <Compile Include="Util\TestBcd.cs" />
     <Compile Include="Util\TestHexCodec.cs" />
+    <Compile Include="TestEbcdic.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

@@ -1,4 +1,4 @@
-<j8583-config>
+<n8583-config>
     <parse type="0100">
         <field num="2" type="LLVAR" />
         <field num="3" type="LLLVAR" />
@@ -7,4 +7,4 @@
         <field num="6" type="LLLBIN" />
         <field num="7" type="LLLLBIN" />
     </parse>
-</j8583-config>
+</n8583-config>

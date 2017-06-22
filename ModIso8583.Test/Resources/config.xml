@@ -1,7 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
-<!DOCTYPE j8583-config PUBLIC "-//J8583//DTD CONFIG 1.0//EN"
-"http://j8583.sourceforge.net/j8583.dtd">
 <n8583-config>
   <!-- This is a test config file -->
 

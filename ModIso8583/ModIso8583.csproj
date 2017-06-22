@@ -33,9 +33,6 @@
     <Reference Include="C5, Version=2.4.5947.17248, Culture=neutral, PublicKeyToken=282361b99ded7e8e, processorArchitecture=MSIL">
       <HintPath>..\packages\C5.2.4.5947.17249\lib\net45\C5.dll</HintPath>
     </Reference>
-    <Reference Include="Serilog, Version=2.0.0.0, Culture=neutral, PublicKeyToken=24c2f752a8e58a10, processorArchitecture=MSIL">
-      <HintPath>..\packages\Serilog.2.4.0\lib\net46\Serilog.dll</HintPath>
-    </Reference>
     <Reference Include="Serilog.Sinks.ColoredConsole, Version=2.0.0.0, Culture=neutral, PublicKeyToken=24c2f752a8e58a10, processorArchitecture=MSIL">
       <HintPath>..\packages\Serilog.Sinks.ColoredConsole.2.0.0\lib\net45\Serilog.Sinks.ColoredConsole.dll</HintPath>
     </Reference>
@@ -52,6 +49,9 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
+    <Reference Include="Serilog">
+      <HintPath>..\packages\Serilog.2.5.0\lib\net46\Serilog.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Codecs\BigIntBcdCodec.cs" />

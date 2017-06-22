@@ -1,5 +1,6 @@
 ﻿using ModIso8583.Util;
 using Xunit;
+using System.IO;
 
 namespace ModIso8583.Test.Parse
 {
@@ -10,7 +11,7 @@ namespace ModIso8583.Test.Parse
 
         public TestEmptyLvars()
         {
-            const string issue38xml = @"\Resources\issue38.xml";
+            string issue38xml = @"/Resources/issue38.xml";
             txtfact.SetConfigPath(issue38xml);
             binfact.UseBinary = true;
             binfact.SetConfigPath(issue38xml);

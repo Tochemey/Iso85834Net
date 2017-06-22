@@ -67,11 +67,6 @@ namespace ModIso8583
         /// </summary>
         public bool UseBinary { get; set; }
 
-        public IsoMessage ParseMessage(object p, int v)
-        {
-            throw new NotImplementedException();
-        }
-
         /// <summary>
         /// </summary>
         public int Etx { get; set; } = -1;
@@ -124,9 +119,9 @@ namespace ModIso8583
 
         public ICustomField GetCustomField(int index) { return _customFields.Contains(index) ? _customFields[index] : null; }
 
-        protected T CreateIsoMessageWithBinaryHeader(byte[] binHeader) { return (T) new IsoMessage(binHeader); }
+        protected T CreateIsoMessageWithBinaryHeader(byte[] binHeader) { return (T)new IsoMessage(binHeader); }
 
-        protected T CreateIsoMessage(string isoHeader) { return (T) new IsoMessage(isoHeader); }
+        protected T CreateIsoMessage(string isoHeader) { return (T)new IsoMessage(isoHeader); }
 
         /// <summary>
         ///     Creates a new message of the specified type, with optional trace and date values as well
@@ -162,7 +157,7 @@ namespace ModIso8583
                 for (var i = 2; i <= 128; i++)
                     if (templ.HasField(i))
                         m.SetField(i,
-                            (IsoValue) templ.GetField(i).Clone());
+                            (IsoValue)templ.GetField(i).Clone());
             if (TraceGenerator != null)
                 m.SetValue(11,
                     TraceGenerator.NextTrace(),
@@ -291,9 +286,9 @@ namespace ModIso8583
             }
             else
             {
-                type = ((buf[isoHeaderLength] - 48) << 12) 
-                    | ((buf[isoHeaderLength + 1] - 48) << 8) 
-                    | ((buf[isoHeaderLength + 2] - 48) << 4) 
+                type = ((buf[isoHeaderLength] - 48) << 12)
+                    | ((buf[isoHeaderLength + 1] - 48) << 8)
+                    | ((buf[isoHeaderLength + 2] - 48) << 4)
                     | (buf[isoHeaderLength + 3] - 48);
             }
             m.Type = type;
@@ -554,26 +549,30 @@ namespace ModIso8583
         /// <summary>
         ///     Sets the ISO header to be used in each message type.
         /// </summary>
-        /// <param name="value">A map where the keys are the message types and the values are the ISO headers.</param>
-        public void SetIsoHeaders(HashDictionary<int, string> value)
+        /// <param name="val">A map where the keys are the message types and the values are the ISO headers.</param>
+        public void SetIsoHeaders(HashDictionary<int, string> val)
         {
             _isoHeaders.Clear();
-            _isoHeaders.AddAll(value);
+            _isoHeaders.AddAll(val);
         }
 
         /// <summary>
         ///     Sets the ISO header for a specific message type.
         /// </summary>
         /// <param name="type">The message type, for example 0x200</param>
-        /// <param name="value">The ISO header, or NULL to remove any headers for this message type.</param>
+        /// <param name="val">The ISO header, or NULL to remove any headers for this message type.</param>
         public void SetIsoHeader(int type,
-            string value)
+                                 string val)
         {
-            if (string.IsNullOrEmpty(value)) { _isoHeaders.Remove(type); }
+            if (string.IsNullOrEmpty(val)) { _isoHeaders.Remove(type); }
             else
             {
-                _isoHeaders.Add(type,
-                    value);
+                if (_isoHeaders.Contains(type))
+                    _isoHeaders[type] = val;
+                else
+                    _isoHeaders.Add(type,
+                        val);
+
                 _binIsoHeaders.Remove(type);
             }
         }
@@ -592,15 +591,19 @@ namespace ModIso8583
         ///     Sets the ISO header for a specific message type, in binary format.
         /// </summary>
         /// <param name="type">The message type, for example 0x200.</param>
-        /// <param name="value">The ISO header, or NULL to remove any headers for this message type.</param>
+        /// <param name="val">The ISO header, or NULL to remove any headers for this message type.</param>
         public void SetBinaryIsoHeader(int type,
-            byte[] value)
+                                       byte[] val)
         {
-            if (value == null) { _binIsoHeaders.Remove(type); }
+            if (val == null) { _binIsoHeaders.Remove(type); }
             else
             {
-                _binIsoHeaders.Add(type,
-                    value);
+                if (_binIsoHeaders.Contains(type))
+                    _binIsoHeaders[type] = val;
+                else
+                    _binIsoHeaders.Add(type,
+                        val);
+
                 _isoHeaders.Remove(type);
             }
         }
@@ -623,8 +626,13 @@ namespace ModIso8583
         public void AddMessageTemplate(T templ)
         {
             if (templ != null)
-                _typeTemplates.Add(templ.Type,
-                    templ);
+            {
+                if (_typeTemplates.Contains(templ.Type))
+                    _typeTemplates[templ.Type] = templ;
+                else
+                    _typeTemplates.Add(templ.Type,
+                        templ);
+            }
         }
 
         /// <summary>
@@ -650,14 +658,22 @@ namespace ModIso8583
         public void SetParseMap(int type,
             HashDictionary<int, FieldParseInfo> map)
         {
-            ParseMap.Add(type,
-                map);
+            if (ParseMap.Contains(type))
+                ParseMap[type] = map;
+            else
+                ParseMap.Add(type,
+                    map);
+
             var index = new ArrayList<int>();
             index.AddAll(map.Keys);
             index.Sort();
             logger.Warning($"ISO8583 MessageFactory adding parse map for type {type:X} with fields {index}");
-            ParseOrder.Add(type,
-                index);
+
+            if (ParseOrder.Contains(type))
+                ParseOrder[type] = index;
+            else
+                ParseOrder.Add(type,
+                    index);
         }
 
         /// <summary>

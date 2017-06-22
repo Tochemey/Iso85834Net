@@ -1,4 +1,4 @@
-<j8583-config>
+<n8583-config>
 
 	<!-- Parent -->
 	<parse type="000">
@@ -11,4 +11,4 @@
 		</field>
 	</parse>
 
-</j8583-config>
+</n8583-config>

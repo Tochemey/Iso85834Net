@@ -61,6 +61,7 @@ namespace ModIso8583
             }
         }
 
+
         public IsoValue(IsoType t,
             object val,
             int len,

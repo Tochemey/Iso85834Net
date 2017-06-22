@@ -3,6 +3,7 @@ using System.Globalization;
 using System.Text;
 using ModIso8583.Util;
 using Xunit;
+using System.IO;
 
 namespace ModIso8583.Test
 {
@@ -10,7 +11,7 @@ namespace ModIso8583.Test
     {
         public TestBinaries()
         {
-            const string configXml = @"\Resources\config.xml";
+            string configXml = @"/Resources/config.xml";
             mfactAscii.Encoding = Encoding.UTF8;
             mfactAscii.SetConfigPath(configXml);
             mfactAscii.AssignDate = true;

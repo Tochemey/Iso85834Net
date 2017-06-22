@@ -3,6 +3,7 @@ using System.Text;
 using ModIso8583.Codecs;
 using ModIso8583.Util;
 using Xunit;
+using System.IO;
 
 namespace ModIso8583.Test
 {
@@ -18,7 +19,7 @@ namespace ModIso8583.Test
         [Fact]
         public void TestParser()
         {
-            string configXml = @"\Resources\config.xml";
+            string configXml = @"/Resources/config.xml";
             MessageFactory<IsoMessage> mfact = Config(configXml);
 
             //Headers
@@ -34,7 +35,7 @@ namespace ModIso8583.Test
 
             for (int i = 2; i < 89; i++)
             {
-                IsoValue  v = m200.GetField(i);
+                IsoValue v = m200.GetField(i);
                 if (v == null)
                 {
                     Assert.False(m400.HasField(i));
@@ -72,11 +73,11 @@ namespace ModIso8583.Test
         [Fact]
         public void TestSimpleCompositeParsers()
         {
-            string configXml = @"\Resources\composites.xml";
+            string configXml = @"/Resources/composites.xml";
             MessageFactory<IsoMessage> mfact = Config(configXml);
             IsoMessage m = mfact.ParseMessage("01000040000000000000016one  03two12345.".GetBytes(), 0);
             Assert.NotNull(m);
-            CompositeField f = (CompositeField) m.GetObjectValue(10);
+            CompositeField f = (CompositeField)m.GetObjectValue(10);
             Assert.NotNull(f);
             Assert.Equal(4, f.Values.Count);
             Assert.Equal("one  ", f.GetObjectValue(0));
@@ -87,7 +88,7 @@ namespace ModIso8583.Test
             m = mfact.ParseMessage("01000040000000000000018ALPHA05LLVAR12345X".GetBytes(), 0);
             Assert.NotNull(m);
             Assert.True(m.HasField(10));
-            f = (CompositeField) m.GetObjectValue(10);
+            f = (CompositeField)m.GetObjectValue(10);
             Assert.NotNull(f.GetField(0));
             Assert.NotNull(f.GetField(1));
             Assert.NotNull(f.GetField(2));
@@ -102,22 +103,22 @@ namespace ModIso8583.Test
         [Fact]
         public void TestNestedCompositeParser()
         {
-            string configXml = @"\Resources\composites.xml";
+            string configXml = @"/Resources/composites.xml";
             MessageFactory<IsoMessage> mfact = Config(configXml);
             IsoMessage m = mfact.ParseMessage("01010040000000000000019ALPHA11F1F205F03F4X".GetBytes(), 0);
             Assert.NotNull(m);
             Assert.True(m.HasField(10));
-            CompositeField f = (CompositeField) m.GetObjectValue(10);
+            CompositeField f = (CompositeField)m.GetObjectValue(10);
             Assert.NotNull(f.GetField(0));
             Assert.NotNull(f.GetField(1));
             Assert.NotNull(f.GetField(2));
             Assert.Null(f.GetField(3));
             Assert.Equal("ALPHA", f.GetObjectValue(0));
             Assert.Equal("X", f.GetObjectValue(2));
-            f = (CompositeField) f.GetObjectValue(1);
+            f = (CompositeField)f.GetObjectValue(1);
             Assert.Equal("F1", f.GetObjectValue(0));
             Assert.Equal("F2", f.GetObjectValue(1));
-            f = (CompositeField) f.GetObjectValue(2);
+            f = (CompositeField)f.GetObjectValue(2);
             Assert.Equal("F03", f.GetObjectValue(0));
             Assert.Equal("F4", f.GetObjectValue(1));
         }
@@ -125,7 +126,7 @@ namespace ModIso8583.Test
         [Fact]
         public void TestSimpleCompositeTemplate()
         {
-            string configXml = @"\Resources\composites.xml";
+            string configXml = @"/Resources/composites.xml";
             MessageFactory<IsoMessage> mfact = Config(configXml);
             IsoMessage m = mfact.NewMessage(0x100);
             //Simple composite
@@ -134,13 +135,122 @@ namespace ModIso8583.Test
             Assert.False(m.HasField(2));
             Assert.False(m.HasField(3));
             Assert.False(m.HasField(4));
-            CompositeField f = (CompositeField) m.GetObjectValue(10);
+            CompositeField f = (CompositeField)m.GetObjectValue(10);
             Assert.NotNull(f);
             Assert.Equal(f.GetObjectValue(0), "abcde");
             Assert.Equal(f.GetObjectValue(1), "llvar");
             Assert.Equal(f.GetObjectValue(2), "12345");
             Assert.Equal(f.GetObjectValue(3), "X");
             Assert.False(m.HasField(4));
+        }
+
+        private void TestNestedCompositeTemplate(int type, int fnum)
+        {
+            string configXml = @"/Resources/composites.xml";
+            MessageFactory<IsoMessage> mfact = Config(configXml);
+            IsoMessage m = mfact.NewMessage(type);
+            Assert.NotNull(m);
+            Assert.False(m.HasField(1));
+            Assert.False(m.HasField(2));
+            Assert.False(m.HasField(3));
+            Assert.False(m.HasField(4));
+            CompositeField f = (CompositeField)m.GetObjectValue(fnum);
+            Assert.Equal(f.GetObjectValue(0), "fghij");
+            Assert.Equal(f.GetObjectValue(2), "67890");
+            Assert.Equal(f.GetObjectValue(3), "Y");
+            f = (CompositeField)f.GetObjectValue(1);
+            Assert.Equal(f.GetObjectValue(0), "KL");
+            Assert.Equal(f.GetObjectValue(1), "mn");
+            f = (CompositeField)f.GetObjectValue(2);
+            Assert.Equal(f.GetObjectValue(0), "123");
+            Assert.Equal(f.GetObjectValue(1), "45");
+        }
+
+        [Fact]
+        public void TestNestedCompositeTemplate()
+        {
+            TestNestedCompositeTemplate(0x101, 10);
+        }
+
+        [Fact]
+        public void TestNestedCompositeFromExtendedTemplate()
+        {
+            TestNestedCompositeTemplate(0x102, 10);
+            TestNestedCompositeTemplate(0x102, 12);
+        }
+
+        [Fact]
+        public void TestMultilevelExtendParseGuides()
+        {
+            string configXml = @"/Resources/issue34.xml";
+            MessageFactory<IsoMessage> mfact = Config(configXml);
+
+            //Parse a 200
+            string m200 = "0200422000000880800001X1231235959123456101010202020TERMINAL484";
+            string m210 = "0210422000000A80800001X123123595912345610101020202099TERMINAL484";
+            string m400 = "0400422000000880800401X1231235959123456101010202020TERMINAL484001X";
+            string m410 = "0410422000000a80800801X123123595912345610101020202099TERMINAL484001X";
+
+            IsoMessage m = mfact.ParseMessage(m200.GetBytes(), 0);
+            Assert.NotNull(m);
+            Assert.Equal("X", m.GetObjectValue(2));
+            Assert.Equal("123456", m.GetObjectValue(11));
+            Assert.Equal("TERMINAL", m.GetObjectValue(41));
+            Assert.Equal("484", m.GetObjectValue(49));
+            m = mfact.ParseMessage(m210.GetBytes(), 0);
+            Assert.NotNull(m);
+            Assert.Equal("X", m.GetObjectValue(2));
+            Assert.Equal("123456", m.GetObjectValue(11));
+            Assert.Equal("TERMINAL", m.GetObjectValue(41));
+            Assert.Equal("484", m.GetObjectValue(49));
+            Assert.Equal("99", m.GetObjectValue(39));
+            m = mfact.ParseMessage(m400.GetBytes(), 0);
+            Assert.NotNull(m);
+            Assert.Equal("X", m.GetObjectValue(2));
+            Assert.Equal("123456", m.GetObjectValue(11));
+            Assert.Equal("TERMINAL", m.GetObjectValue(41));
+            Assert.Equal("484", m.GetObjectValue(49));
+            Assert.Equal("X", m.GetObjectValue(62));
+            m = mfact.ParseMessage(m410.GetBytes(), 0);
+            Assert.NotNull(m);
+            Assert.Equal("X", m.GetObjectValue(2));
+            Assert.Equal("123456", m.GetObjectValue(11));
+            Assert.Equal("TERMINAL", m.GetObjectValue(41));
+            Assert.Equal("484", m.GetObjectValue(49));
+            Assert.Equal("99", m.GetObjectValue(39));
+            Assert.Equal("X", m.GetObjectValue(61));
+
+        }
+
+        [Fact]
+        public void TestExtendCompositeWithSameField()
+        {
+            string configXml = @"/Resources/issue47.xml";
+            MessageFactory<IsoMessage> mfact = Config(configXml);
+
+            string m200 = "02001000000000000004000000100000013ABCDEFGHIJKLM";
+
+            IsoMessage isoMessage = mfact.ParseMessage(m200.GetBytes(), 0);
+
+            // check field num 4
+            IsoValue field4 = isoMessage.GetField(4);
+            Assert.Equal(IsoType.AMOUNT, field4.Type);
+            Assert.Equal(IsoType.AMOUNT.Length(), field4.Length);
+
+            // check nested field num 4 from composite field 62
+            CompositeField compositeField62 = (CompositeField)isoMessage.GetField(62).Value;
+            IsoValue nestedField4 = compositeField62.GetField(0); // first in list
+            Assert.Equal(IsoType.ALPHA, nestedField4.Type);
+            Assert.Equal(13, nestedField4.Length);
+        }
+
+        [Fact]
+        public void TestEmptyFields()
+        {
+            string configXml = @"/Resources/issue64.xml";
+            MessageFactory<IsoMessage> mfact = Config(configXml);
+            IsoMessage msg = mfact.NewMessage(0x200);
+            Assert.Equal("", msg.GetObjectValue(3));
         }
     }
 }

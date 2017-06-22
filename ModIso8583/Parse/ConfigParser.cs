@@ -375,6 +375,9 @@ namespace ModIso8583.Parse
                 var xmlDoc = new XmlDocument();
                 xmlDoc.Load(source);
                 var root = xmlDoc.DocumentElement;
+
+                if (root == null || !root.Name.Equals("n8583-config")) throw new Exception("Invalid ISO8583 config file. XML file does not contain any root element.");
+
                 ParseHeaders(root.GetElementsByTagName("header"),
                     mfact);
                 ParseTemplates(root.GetElementsByTagName("template"),
