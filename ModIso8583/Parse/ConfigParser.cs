@@ -142,6 +142,39 @@ namespace ModIso8583.Parse
                 }
                 mfact.AddMessageTemplate(m);
             }
+
+            if (subs != null)
+                foreach (var elem in subs)
+                {
+                    var type = ParseType(elem.GetAttribute("type"));
+                    var @ref = ParseType(elem.GetAttribute("extends"));
+                    if (@ref == -1) throw new ArgumentException("Message template " + elem.GetAttribute("type") + " extends invalid template " + elem.GetAttribute("extends"));
+                    IsoMessage tref = mfact.GetMessageTemplate(@ref);
+                    if (tref == null) throw new ArgumentException("Message template " + elem.GetAttribute("type") + " extends nonexistent template " + elem.GetAttribute("extends"));
+                    var m = (T) new IsoMessage();
+                    m.Type = type;
+                    m.Encoding = mfact.Encoding;
+                    for (var i = 2; i < 128; i++)
+                        if (tref.HasField(i))
+                            m.SetField(i,
+                                (IsoValue) tref.GetField(i).Clone());
+                    var fields = elem.GetElementsByTagName("field");
+                    for (var j = 0; j < fields.Count; j++)
+                    {
+                        var f = (XmlElement) fields.Item(j);
+                        var num = int.Parse(f.GetAttribute("num"));
+                        if (f.ParentNode == elem)
+                        {
+                            var v = GetTemplateField(f,
+                                mfact,
+                                true);
+                            if (v != null) v.Encoding = mfact.Encoding;
+                            m.SetField(num,
+                                v);
+                        }
+                    }
+                    mfact.AddMessageTemplate(m);
+                }
         }
 
         private static int ParseType(string type)

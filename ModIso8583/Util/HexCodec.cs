@@ -1,4 +1,6 @@
-﻿namespace ModIso8583.Util
+﻿using System;
+
+namespace ModIso8583.Util
 {
     public static class HexCodec
     {
@@ -29,7 +31,7 @@
             if (hex.Length < 3)
                 return new[]
                 {
-                    (byte) (short.Parse(hex) & 0xff)
+                    (byte) (Convert.ToInt32(hex, 16) & 0xff)
                 };
             //Adjust accordingly for odd-length strings
             var count = hex.Length;

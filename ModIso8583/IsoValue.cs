@@ -126,7 +126,7 @@ namespace ModIso8583
                             return Type.Format((decimal) Value,
                                 12);
                         else
-                            return Type.Format(Value.ToString(),
+                            return Type.Format(Convert.ToDecimal(Value),
                                 12);
                     else if (Value is BigInteger)
                         return Type.Format(Encoder == null ? Value.ToString() : Encoder.EncodeField(Value),
@@ -344,10 +344,7 @@ namespace ModIso8583
                 }
 
                 if (Type != IsoType.BINARY || missing <= 0) return;
-                for (int i = 0; i < missing; i++)
-                {
-                    outs.WriteByte(0);
-                }
+                for (var i = 0; i < missing; i++) outs.WriteByte(0);
             }
             else
             {
@@ -357,5 +354,14 @@ namespace ModIso8583
                     bytes.Length);
             }
         }
+
+        public override bool Equals(object other)
+        {
+            if (!(other is IsoValue)) return false;
+            var comp = (IsoValue) other;
+            return comp.GetType() == GetType() && comp.Value.Equals(Value) && comp.Length == Length;
+        }
+
+        public override int GetHashCode() { return Value == null ? 0 : ToString().GetHashCode(); }
     }
 }

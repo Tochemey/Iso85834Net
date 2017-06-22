@@ -88,7 +88,7 @@ namespace ModIso8583.Test.Parse
             mfact.UseBinary = true;
 
             //Test encoding
-            tmpl = mfact.NewIsoMessage(0x200);
+            tmpl = mfact.NewMessage(0x200);
             var buf = tmpl.WriteData();
             var message = HexCodec.HexEncode(buf,
                 0,

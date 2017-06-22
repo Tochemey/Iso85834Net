@@ -3,7 +3,6 @@ using System.Collections;
 using System.Text;
 using C5;
 using ModIso8583.Parse;
-using ModIso8583.Util;
 using Serilog;
 using Logger = Serilog.Core.Logger;
 
@@ -44,6 +43,7 @@ namespace ModIso8583
         private readonly HashDictionary<int, T> _typeTemplates = new HashDictionary<int, T>();
 
         private Encoding _encoding = Encoding.UTF8;
+        private bool _forceStringEncoding;
 
         /// <summary>
         ///     Stores the information needed to parse messages sorted by type
@@ -60,12 +60,17 @@ namespace ModIso8583
         /// <summary>
         ///     Indicates if the current date should be set on new messages (field 7).
         /// </summary>
-        public bool SetDate { get; set; }
+        public bool AssignDate { get; set; }
 
         /// <summary>
         ///     Indicates if the factory should create binary messages and also parse binary messages.
         /// </summary>
         public bool UseBinary { get; set; }
+
+        public IsoMessage ParseMessage(object p, int v)
+        {
+            throw new NotImplementedException();
+        }
 
         /// <summary>
         /// </summary>
@@ -74,7 +79,16 @@ namespace ModIso8583
         public bool IgnoreLast { get; set; }
         public bool Forceb2 { get; set; }
         public bool BinBitmap { get; set; }
-        public bool ForceStringEncoding { get; set; }
+
+        public bool ForceStringEncoding
+        {
+            get => _forceStringEncoding;
+            set
+            {
+                _forceStringEncoding = value;
+                foreach (var mapValue in ParseMap.Values) foreach (var parser in mapValue.Values) parser.ForceStringDecoding = value;
+            }
+        }
 
         public Encoding Encoding
         {
@@ -108,11 +122,11 @@ namespace ModIso8583
                 value);
         }
 
-        public ICustomField GetCustomField(int index) { return _customFields[index]; }
+        public ICustomField GetCustomField(int index) { return _customFields.Contains(index) ? _customFields[index] : null; }
 
-        protected T CreateIsoMessageWithBinaryHeader(byte[] binHeader) { return (T)new IsoMessage(binHeader); }
+        protected T CreateIsoMessageWithBinaryHeader(byte[] binHeader) { return (T) new IsoMessage(binHeader); }
 
-        protected T CreateIsoMessage(string isoHeader) { return (T)new IsoMessage(isoHeader); }
+        protected T CreateIsoMessage(string isoHeader) { return (T) new IsoMessage(isoHeader); }
 
         /// <summary>
         ///     Creates a new message of the specified type, with optional trace and date values as well
@@ -121,23 +135,19 @@ namespace ModIso8583
         /// </summary>
         /// <param name="type">The message type, for example 0x200, 0x400, etc.</param>
         /// <returns></returns>
-        public T NewIsoMessage(int type)
+        public T NewMessage(int type)
         {
-            bool keyPresent = _binIsoHeaders.Contains(type);
+            var keyPresent = _binIsoHeaders.Contains(type);
             byte[] val = null;
-            string valStr = string.Empty;
+            var valStr = string.Empty;
 
             if (keyPresent)
-            {
                 _binIsoHeaders.Find(ref type,
                     out val);
-            }
             else
-            {
                 _isoHeaders.Find(ref type,
                     out valStr);
-            }
-            var m = keyPresent? CreateIsoMessageWithBinaryHeader(val) : CreateIsoMessage(valStr);
+            var m = keyPresent ? CreateIsoMessageWithBinaryHeader(val) : CreateIsoMessage(valStr);
             m.Type = type;
             m.Etx = Etx;
             m.Binary = UseBinary;
@@ -147,18 +157,18 @@ namespace ModIso8583
             m.ForceStringEncoding = ForceStringEncoding;
 
             //Copy the values from the template
-            IsoMessage templ = _typeTemplates[type];
+            IsoMessage templ = _typeTemplates.Contains(type) ? _typeTemplates[type] : null;
             if (templ != null)
                 for (var i = 2; i <= 128; i++)
                     if (templ.HasField(i))
                         m.SetField(i,
-                            (IsoValue)templ.GetField(i).Clone());
+                            (IsoValue) templ.GetField(i).Clone());
             if (TraceGenerator != null)
                 m.SetValue(11,
                     TraceGenerator.NextTrace(),
                     IsoType.NUMERIC,
                     6);
-            if (SetDate)
+            if (AssignDate)
                 m.SetValue(7,
                     DateTime.Now,
                     IsoType.DATE10,
@@ -276,14 +286,15 @@ namespace ModIso8583
                 var string0 = Encoding.GetString(buf,
                     isoHeaderLength,
                     4);
-                type = short.Parse(string0);
+                type = Convert.ToInt32(string0,
+                    16);
             }
             else
             {
-                type = ((buf[isoHeaderLength] - 48) << 12)
-                       | ((buf[isoHeaderLength + 1] - 48) << 8)
-                       | ((buf[isoHeaderLength + 2] - 48) << 4)
-                       | (buf[isoHeaderLength + 3] - 48);
+                type = ((buf[isoHeaderLength] - 48) << 12) 
+                    | ((buf[isoHeaderLength + 1] - 48) << 8) 
+                    | ((buf[isoHeaderLength + 2] - 48) << 4) 
+                    | (buf[isoHeaderLength + 3] - 48);
             }
             m.Type = type;
             //Parse the bitmap (primary first)
@@ -305,6 +316,7 @@ namespace ModIso8583
                 //Check for secondary bitmap and parse if necessary
                 if (bs.Get(0))
                 {
+                    bs.Length = 128;
                     if (buf.Length < minlength + 8) throw new Exception($"Insufficient length for secondary bitmap : {minlength}");
                     for (var i = 8 + bitmapStart; i < 16 + bitmapStart; i++)
                     {
@@ -377,6 +389,7 @@ namespace ModIso8583
                     //Check for secondary bitmap and parse it if necessary
                     if (bs.Get(0))
                     {
+                        bs.Length = 128;
                         if (buf.Length < minlength + 16) throw new Exception($"Insufficient length for secondary bitmap :{minlength}");
                         if (ForceStringEncoding)
                         {
@@ -463,8 +476,8 @@ namespace ModIso8583
                         logger.Warning("Field {Index} is not really in the message even though it's in the bitmap",
                             i);
 
-                        bs.Set(i -1, false);
-                        //bs.Clear(i - 1);
+                        bs.Set(i - 1,
+                            false);
                     }
                     else
                     {
@@ -502,8 +515,8 @@ namespace ModIso8583
                         {
                             logger.Warning("Field {FieldId} is not really in the message even though it's in the bitmap",
                                 i);
-                            //bs.Clear(i - 1);
-                            bs.Set(i - 1, false);
+                            bs.Set(i - 1,
+                                false);
                         }
                         else
                         {
@@ -624,8 +637,8 @@ namespace ModIso8583
         }
 
         /// <summary>
-        /// Returns the template for the specified message type. This allows templates to be modified
-        /// programmatically.
+        ///     Returns the template for the specified message type. This allows templates to be modified
+        ///     programmatically.
         /// </summary>
         /// <param name="type"></param>
         /// <returns></returns>
@@ -637,12 +650,29 @@ namespace ModIso8583
         public void SetParseMap(int type,
             HashDictionary<int, FieldParseInfo> map)
         {
-            ParseMap.Add(type, map);
-            ArrayList<int> index = new ArrayList<int>();
+            ParseMap.Add(type,
+                map);
+            var index = new ArrayList<int>();
             index.AddAll(map.Keys);
             index.Sort();
             logger.Warning($"ISO8583 MessageFactory adding parse map for type {type:X} with fields {index}");
-            ParseOrder.Add(type, index);
+            ParseOrder.Add(type,
+                index);
+        }
+
+        /// <summary>
+        ///     Tells the receiver to read the configuration at the specified path. This just calls
+        ///     ConfigParser.configureFromClasspathConfig() with itself and the specified path at arguments,
+        ///     but is really convenient in case the MessageFactory is being configured from within
+        /// </summary>
+        /// <param name="path"></param>
+        public void SetConfigPath(string path)
+        {
+            ConfigParser.ConfigureFromClasspathConfig(this,
+                path);
+            //Now re-set some properties that need to be propagated down to the recently assigned objects
+            Encoding = _encoding;
+            ForceStringEncoding = _forceStringEncoding;
         }
     }
 }

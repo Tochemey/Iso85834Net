@@ -87,19 +87,16 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Util\Arrays.cs" />
     <Compile Include="Util\Bcd.cs" />
-    <Compile Include="Util\BitSet.cs" />
+    <Compile Include="Util\ByteUtil.cs" />
     <Compile Include="Util\DateUtil.cs" />
     <Compile Include="Util\Enumm.cs" />
     <Compile Include="Util\HexCodec.cs" />
-    <Compile Include="Util\ObjectCopier.cs" />
     <Compile Include="Util\StringUtil.cs" />
     <Compile Include="Impl\SimpleTraceGenerator.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Impl\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

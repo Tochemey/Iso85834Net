@@ -18,7 +18,7 @@ namespace ModIso8583.Parse
 
         public IsoType IsoType { get; }
         public int Length { get; }
-        public bool ForceStringDecoding { get; }
+        public bool ForceStringDecoding { get; set; }
         public ICustomField Decoder { get; set; }
         public Encoding Encoding { get; set; } = Encoding.UTF8;
 
@@ -68,9 +68,14 @@ namespace ModIso8583.Parse
             }
             switch (digits)
             {
-                case 2: return (buf[pos] - 48) * 10 + (buf[pos + 1] - 48);
-                case 3: return (buf[pos] - 48) * 100 + (buf[pos + 1] - 48) * 10 + (buf[pos + 2] - 48);
-                case 4: return (buf[pos] - 48) * 1000 + (buf[pos + 1] - 48) * 100 + (buf[pos + 2] - 48) * 10 + (buf[pos + 3] - 48);
+                case 2:
+                    return ((buf[pos] - 48) * 10) + (buf[pos + 1] - 48);
+                case 3:
+                    return ((buf[pos] - 48) * 100) + ((buf[pos + 1] - 48) * 10)
+                           + (buf[pos + 2] - 48);
+                case 4:
+                    return ((buf[pos] - 48) * 1000) + ((buf[pos + 1] - 48) * 100)
+                           + ((buf[pos + 2] - 48) * 10) + (buf[pos + 3] - 48);
             }
             return -1;
         }

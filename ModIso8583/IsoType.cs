@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Globalization;
 
 namespace ModIso8583
 {
@@ -150,124 +149,105 @@ namespace ModIso8583
                 case IsoType.DATE10: return dateTime.ToString("MMddHHmmss");
                 case IsoType.DATE12: return dateTime.ToString("yyMMddHHmmss");
                 case IsoType.DATE4: return dateTime.ToString("MMdd");
-                case IsoType.DATE14: return dateTime.ToString("YYYYMMddHHmmss");
+                case IsoType.DATE14: return dateTime.ToString("yyyyMMddHHmmss");
                 case IsoType.DATE_EXP: return dateTime.ToString("yyMM");
                 case IsoType.TIME: return dateTime.ToString("HHmmss");
                 default: throw new ArgumentException("IsoType must be DATE10, DATE12, DATE4, DATE14, DATE_EXP or TIME");
             }
         }
 
-
-        public static string Format(this IsoType isoType, string value, int length)
+        public static string Format(this IsoType isoType,
+            string value,
+            int length)
         {
             if (isoType == IsoType.ALPHA)
             {
-                char[] c = new char[length];
-                if (value == null)
-                {
-                    value = string.Empty;
-                }
+                var c = new char[length];
+                if (value == null) value = string.Empty;
                 if (value.Length > length)
-                {
-                    return value.Substring(0, length);
-                }
-                if (value.Length == length)
-                {
-                    return value;
-                }
-                Array.Copy(value.ToCharArray(), c, value.Length);
-                for (int i = value.Length; i < length; i++)
-                {
-                    c[i] = ' ';
-                }
+                    return value.Substring(0,
+                        length);
+                if (value.Length == length) return value;
+                Array.Copy(value.ToCharArray(),
+                    c,
+                    value.Length);
+                for (var i = value.Length; i < length; i++) c[i] = ' ';
                 return new string(c);
             }
-            if (isoType == IsoType.LLVAR || isoType == IsoType.LLLVAR || isoType == IsoType.LLLLVAR)
-            {
-                return value;
-            }
+            if (isoType == IsoType.LLVAR || isoType == IsoType.LLLVAR || isoType == IsoType.LLLLVAR) return value;
             if (isoType == IsoType.NUMERIC)
             {
-                char[] c = new char[length];
-                char[] x = value.ToCharArray();
-                if (x.Length > length)
-                {
-                    throw new ArgumentException("Numeric value is larger than intended length: " + value + " LEN " + length);
-                }
-                int lim = c.Length - x.Length;
-                for (int i = 0; i < lim; i++)
-                {
-                    c[i] = '0';
-                }
-                Array.Copy(x, 0, c, lim, x.Length);
+                var c = new char[length];
+                var x = value.ToCharArray();
+                if (x.Length > length) throw new ArgumentException("Numeric value is larger than intended length: " + value + " LEN " + length);
+                var lim = c.Length - x.Length;
+                for (var i = 0; i < lim; i++) c[i] = '0';
+                Array.Copy(x,
+                    0,
+                    c,
+                    lim,
+                    x.Length);
                 return new string(c);
             }
 
             if (isoType == IsoType.AMOUNT)
             {
-                return isoType.Format(
-                    (Convert.ToInt64(decimal.Parse(value) * 100)), 12);
+                return isoType.Format(Convert.ToInt64(decimal.Parse(value) * 100),
+                    12);
+                //return value.ToString("0000000000") + "00";
             }
 
             if (isoType == IsoType.BINARY)
             {
-
-                if (value == null)
-                {
-                    value = "";
-                }
+                if (value == null) value = "";
                 if (value.Length > length)
-                {
-                    return value.Substring(0, length);
-                }
-                char[] c = new char[length];
-                int end = value.Length;
+                    return value.Substring(0,
+                        length);
+                var c = new char[length];
+                var end = value.Length;
                 if (value.Length % 2 == 1)
                 {
                     c[0] = '0';
-                    Array.Copy(value.ToCharArray(), 0, c, 1, value.Length);
+                    Array.Copy(value.ToCharArray(),
+                        0,
+                        c,
+                        1,
+                        value.Length);
                     end++;
                 }
                 else
                 {
-                    Array.Copy(value.ToCharArray(), 0, c, 0, value.Length);
+                    Array.Copy(value.ToCharArray(),
+                        0,
+                        c,
+                        0,
+                        value.Length);
                 }
-                for (int i = end; i < c.Length; i++)
-                {
-                    c[i] = '0';
-                }
+                for (var i = end; i < c.Length; i++) c[i] = '0';
                 return new string(c);
-
             }
 
-            if (isoType == IsoType.LLBIN || isoType == IsoType.LLLBIN || isoType == IsoType.LLLLBIN)
-            {
-                return value;
-            }
+            if (isoType == IsoType.LLBIN || isoType == IsoType.LLLBIN || isoType == IsoType.LLLLBIN) return value;
             throw new ArgumentException("Cannot format String as " + isoType);
         }
 
-        public static string Format(this IsoType isoType, long value, int length)
+        public static string Format(this IsoType isoType,
+            long value,
+            int length)
         {
             if (isoType == IsoType.NUMERIC)
             {
-                string x = value.ToString().PadLeft(length,
+                var x = value.ToString().PadLeft(length,
                     '0');
-                if (x.Length > length)
-                {
-                    throw new ArgumentException("Numeric value is larger than intended length: " + value + " LEN " + length);
-                }
+                if (x.Length > length) throw new ArgumentException("Numeric value is larger than intended length: " + value + " LEN " + length);
                 return x;
             }
             if (isoType == IsoType.ALPHA || isoType == IsoType.LLVAR || isoType == IsoType.LLLVAR || isoType == IsoType.LLLLVAR)
-            {
-                return   isoType.Format(Convert.ToString(value), length);
-            }
+                return isoType.Format(Convert.ToString(value),
+                    length);
             if (isoType == IsoType.AMOUNT)
             {
-                string x = value.ToString().PadLeft(10,
-                    '0');
-                return $"{x}00";
+                return value.ToString("0000000000") + "00";
             }
             if (isoType == IsoType.BINARY || isoType == IsoType.LLBIN || isoType == IsoType.LLLBIN || isoType == IsoType.LLLLBIN)
             {
@@ -276,7 +256,9 @@ namespace ModIso8583
             throw new ArgumentException("Cannot format number as " + isoType);
         }
 
-        public static string Format(this IsoType isoType,decimal value, int length)
+        public static string Format(this IsoType isoType,
+            decimal value,
+            int length)
         {
             if (isoType == IsoType.AMOUNT)
             {
@@ -286,14 +268,13 @@ namespace ModIso8583
                 Array.Copy(x, 11, digits, 10, 2);
                 return new string(digits);
             }
+
             if (isoType == IsoType.NUMERIC)
-            {
-                return isoType.Format(Convert.ToInt64(value), length);
-            }
+                return isoType.Format(Convert.ToInt64(value),
+                    length);
             if (isoType == IsoType.ALPHA || isoType == IsoType.LLVAR || isoType == IsoType.LLLVAR || isoType == IsoType.LLLLVAR)
-            {
-                return isoType.Format(Convert.ToString(value), length);
-            }
+                return isoType.Format(Convert.ToString(value),
+                    length);
             if (isoType == IsoType.BINARY || isoType == IsoType.LLBIN || isoType == IsoType.LLLBIN || isoType == IsoType.LLLLBIN)
             {
                 //TODO

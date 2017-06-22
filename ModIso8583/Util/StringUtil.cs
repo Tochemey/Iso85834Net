@@ -688,6 +688,8 @@ namespace ModIso8583.Util
             return false;
         }
 
+        public static byte[] GetBytes(this string check) { return Encoding.UTF8.GetBytes(check); }
+
         #region Private Routines
 
         private static string RegexReplace(this string stringValue,

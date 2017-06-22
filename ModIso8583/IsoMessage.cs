@@ -35,7 +35,7 @@ namespace ModIso8583
         /// <summary>
         ///     This is where values are stored
         /// </summary>
-        private readonly IsoValue[] fields = new IsoValue[129];
+        private readonly IsoValue[] _fields = new IsoValue[129];
 
         public bool ForceStringEncoding { get; set; } = false;
 
@@ -86,7 +86,7 @@ namespace ModIso8583
         /// <returns>The stored object value in that field, or null if the message does not have the field.</returns>
         public object GetObjectValue(int field)
         {
-            var v = fields[field];
+            var v = _fields[field];
             return v.Value;
         }
 
@@ -97,7 +97,7 @@ namespace ModIso8583
         /// <returns>The IsoValue for the specified field.</returns>
         public IsoValue GetField(int field)
         {
-            return fields[field];
+            return _fields[field];
         }
 
         /// <summary>
@@ -112,7 +112,7 @@ namespace ModIso8583
         {
             if (index < 2 || index > 128) throw new IndexOutOfRangeException("Field index must be between 2 and 128");
             if (field != null) field.Encoding = Encoding;
-            fields[index] = field;
+            _fields[index] = field;
             return this;
         }
 
@@ -145,7 +145,7 @@ namespace ModIso8583
             int length)
         {
             if (index < 2 || index > 128) throw new IndexOutOfRangeException("Field index must be between 2 and 128");
-            if (value == null) { fields[index] = null; }
+            if (value == null) { _fields[index] = null; }
             else
             {
                 IsoValue v;
@@ -156,7 +156,7 @@ namespace ModIso8583
                     value,
                     encoder);
                 v.Encoding = Encoding;
-                fields[index] = v;
+                _fields[index] = v;
             }
             return this;
         }
@@ -212,7 +212,7 @@ namespace ModIso8583
         public bool HasField(int idx)
         {
             {
-                return fields[idx] != null;
+                return _fields[idx] != null;
             }
         }
 
@@ -273,8 +273,18 @@ namespace ModIso8583
         {
             var bs = new BitArray(Forceb2 ? 128 : 64);
             for (var i = 2; i < 129; i++)
-                if (fields[i] != null)
+                if (_fields[i] != null)
+                {
+                    if (i > 64 && !Forceb2)
+                    {
+                        //Extend to 128 if needed
+                        bs.Length = 128;
+                        bs.Set(0, true);
+
+                    }
                     bs.Set(i - 1, true);
+                }
+                    
             if (Forceb2)
             {
                 bs.Set(0, true);
@@ -401,7 +411,7 @@ namespace ModIso8583
             //Fields
             for (var i = 2; i < 129; i++)
             {
-                var v = fields[i];
+                var v = _fields[i];
                 if (v == null) continue;
                 try
                 {
@@ -478,7 +488,7 @@ namespace ModIso8583
             //Fields
             for (var i = 2; i < 129; i++)
             {
-                var v = fields[i];
+                var v = _fields[i];
                 if (v == null) continue;
                 var desc = v.ToString();
                 if (v.Type == IsoType.LLBIN || v.Type == IsoType.LLVAR) sb.Append(desc.Length.ToString("x2"));
