@@ -73,7 +73,7 @@ namespace ModIso8583
 
         public bool IgnoreLast { get; set; }
         public bool Forceb2 { get; set; }
-        public bool BinBitmap { get; set; }
+        public bool UseBinaryBitmap { get; set; }
 
         public bool ForceStringEncoding
         {
@@ -147,7 +147,7 @@ namespace ModIso8583
             m.Etx = Etx;
             m.Binary = UseBinary;
             m.Forceb2 = Forceb2;
-            m.BinBitmap = BinBitmap;
+            m.BinBitmap = UseBinaryBitmap;
             m.Encoding = Encoding;
             m.ForceStringEncoding = ForceStringEncoding;
 
@@ -253,7 +253,7 @@ namespace ModIso8583
             int isoHeaderLength,
             bool binaryIsoHeader = false)
         {
-            var minlength = isoHeaderLength + (UseBinary ? 2 : 4) + (BinBitmap || UseBinary ? 8 : 16);
+            var minlength = isoHeaderLength + (UseBinary ? 2 : 4) + (UseBinaryBitmap || UseBinary ? 8 : 16);
             if (buf.Length < minlength) throw new Exception("Insufficient buffer length, needs to be at least " + minlength);
             T m;
             if (binaryIsoHeader && isoHeaderLength > 0)
@@ -295,7 +295,7 @@ namespace ModIso8583
             //Parse the bitmap (primary first)
             var bs = new BitArray(64);
             var pos = 0;
-            if (UseBinary || BinBitmap)
+            if (UseBinary || UseBinaryBitmap)
             {
                 var bitmapStart = isoHeaderLength + (UseBinary ? 2 : 4);
                 for (var i = bitmapStart; i < 8 + bitmapStart; i++)
@@ -542,7 +542,7 @@ namespace ModIso8583
                         }
                 }
             m.Binary = UseBinary;
-            m.BinBitmap = BinBitmap;
+            m.BinBitmap = UseBinaryBitmap;
             return m;
         }
 

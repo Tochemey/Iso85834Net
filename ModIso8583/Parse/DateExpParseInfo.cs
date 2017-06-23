@@ -20,17 +20,15 @@ namespace ModIso8583.Parse
             calendar = calendar.AddHours(0).AddMinutes(0).AddSeconds(0).AddDays(1);
             if (ForceStringDecoding)
             {
-                calendar = calendar.AddYears(calendar.Year - calendar.Year % 100 + int.Parse(Encoding.GetString(buf,
+                calendar = calendar.AddYears(calendar.Year - calendar.Year % 100 + Convert.ToInt32(Encoding.GetString(buf,
                                                  pos,
-                                                 2)));
-                calendar = calendar.AddMonths(int.Parse(Encoding.GetString(buf,
-                    pos + 2,
-                    2)));
+                                                 2), 10));
+                calendar = calendar.AddMonths(Convert.ToInt32(Encoding.GetString(buf, pos +2, 2), 10));
             }
             else
             {
                 calendar = calendar.AddYears(calendar.Year - calendar.Year % 100 + (buf[pos] - 48) * 10 + buf[pos + 1] - 48);
-                calendar = calendar.AddMonths((buf[pos + 2] - 48) * 10 + buf[pos + 3] - 49);
+                calendar = calendar.AddMonths((buf[pos + 2] - 48) * 10 + buf[pos + 3] - 48);
             }
 
             if (TimeZoneInfo != null)
@@ -55,7 +53,7 @@ namespace ModIso8583.Parse
             for (var i = pos; i < pos + tens.Length; i++) tens[start++] = ((buf[i] & 0xf0) >> 4) * 10 + (buf[i] & 0x0f);
 
             var calendar = new DateTime(DateTime.Now.Year - DateTime.Now.Year % 100 + tens[0],
-                tens[1] - 1,
+                tens[1],
                 1,
                 0,
                 0,
