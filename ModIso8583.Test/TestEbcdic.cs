@@ -79,7 +79,11 @@ namespace ModIso8583.Test
         [Fact]
         public void TestMessageType()
         {
-            //todo to implement
+            IsoMessage msg = new IsoMessage();
+            msg.Type = 0x1100;
+            msg.Encoding = Encoding.GetEncoding(1047);
+            byte[] enc = msg.WriteData();
+            Assert.Equal(12, enc.Length);
         }
     }
 }
