@@ -66,6 +66,9 @@
     <Compile Include="Parse\TestDates.cs" />
     <Compile Include="TestBinaries.cs" />
     <Compile Include="TestConfigParser.cs" />
+    <Compile Include="TestFormats.cs" />
+    <Compile Include="TestHeaders.cs" />
+    <Compile Include="TestIsoMessage.cs" />
     <Compile Include="Util\TestBcd.cs" />
     <Compile Include="Util\TestHexCodec.cs" />
     <Compile Include="TestEbcdic.cs" />
@@ -111,7 +114,9 @@
     <Content Include="Resources\issue64.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Resources\parse1.txt" />
+    <Content Include="Resources\parse1.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

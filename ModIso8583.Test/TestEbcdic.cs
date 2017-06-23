@@ -1,156 +1,347 @@
 ﻿using System;
-using Xunit;
-using System.Text;
 using System.IO;
-using ModIso8583.Parse;
+using System.Text;
 using C5;
+using ModIso8583.Parse;
+using ModIso8583.Util;
+using Xunit;
 
 namespace ModIso8583.Test
 {
     public class TestEbcdic
     {
-        private IsoValue llvar = new IsoValue(IsoType.LLVAR, "Testing, testing, 123");
+        private readonly IsoValue llvar = new IsoValue(IsoType.LLVAR,
+            "Testing, testing, 123");
+
+        [Fact]
+        public void TestAmount()
+        {
+            var parser = new AmountParseInfo
+            {
+                Encoding = Encoding.GetEncoding(1047),
+                ForceStringDecoding = true
+            };
+
+            var v = parser.Parse(4,
+                new[]
+                {
+                    (byte) 240,
+                    (byte) 240,
+                    (byte) 240,
+                    (byte) 241,
+                    (byte) 242,
+                    (byte) 243,
+                    (byte) 244,
+                    (byte) 245,
+                    (byte) 246,
+                    (byte) 247,
+                    (byte) 248,
+                    (byte) 249
+                },
+                0,
+                null);
+            Assert.Equal(decimal.Parse("1234567.89"),
+                v.Value);
+        }
 
         [Fact]
         public void TestAscii()
         {
             llvar.Encoding = Encoding.UTF8;
-            MemoryStream bout = new MemoryStream();
-            llvar.Write(bout, false, false);
-            byte[] buf = bout.ToArray();
-            Assert.Equal(50, buf[0]);
-            Assert.Equal(49, buf[1]);
-            LlvarParseInfo parser = new LlvarParseInfo()
+            var bout = new MemoryStream();
+            llvar.Write(bout,
+                false,
+                false);
+            var buf = bout.ToArray();
+            Assert.Equal(50,
+                buf[0]);
+            Assert.Equal(49,
+                buf[1]);
+            var parser = new LlvarParseInfo
             {
                 Encoding = Encoding.UTF8
             };
 
-            IsoValue field = parser.Parse(1, buf, 0, null);
-            Assert.Equal(llvar.Value, field.Value);
+            var field = parser.Parse(1,
+                buf,
+                0,
+                null);
+            Assert.Equal(llvar.Value,
+                field.Value);
+        }
+
+        [Fact]
+        public void TestDate10()
+        {
+            var parser = new Date10ParseInfo
+            {
+                Encoding = Encoding.GetEncoding(1047),
+                ForceStringDecoding = true
+            };
+            var v = parser.Parse(1,
+                new[]
+                {
+                    (byte) 240,
+                    (byte) 241,
+                    (byte) 242,
+                    (byte) 245,
+                    (byte) 242,
+                    (byte) 243,
+                    (byte) 245,
+                    (byte) 249,
+                    (byte) 245,
+                    (byte) 249
+                },
+                0,
+                null);
+            var val = (DateTime) v.Value;
+            Assert.Equal("01",
+                val.ToString("MM"));
+            Assert.Equal("25",
+                val.ToString("dd"));
+            Assert.Equal("23:59:59",
+                val.ToString("HH:mm:ss"));
+        }
+
+        [Fact]
+        public void TestDate4()
+        {
+            var parser = new Date4ParseInfo
+            {
+                Encoding = Encoding.GetEncoding(1047),
+                ForceStringDecoding = true
+            };
+            var v = parser.Parse(1,
+                new[]
+                {
+                    (byte) 240,
+                    (byte) 241,
+                    (byte) 242,
+                    (byte) 245
+                },
+                0,
+                null);
+            var val = (DateTime) v.Value;
+            Assert.Equal("01",
+                val.ToString("MM"));
+            Assert.Equal("25",
+                val.ToString("dd"));
+        }
+
+        [Fact]
+        public void TestDateExp()
+        {
+            var parser = new DateExpParseInfo
+            {
+                Encoding = Encoding.GetEncoding(1047),
+                ForceStringDecoding = true
+            };
+
+            var v = parser.Parse(1,
+                new[]
+                {
+                    (byte) 241,
+                    (byte) 247,
+                    (byte) 241,
+                    (byte) 242
+                },
+                0,
+                null);
+            var val = (DateTime) v.Value;
+            Assert.Equal("12",
+                val.ToString("MM"));
+            Assert.Equal("2017",
+                val.ToString("yyyy"));
         }
 
         [Fact]
         public void TestEbcdic0()
         {
             llvar.Encoding = Encoding.GetEncoding(1047);
-            MemoryStream bout = new MemoryStream();
-            llvar.Write(bout, false, true);
-            byte[] buf = bout.ToArray();
-            Assert.Equal((byte)242, buf[0]);
-            Assert.Equal((byte)241, buf[1]);
-            LlvarParseInfo parser = new LlvarParseInfo()
+            var bout = new MemoryStream();
+            llvar.Write(bout,
+                false,
+                true);
+            var buf = bout.ToArray();
+            Assert.Equal((byte) 242,
+                buf[0]);
+            Assert.Equal((byte) 241,
+                buf[1]);
+            var parser = new LlvarParseInfo
             {
                 Encoding = Encoding.GetEncoding(1047),
                 ForceStringDecoding = true
             };
-            IsoValue field = parser.Parse(1, buf, 0, null);
-            Assert.Equal(llvar.Value, field.Value);
+            var field = parser.Parse(1,
+                buf,
+                0,
+                null);
+            Assert.Equal(llvar.Value,
+                field.Value);
         }
 
         [Fact]
-        public void TestParsers()
+        public void TestMessage()
         {
-            byte[] stringA = Encoding.GetEncoding(1047).GetBytes("A");
-            LllvarParseInfo lllvar = new LllvarParseInfo()
+            var trama = HexCodec.HexDecode("f1f8f1f42030010002000000f0f0f0f0f0f0f0f1f5f9f5f5f1f3f0f6f1f2f1f1f2f9f0f8f8f3f1f8f0f0");
+            var mfact = new MessageFactory<IsoMessage>
             {
-                Encoding = Encoding.GetEncoding(1047),
-                ForceStringDecoding = true
+                UseBinaryBitmap = true
             };
-            IsoValue field = lllvar.Parse(1, new byte[] { (byte)240, (byte)240, (byte)241, (byte)193 }, 0, null);
-            string string0 = Encoding.GetEncoding(1047).GetString(stringA);
-            Assert.Equal(string0, field.Value);
-
-            LllbinParseInfo lllbin = new LllbinParseInfo()
+            var pinfo = new HashDictionary<int, FieldParseInfo>
             {
-                Encoding = Encoding.GetEncoding(1047),
-                ForceStringDecoding = true
+                {3, new AlphaParseInfo(6)},
+                {11, new AlphaParseInfo(6)},
+                {12, new AlphaParseInfo(12)},
+                {24, new AlphaParseInfo(3)},
+                {39, new AlphaParseInfo(3)}
             };
-            field = lllbin.Parse(1, new byte[] { (byte)240, (byte)240, (byte)242, 67, 49 }, 0, null);
-            Assert.Equal(stringA, (byte[])field.Value);
-
-            LlbinParseInfo llbin = new LlbinParseInfo()
-            {
-                Encoding = Encoding.GetEncoding(1047),
-                ForceStringDecoding = true
-            };
-            field = llbin.Parse(1, new byte[] { (byte)240, (byte)242, 67, 49 }, 0, null);
-            Assert.Equal(stringA, (byte[])field.Value);
+            mfact.SetParseMap(0x1814,
+                pinfo);
+            mfact.Encoding = Encoding.GetEncoding(1047);
+            mfact.ForceStringEncoding = true;
+            var iso = mfact.ParseMessage(trama,
+                0);
+            Assert.NotNull(iso);
+            Assert.Equal("000000",
+                iso.GetObjectValue(3));
+            Assert.Equal("015955",
+                iso.GetObjectValue(11));
+            Assert.Equal("130612112908",
+                iso.GetObjectValue(12));
+            Assert.Equal("831",
+                iso.GetObjectValue(24));
+            Assert.Equal("800",
+                iso.GetObjectValue(39));
         }
 
         [Fact]
         public void TestMessageType()
         {
-            IsoMessage msg = new IsoMessage();
+            var msg = new IsoMessage();
             msg.Type = 0x1100;
             msg.Encoding = Encoding.GetEncoding(1047);
             msg.BinBitmap = true;
-            byte[] enc = msg.WriteData();
-            Assert.Equal(12, enc.Length);
-            Assert.Equal((byte)241, enc[0]);
-            Assert.Equal((byte)241, enc[1]);
-            Assert.Equal((byte)240, enc[2]);
-            Assert.Equal((byte)240, enc[3]);
-            MessageFactory<IsoMessage> mf = new MessageFactory<IsoMessage>();
-            HashDictionary<int, FieldParseInfo> pmap = new HashDictionary<int, FieldParseInfo>();
+            var enc = msg.WriteData();
+            Assert.Equal(12,
+                enc.Length);
+            Assert.Equal((byte) 241,
+                enc[0]);
+            Assert.Equal((byte) 241,
+                enc[1]);
+            Assert.Equal((byte) 240,
+                enc[2]);
+            Assert.Equal((byte) 240,
+                enc[3]);
+            var mf = new MessageFactory<IsoMessage>();
+            var pmap = new HashDictionary<int, FieldParseInfo>();
             mf.ForceStringEncoding = true;
             mf.UseBinaryBitmap = true;
             mf.Encoding = Encoding.GetEncoding(1047);
-            mf.SetParseMap(0x1100, pmap);
-            IsoMessage m2 = mf.ParseMessage(enc, 0);
-            Assert.Equal(msg.Type, m2.Type);
+            mf.SetParseMap(0x1100,
+                pmap);
+            var m2 = mf.ParseMessage(enc,
+                0);
+            Assert.Equal(msg.Type,
+                m2.Type);
 
             //Now with text bitmap
             msg.BinBitmap = false;
             msg.ForceStringEncoding = true;
-            byte[] enc2 = msg.WriteData();
-            Assert.Equal(20, enc2.Length);
+            var enc2 = msg.WriteData();
+            Assert.Equal(20,
+                enc2.Length);
             mf.UseBinaryBitmap = false;
-            m2 = mf.ParseMessage(enc2, 0);
-            Assert.Equal(msg.Type, m2.Type);
+            m2 = mf.ParseMessage(enc2,
+                0);
+            Assert.Equal(msg.Type,
+                m2.Type);
         }
 
         [Fact]
-        public void TestDate4()
+        public void TestParsers()
         {
-            Date4ParseInfo parser = new Date4ParseInfo()
+            var stringA = Encoding.GetEncoding(1047).GetBytes("A");
+            var lllvar = new LllvarParseInfo
             {
                 Encoding = Encoding.GetEncoding(1047),
                 ForceStringDecoding = true
             };
-            IsoValue v = parser.Parse(1, new byte[] { (byte)240, (byte)241, (byte)242, (byte)245 }, 0, null);
-            DateTime val = (DateTime)v.Value;
-            Assert.Equal("01", val.ToString("MM"));
-            Assert.Equal("25", val.ToString("dd"));
-        }
+            var field = lllvar.Parse(1,
+                new[]
+                {
+                    (byte) 240,
+                    (byte) 240,
+                    (byte) 241,
+                    (byte) 193
+                },
+                0,
+                null);
+            var string0 = Encoding.GetEncoding(1047).GetString(stringA);
+            Assert.Equal(string0,
+                field.Value);
 
-        [Fact]
-        public void TestDate10()
-        {
-            Date10ParseInfo parser = new Date10ParseInfo()
+            var lllbin = new LllbinParseInfo
             {
                 Encoding = Encoding.GetEncoding(1047),
                 ForceStringDecoding = true
             };
-            IsoValue v = parser.Parse(1, new byte[] { (byte)240, (byte)241, (byte)242, (byte)245, (byte)242, (byte)243, (byte)245, (byte)249, (byte)245, (byte)249 }, 0, null);
-            DateTime val = (DateTime)v.Value;
-            Assert.Equal("01", val.ToString("MM"));
-            Assert.Equal("25", val.ToString("dd"));
-            Assert.Equal("23:59:59", val.ToString("HH:mm:ss"));
-        }
+            field = lllbin.Parse(1,
+                new byte[]
+                {
+                    240,
+                    240,
+                    242,
+                    67,
+                    49
+                },
+                0,
+                null);
+            Assert.Equal(stringA,
+                (byte[]) field.Value);
 
-        [Fact]
-        public void TestDateExp()
-        {
-            DateExpParseInfo parser = new DateExpParseInfo()
+            var llbin = new LlbinParseInfo
             {
                 Encoding = Encoding.GetEncoding(1047),
                 ForceStringDecoding = true
             };
+            field = llbin.Parse(1,
+                new byte[]
+                {
+                    240,
+                    242,
+                    67,
+                    49
+                },
+                0,
+                null);
+            Assert.Equal(stringA,
+                (byte[]) field.Value);
+        }
 
-            IsoValue v = parser.Parse(1, new byte[] { (byte)241, (byte)247, (byte)241, (byte)242 }, 0, null);
-            DateTime val = (DateTime)v.Value;
-            Assert.Equal("12", val.ToString("MM"));
-            Assert.Equal("2017", val.ToString("yyyy"));
+        [Fact]
+        public void TestTime()
+        {
+            var parser = new TimeParseInfo
+            {
+                Encoding = Encoding.GetEncoding(1047),
+                ForceStringDecoding = true
+            };
+            var v = parser.Parse(1,
+                new[]
+                {
+                    (byte) 242,
+                    (byte) 241,
+                    (byte) 243,
+                    (byte) 244,
+                    (byte) 245,
+                    (byte) 246
+                },
+                0,
+                null);
+            var val = (TimeSpan) v.Value;
+            Assert.Equal("21:34:56",
+                val.ToString("hh\\:mm\\:ss"));
         }
     }
 }

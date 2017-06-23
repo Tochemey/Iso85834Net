@@ -144,7 +144,7 @@ namespace ModIso8583.Test
             Assert.False(m.HasField(4));
         }
 
-        private void TestNestedCompositeTemplate(int type, int fnum)
+        private void NestedCompositeTemplate(int type, int fnum)
         {
             string configXml = @"/Resources/composites.xml";
             MessageFactory<IsoMessage> mfact = Config(configXml);
@@ -169,14 +169,14 @@ namespace ModIso8583.Test
         [Fact]
         public void TestNestedCompositeTemplate()
         {
-            TestNestedCompositeTemplate(0x101, 10);
+            NestedCompositeTemplate(0x101, 10);
         }
 
         [Fact]
         public void TestNestedCompositeFromExtendedTemplate()
         {
-            TestNestedCompositeTemplate(0x102, 10);
-            TestNestedCompositeTemplate(0x102, 12);
+            NestedCompositeTemplate(0x102, 10);
+            NestedCompositeTemplate(0x102, 12);
         }
 
         [Fact]

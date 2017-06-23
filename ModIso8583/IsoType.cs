@@ -192,9 +192,12 @@ namespace ModIso8583
 
             if (isoType == IsoType.AMOUNT)
             {
-                return isoType.Format(Convert.ToInt64(decimal.Parse(value) * 100),
-                    12);
-                //return value.ToString("0000000000") + "00";
+                decimal dec = decimal.Parse(value);
+                char[] x = dec.ToString("0000000000.00").ToCharArray();
+                char[] digits = new char[12];
+                Array.Copy(x, digits, 10);
+                Array.Copy(x, 11, digits, 10, 2);
+                return new string(digits);
             }
 
             if (isoType == IsoType.BINARY)

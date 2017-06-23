@@ -28,13 +28,15 @@ namespace ModIso8583.Parse
                 var c = Encoding.GetString(buf,
                     pos,
                     2);
-                month = int.Parse(c);
+                month = Convert.ToInt32(c,
+                    10);
 
                 c = Encoding.GetString(buf,
                     pos + 2,
                     2);
-                
-                day = int.Parse(c);
+
+                day = Convert.ToInt32(c,
+                    10);
             }
             else
             {

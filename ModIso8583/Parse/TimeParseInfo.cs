@@ -20,15 +20,15 @@ namespace ModIso8583.Parse
             TimeSpan calendar;
             if (ForceStringDecoding)
                 calendar = new TimeSpan(DateTime.Now.Day,
-                    int.Parse(Encoding.GetString(buf,
+                    Convert.ToInt32(Encoding.GetString(buf,
                         pos,
-                        2)),
-                    int.Parse(Encoding.GetString(buf,
+                        2), 10),
+                    Convert.ToInt32(Encoding.GetString(buf,
                         pos + 2,
-                        2)),
-                    int.Parse(Encoding.GetString(buf,
+                        2), 10),
+                    Convert.ToInt32(Encoding.GetString(buf,
                         pos + 4,
-                        2)));
+                        2)), 10);
             else
                 calendar = new TimeSpan(DateTime.Now.Day,
                     (buf[pos] - 48) * 10 + buf[pos + 1] - 48,

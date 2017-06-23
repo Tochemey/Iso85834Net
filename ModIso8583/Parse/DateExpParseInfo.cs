@@ -16,28 +16,35 @@ namespace ModIso8583.Parse
             if (pos < 0) throw new Exception($"Invalid DATE_EXP field {field} position {pos}");
             if (pos + 4 > buf.Length) throw new Exception($"Insufficient data for DATE_EXP field {field}, pos {pos}");
 
-            var calendar = new DateTime();
-            calendar = calendar.AddHours(0).AddMinutes(0).AddSeconds(0).AddDays(1);
+            int year, month;
+            int hour,minute, seconds;
+            hour = minute = seconds = 0;
+            int day = 1;
             if (ForceStringDecoding)
             {
-                calendar = calendar.AddYears(calendar.Year - calendar.Year % 100 + Convert.ToInt32(Encoding.GetString(buf,
-                                                 pos,
-                                                 2), 10));
-                calendar = calendar.AddMonths(Convert.ToInt32(Encoding.GetString(buf, pos +2, 2), 10));
+                year = DateTime.Today.Year - (DateTime.Today.Year % 100) + Convert.ToInt32(Encoding.GetString(buf,
+                               pos,
+                               2),
+                           10);
+
+                month = Convert.ToInt32(Encoding.GetString(buf,
+                        pos + 2,
+                        2),
+                    10);
             }
             else
-            {
-                calendar = calendar.AddYears(calendar.Year - calendar.Year % 100 + (buf[pos] - 48) * 10 + buf[pos + 1] - 48);
-                calendar = calendar.AddMonths((buf[pos + 2] - 48) * 10 + buf[pos + 3] - 48);
+            {               
+                year = DateTime.Today.Year - DateTime.Today.Year % 100 + (buf[pos] - 48) * 10 + buf[pos + 1] - 48;
+                month = ((buf[pos + 2] - 48) * 10 + buf[pos + 3] - 48);
             }
 
+            DateTime calendar = new DateTime(year, month, day, hour, minute, seconds);
             if (TimeZoneInfo != null)
                 calendar = TimeZoneInfo.ConvertTime(calendar,
                     TimeZoneInfo);
 
-            var ajusted = AdjustWithFutureTolerance(new DateTimeOffset(calendar));
             return new IsoValue(IsoType,
-                ajusted.DateTime);
+                calendar);
         }
 
         public override IsoValue ParseBinary(int field,
@@ -52,7 +59,7 @@ namespace ModIso8583.Parse
             var start = 0;
             for (var i = pos; i < pos + tens.Length; i++) tens[start++] = ((buf[i] & 0xf0) >> 4) * 10 + (buf[i] & 0x0f);
 
-            var calendar = new DateTime(DateTime.Now.Year - DateTime.Now.Year % 100 + tens[0],
+            var calendar = new DateTime(DateTime.Now.Year - (DateTime.Now.Year % 100) + tens[0],
                 tens[1],
                 1,
                 0,
@@ -63,9 +70,8 @@ namespace ModIso8583.Parse
                 calendar = TimeZoneInfo.ConvertTime(calendar,
                     TimeZoneInfo);
 
-            var ajusted = AdjustWithFutureTolerance(new DateTimeOffset(calendar));
             return new IsoValue(IsoType,
-                ajusted.DateTime);
+                calendar);
         }
     }
 }
