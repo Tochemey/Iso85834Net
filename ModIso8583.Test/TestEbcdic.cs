@@ -82,6 +82,7 @@ namespace ModIso8583.Test
             IsoMessage msg = new IsoMessage();
             msg.Type = 0x1100;
             msg.Encoding = Encoding.GetEncoding(1047);
+            msg.BinBitmap = true;
             byte[] enc = msg.WriteData();
             Assert.Equal(12, enc.Length);
         }
