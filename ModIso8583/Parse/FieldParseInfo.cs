@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text;
+using ModIso8583.Util;
 
 namespace ModIso8583.Parse
 {
@@ -20,7 +21,7 @@ namespace ModIso8583.Parse
         public int Length { get; }
         public bool ForceStringDecoding { get; set; }
         public ICustomField Decoder { get; set; }
-        public Encoding Encoding { get; set; } = Encoding.UTF8;
+        public Encoding Encoding { get; set; } = Encoding.Default;
 
         /// <summary>
         ///     Parses the character data from the buffer and returns the IsoValue with the correct data type in it.
@@ -31,7 +32,7 @@ namespace ModIso8583.Parse
         /// <param name="custom">A CustomField to decode the field.</param>
         /// <returns></returns>
         public abstract IsoValue Parse(int field,
-            byte[] buf,
+            sbyte[] buf,
             int pos,
             ICustomField custom);
 
@@ -45,7 +46,7 @@ namespace ModIso8583.Parse
         /// <param name="custom">A CustomField to decode the field.</param>
         /// <returns></returns>
         public abstract IsoValue ParseBinary(int field,
-            byte[] buf,
+            sbyte[] buf,
             int pos,
             ICustomField custom);
 
@@ -55,27 +56,34 @@ namespace ModIso8583.Parse
         /// <param name="pos"></param>
         /// <param name="digits"></param>
         /// <returns></returns>
-        protected int DecodeLength(byte[] buf,
+        protected int DecodeLength(sbyte[] buf,
             int pos,
             int digits)
         {
+            var sbytes = buf;
             if (ForceStringDecoding)
             {
-                var string0 = Encoding.GetString(buf,
-                    pos,
-                    digits);
+                //var string0 = Encoding.GetString(buf,
+                //    pos,
+                //    digits);
+                var string0 = buf.SbyteString(pos,
+                    digits,
+                    Encoding);
                 return int.Parse(string0);
             }
             switch (digits)
             {
-                case 2:
-                    return ((buf[pos] - 48) * 10) + (buf[pos + 1] - 48);
-                case 3:
-                    return ((buf[pos] - 48) * 100) + ((buf[pos + 1] - 48) * 10)
-                           + (buf[pos + 2] - 48);
-                case 4:
-                    return ((buf[pos] - 48) * 1000) + ((buf[pos + 1] - 48) * 100)
-                           + ((buf[pos + 2] - 48) * 10) + (buf[pos + 3] - 48);
+                //case 2:
+                //    return ((buf[pos] - 48) * 10) + (buf[pos + 1] - 48);
+                //case 3:
+                //    return ((buf[pos] - 48) * 100) + ((buf[pos + 1] - 48) * 10)
+                //           + (buf[pos + 2] - 48);
+                //case 4:
+                //    return ((buf[pos] - 48) * 1000) + ((buf[pos + 1] - 48) * 100)
+                //           + ((buf[pos + 2] - 48) * 10) + (buf[pos + 3] - 48);
+                case 2: return (sbytes[pos] - 48) * 10 + (sbytes[pos + 1] - 48);
+                case 3: return (sbytes[pos] - 48) * 100 + (sbytes[pos + 1] - 48) * 10 + (sbytes[pos + 2] - 48);
+                case 4: return (sbytes[pos] - 48) * 1000 + (sbytes[pos + 1] - 48) * 100 + (sbytes[pos + 2] - 48) * 10 + (sbytes[pos + 3] - 48);
             }
             return -1;
         }

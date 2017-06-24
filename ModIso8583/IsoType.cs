@@ -192,11 +192,17 @@ namespace ModIso8583
 
             if (isoType == IsoType.AMOUNT)
             {
-                decimal dec = decimal.Parse(value);
-                char[] x = dec.ToString("0000000000.00").ToCharArray();
-                char[] digits = new char[12];
-                Array.Copy(x, digits, 10);
-                Array.Copy(x, 11, digits, 10, 2);
+                var dec = decimal.Parse(value);
+                var x = dec.ToString("0000000000.00").ToCharArray();
+                var digits = new char[12];
+                Array.Copy(x,
+                    digits,
+                    10);
+                Array.Copy(x,
+                    11,
+                    digits,
+                    10,
+                    2);
                 return new string(digits);
             }
 
@@ -248,10 +254,7 @@ namespace ModIso8583
             if (isoType == IsoType.ALPHA || isoType == IsoType.LLVAR || isoType == IsoType.LLLVAR || isoType == IsoType.LLLLVAR)
                 return isoType.Format(Convert.ToString(value),
                     length);
-            if (isoType == IsoType.AMOUNT)
-            {
-                return value.ToString("0000000000") + "00";
-            }
+            if (isoType == IsoType.AMOUNT) return value.ToString("0000000000") + "00";
             if (isoType == IsoType.BINARY || isoType == IsoType.LLBIN || isoType == IsoType.LLLBIN || isoType == IsoType.LLLLBIN)
             {
                 //TODO
@@ -265,10 +268,16 @@ namespace ModIso8583
         {
             if (isoType == IsoType.AMOUNT)
             {
-                char[] x = value.ToString("0000000000.00").ToCharArray();
-                char[] digits = new char[12];
-                Array.Copy(x, digits, 10);
-                Array.Copy(x, 11, digits, 10, 2);
+                var x = value.ToString("0000000000.00").ToCharArray();
+                var digits = new char[12];
+                Array.Copy(x,
+                    digits,
+                    10);
+                Array.Copy(x,
+                    11,
+                    digits,
+                    10,
+                    2);
                 return new string(digits);
             }
 

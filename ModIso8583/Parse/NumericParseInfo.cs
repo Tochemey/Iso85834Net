@@ -10,12 +10,11 @@ namespace ModIso8583.Parse
         { }
 
         public override IsoValue ParseBinary(int field,
-            byte[] buf,
+            sbyte[] buf,
             int pos,
             ICustomField custom)
         {
-            if (pos < 0)
-                throw new Exception($"Invalid bin NUMERIC field {field} pos {pos}");
+            if (pos < 0) throw new Exception($"Invalid bin NUMERIC field {field} pos {pos}");
             if (pos + Length / 2 > buf.Length) throw new Exception($"Insufficient data for bin {IsoType} field {field} of length {Length}, pos {pos}");
 
             //A long covers up to 18 digits

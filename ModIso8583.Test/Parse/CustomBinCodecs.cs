@@ -12,13 +12,13 @@ namespace ModIso8583.Test.Parse
     {
         private readonly BigInteger b29 = BigInteger.Parse("12345678901234567890123456789");
 
-        private readonly byte[] longData2 =
+        private readonly sbyte[] longData2 =
         {
             0x12,
             0x34,
             0x56,
             0x78,
-            0x90,
+            unchecked((sbyte) 0x90),
             00,
             00,
             00,
@@ -26,23 +26,23 @@ namespace ModIso8583.Test.Parse
             00
         };
 
-        private readonly byte[] bigintData1 =
+        private readonly sbyte[] bigintData1 =
         {
             1,
             0x23,
             0x45,
             0x67,
-            0x89,
+            unchecked((sbyte) 0x89),
             1,
             0x23,
             0x45,
             0x67,
-            0x89,
+            unchecked((sbyte) 0x89),
             1,
             0x23,
             0x45,
             0x67,
-            0x89,
+            unchecked((sbyte) 0x89),
             00,
             00,
             00,
@@ -118,23 +118,23 @@ namespace ModIso8583.Test.Parse
         {
             var b30 = BigInteger.Parse("123456789012345678901234567890");
             var bigintCodec = new BigIntBcdCodec();
-            byte[] data2 =
+            sbyte[] data2 =
             {
                 0x12,
                 0x34,
                 0x56,
                 0x78,
-                0x90,
+                unchecked((sbyte) 0x90),
                 0x12,
                 0x34,
                 0x56,
                 0x78,
-                0x90,
+                unchecked((sbyte) 0x90),
                 0x12,
                 0x34,
                 0x56,
                 0x78,
-                0x90,
+                unchecked((sbyte) 0x90),
                 00,
                 00,
                 00,
@@ -183,13 +183,13 @@ namespace ModIso8583.Test.Parse
         public void TestLongCodec()
         {
             var longCodec = new LongBcdCodec();
-            byte[] data1 =
+            sbyte[] data1 =
             {
                 1,
                 0x23,
                 0x45,
                 0x67,
-                0x89,
+                unchecked((sbyte) 0x89),
                 00,
                 00,
                 00,

@@ -5,7 +5,7 @@ namespace ModIso8583.Util
 {
     public static class Bcd
     {
-        public static long DecodeToLong(byte[] buf,
+        public static long DecodeToLong(sbyte[] buf,
             int pos,
             int length)
         {
@@ -23,27 +23,27 @@ namespace ModIso8583.Util
         }
 
         public static void Encode(string value,
-            byte[] buf)
+            sbyte[] buf)
         {
             var charpos = 0; //char where we start
             var bufpos = 0;
             if (value.Length % 2 == 1)
             {
                 //for odd lengths we encode just the first digit in the first byte
-                buf[0] = (byte) (value[0] - 48);
+                buf[0] = (sbyte) (value[0] - 48);
                 charpos = 1;
                 bufpos = 1;
             }
             //encode the rest of the string
             while (charpos < value.Length)
             {
-                buf[bufpos] = (byte) (((value[charpos] - 48) << 4) | (value[charpos + 1] - 48));
+                buf[bufpos] = (sbyte) (((value[charpos] - 48) << 4) | (value[charpos + 1] - 48));
                 charpos += 2;
                 bufpos++;
             }
         }
 
-        public static BigInteger DecodeToBigInteger(byte[] buf,
+        public static BigInteger DecodeToBigInteger(sbyte[] buf,
             int pos,
             int length)
         {

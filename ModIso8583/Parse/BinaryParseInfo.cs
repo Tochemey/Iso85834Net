@@ -14,26 +14,35 @@ namespace ModIso8583.Parse
         { }
 
         public override IsoValue Parse(int field,
-            byte[] buf,
+            sbyte[] buf,
             int pos,
             ICustomField custom)
         {
             if (pos < 0) throw new Exception($"Invalid BINARY field {field} position {pos}");
 
-            if (pos + (Length * 2) > buf.Length) throw new Exception($"Insufficient data for BINARY field {field} of length {Length}, pos {pos}");
+            if (pos + Length * 2 > buf.Length) throw new Exception($"Insufficient data for BINARY field {field} of length {Length}, pos {pos}");
 
-            var binval = HexCodec.HexDecode(Encoding.ASCII.GetString(buf,
-                pos,
-                Length * 2));
+            var s = buf.SbyteString(pos,
+                Length * 2,
+                Encoding.Default);
+            //var binval = HexCodec.HexDecode(Encoding.ASCII.GetString(buf,
+            //    pos,
+            //    Length * 2));
+
+            var binval = HexCodec.HexDecode(s);
 
             if (custom == null)
                 return new IsoValue(IsoType,
                     binval,
                     binval.Length);
 
-            var dec = custom.DecodeField(Encoding.GetString(buf,
-                pos,
-                Length * 2));
+            s = buf.SbyteString(pos,
+                Length * 2,
+                Encoding);
+            //var dec = custom.DecodeField(Encoding.GetString(buf,
+            //    pos,
+            //    Length * 2));
+            var dec = custom.DecodeField(s);
             return dec == null ? new IsoValue(IsoType,
                 binval,
                 binval.Length) : new IsoValue(IsoType,
@@ -43,14 +52,15 @@ namespace ModIso8583.Parse
         }
 
         public override IsoValue ParseBinary(int field,
-            byte[] buf,
+            sbyte[] buf,
             int pos,
             ICustomField custom)
         {
             if (pos < 0) throw new Exception($"Invalid BINARY field {field} position {pos}");
             if (pos + Length > buf.Length) throw new Exception($"Insufficient data for BINARY field {field} of length {Length}, pos {pos}");
-            var v = new byte[Length];
-            Array.Copy(buf,
+            var v = new sbyte[Length];
+            var sbytes = buf;
+            Array.Copy(sbytes,
                 pos,
                 v,
                 0,

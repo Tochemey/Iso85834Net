@@ -6,7 +6,7 @@ namespace ModIso8583.Util
     {
         private static readonly char[] Hex = "0123456789ABCDEF".ToCharArray();
 
-        public static string HexEncode(byte[] buffer,
+        public static string HexEncode(sbyte[] buffer,
             int start,
             int length)
         {
@@ -24,14 +24,15 @@ namespace ModIso8583.Util
             return new string(chars);
         }
 
-        public static byte[] HexDecode(string hex)
+        public static sbyte[] HexDecode(string hex)
         {
             //A null string returns an empty array
-            if (string.IsNullOrEmpty(hex)) return new byte[0];
+            if (string.IsNullOrEmpty(hex)) return new sbyte[0];
             if (hex.Length < 3)
                 return new[]
                 {
-                    (byte) (Convert.ToInt32(hex, 16) & 0xff)
+                    (sbyte) (Convert.ToInt32(hex,
+                                 16) & 0xff)
                 };
             //Adjust accordingly for odd-length strings
             var count = hex.Length;
@@ -41,7 +42,7 @@ namespace ModIso8583.Util
                 count++;
                 nibble = 1;
             }
-            var buf = new byte[count / 2];
+            var buf = new sbyte[count / 2];
             int c;
             var holder = 0;
             var pos = 0;
@@ -56,7 +57,7 @@ namespace ModIso8583.Util
                 else
                 {
                     holder |= c;
-                    buf[i] = (byte) holder;
+                    buf[i] = (sbyte) holder;
                 }
                 nibble = 1 - nibble;
             }

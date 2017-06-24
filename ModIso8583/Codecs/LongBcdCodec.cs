@@ -9,19 +9,23 @@ namespace ModIso8583.Codecs
     /// </summary>
     public class LongBcdCodec : ICustomBinaryField
     {
-        public object DecodeField(string val) => long.Parse(val);
-        public string EncodeField(object obj) => Convert.ToString(obj);
+        public object DecodeField(string val) { return long.Parse(val); }
 
-        public object DecodeBinaryField(byte[] bytes,
+        public string EncodeField(object obj) { return Convert.ToString(obj); }
+
+        public object DecodeBinaryField(sbyte[] bytes,
             int offset,
-            int length) => Bcd.DecodeToLong(bytes,
-            offset,
-            length * 2);
+            int length)
+        {
+            return Bcd.DecodeToLong(bytes,
+                offset,
+                length * 2);
+        }
 
-        public byte[] EncodeBinaryField(object obj)
+        public sbyte[] EncodeBinaryField(object obj)
         {
             var s = Convert.ToString(obj);
-            var buf = new byte[s.Length / 2 + s.Length % 2];
+            var buf = new sbyte[s.Length / 2 + s.Length % 2];
             Bcd.Encode(s,
                 buf);
             return buf;

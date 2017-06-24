@@ -1,4 +1,5 @@
 ﻿using System;
+using ModIso8583.Util;
 
 namespace ModIso8583.Parse
 {
@@ -12,16 +13,19 @@ namespace ModIso8583.Parse
         { }
 
         public override IsoValue Parse(int field,
-            byte[] buf,
+            sbyte[] buf,
             int pos,
             ICustomField custom)
         {
             if (pos < 0) throw new Exception($"Invalid AMOUNT field {field} position {pos}");
             if (pos + 12 > buf.Length) throw new Exception($"Insufficient data for AMOUNT field {field}, pos {pos}");
 
-            var v = Encoding.GetString(buf,
-                pos,
-                12);
+            //var v = Encoding.GetString(buf,
+            //    pos,
+            //    12);
+            var v = buf.SbyteString(pos,
+                12,
+                Encoding);
 
             try
             {
@@ -36,17 +40,18 @@ namespace ModIso8583.Parse
         }
 
         public override IsoValue ParseBinary(int field,
-            byte[] buf,
+            sbyte[] buf,
             int pos,
             ICustomField custom)
         {
+            var sbytes = buf;
             var digits = new char[13];
             digits[10] = '.';
             var start = 0;
             for (var i = pos; i < pos + 6; i++)
             {
-                digits[start++] = (char) (((buf[i] & 0xf0) >> 4) + 48);
-                digits[start++] = (char) ((buf[i] & 0x0f) + 48);
+                digits[start++] = (char) (((sbytes[i] & 0xf0) >> 4) + 48);
+                digits[start++] = (char) ((sbytes[i] & 0x0f) + 48);
                 if (start == 10) start++;
             }
 

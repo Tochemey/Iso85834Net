@@ -55,13 +55,13 @@ namespace ModIso8583.Test
             //Parsing guides
             string s800 = "0800201080000000000012345611251125";
             string s810 = "08102010000002000000123456112500";
-            IsoMessage m = mfact.ParseMessage(Encoding.UTF8.GetBytes(s800), 0);
+            IsoMessage m = mfact.ParseMessage(s800.GetSbytes(), 0);
             Assert.NotNull(m);
             Assert.True(m.HasField(3));
             Assert.True(m.HasField(12));
             Assert.True(m.HasField(17));
             Assert.False(m.HasField(39));
-            m = mfact.ParseMessage(Encoding.UTF8.GetBytes(s810),
+            m = mfact.ParseMessage(s810.GetSbytes(),
                 0);
             Assert.NotNull(m);
             Assert.True(m.HasField(3));
@@ -75,7 +75,7 @@ namespace ModIso8583.Test
         {
             string configXml = @"/Resources/composites.xml";
             MessageFactory<IsoMessage> mfact = Config(configXml);
-            IsoMessage m = mfact.ParseMessage("01000040000000000000016one  03two12345.".GetBytes(), 0);
+            IsoMessage m = mfact.ParseMessage("01000040000000000000016one  03two12345.".GetSbytes(), 0);
             Assert.NotNull(m);
             CompositeField f = (CompositeField)m.GetObjectValue(10);
             Assert.NotNull(f);
@@ -85,7 +85,7 @@ namespace ModIso8583.Test
             Assert.Equal("12345", f.GetObjectValue(2));
             Assert.Equal(".", f.GetObjectValue(3));
 
-            m = mfact.ParseMessage("01000040000000000000018ALPHA05LLVAR12345X".GetBytes(), 0);
+            m = mfact.ParseMessage("01000040000000000000018ALPHA05LLVAR12345X".GetSbytes(), 0);
             Assert.NotNull(m);
             Assert.True(m.HasField(10));
             f = (CompositeField)m.GetObjectValue(10);
@@ -105,7 +105,7 @@ namespace ModIso8583.Test
         {
             string configXml = @"/Resources/composites.xml";
             MessageFactory<IsoMessage> mfact = Config(configXml);
-            IsoMessage m = mfact.ParseMessage("01010040000000000000019ALPHA11F1F205F03F4X".GetBytes(), 0);
+            IsoMessage m = mfact.ParseMessage("01010040000000000000019ALPHA11F1F205F03F4X".GetSbytes(), 0);
             Assert.NotNull(m);
             Assert.True(m.HasField(10));
             CompositeField f = (CompositeField)m.GetObjectValue(10);
@@ -191,27 +191,27 @@ namespace ModIso8583.Test
             string m400 = "0400422000000880800401X1231235959123456101010202020TERMINAL484001X";
             string m410 = "0410422000000a80800801X123123595912345610101020202099TERMINAL484001X";
 
-            IsoMessage m = mfact.ParseMessage(m200.GetBytes(), 0);
+            IsoMessage m = mfact.ParseMessage(m200.GetSbytes(), 0);
             Assert.NotNull(m);
             Assert.Equal("X", m.GetObjectValue(2));
             Assert.Equal("123456", m.GetObjectValue(11));
             Assert.Equal("TERMINAL", m.GetObjectValue(41));
             Assert.Equal("484", m.GetObjectValue(49));
-            m = mfact.ParseMessage(m210.GetBytes(), 0);
+            m = mfact.ParseMessage(m210.GetSbytes(), 0);
             Assert.NotNull(m);
             Assert.Equal("X", m.GetObjectValue(2));
             Assert.Equal("123456", m.GetObjectValue(11));
             Assert.Equal("TERMINAL", m.GetObjectValue(41));
             Assert.Equal("484", m.GetObjectValue(49));
             Assert.Equal("99", m.GetObjectValue(39));
-            m = mfact.ParseMessage(m400.GetBytes(), 0);
+            m = mfact.ParseMessage(m400.GetSbytes(), 0);
             Assert.NotNull(m);
             Assert.Equal("X", m.GetObjectValue(2));
             Assert.Equal("123456", m.GetObjectValue(11));
             Assert.Equal("TERMINAL", m.GetObjectValue(41));
             Assert.Equal("484", m.GetObjectValue(49));
             Assert.Equal("X", m.GetObjectValue(62));
-            m = mfact.ParseMessage(m410.GetBytes(), 0);
+            m = mfact.ParseMessage(m410.GetSbytes(), 0);
             Assert.NotNull(m);
             Assert.Equal("X", m.GetObjectValue(2));
             Assert.Equal("123456", m.GetObjectValue(11));
@@ -230,7 +230,7 @@ namespace ModIso8583.Test
 
             string m200 = "02001000000000000004000000100000013ABCDEFGHIJKLM";
 
-            IsoMessage isoMessage = mfact.ParseMessage(m200.GetBytes(), 0);
+            IsoMessage isoMessage = mfact.ParseMessage(m200.GetSbytes(), 0);
 
             // check field num 4
             IsoValue field4 = isoMessage.GetField(4);

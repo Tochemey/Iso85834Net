@@ -1,4 +1,5 @@
 ﻿using System;
+using ModIso8583.Util;
 
 namespace ModIso8583.Parse
 {
@@ -12,7 +13,7 @@ namespace ModIso8583.Parse
         { }
 
         public override IsoValue ParseBinary(int field,
-            byte[] buf,
+            sbyte[] buf,
             int pos,
             ICustomField custom)
         {
@@ -20,19 +21,32 @@ namespace ModIso8583.Parse
             if (pos + Length > buf.Length) throw new Exception($"Insufficient data for bin {IsoType} field {field} of length {Length}, pos {pos}");
             try
             {
+                string v;
                 if (custom == null)
+                {
+                    v = buf.SbyteString(pos,
+                        Length,
+                        Encoding);
                     return new IsoValue(IsoType,
-                        Encoding.GetString(buf,
-                            pos,
-                            Length),
+                        v,
+                        //Encoding.GetString(buf,
+                        //    pos,
+                        //    Length),
                         Length);
-                var decoded = custom.DecodeField(Encoding.GetString(buf,
-                    pos,
-                    Length));
+                }
+
+                v = buf.SbyteString(pos,
+                    Length,
+                    Encoding);
+                //var decoded = custom.DecodeField(Encoding.GetString(buf,
+                //    pos,
+                //    Length));
+                var decoded = custom.DecodeField(v);
                 return decoded == null ? new IsoValue(IsoType,
-                    Encoding.GetString(buf,
-                        pos,
-                        Length),
+                    v,
+                    //Encoding.GetString(buf,
+                    //    pos,
+                    //    Length),
                     Length) : new IsoValue(IsoType,
                     decoded,
                     Length,

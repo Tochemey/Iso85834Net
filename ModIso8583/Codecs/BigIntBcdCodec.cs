@@ -19,7 +19,7 @@ namespace ModIso8583.Codecs
 
         public string EncodeField(object obj) { return obj.ToString(); }
 
-        public object DecodeBinaryField(byte[] bytes,
+        public object DecodeBinaryField(sbyte[] bytes,
             int offset,
             int length)
         {
@@ -28,11 +28,11 @@ namespace ModIso8583.Codecs
                 length * 2);
         }
 
-        public byte[] EncodeBinaryField(object val)
+        public sbyte[] EncodeBinaryField(object val)
         {
             var value = (BigInteger) val;
             var s = value.ToString(NumberFormatInfo.InvariantInfo);
-            var buf = new byte[s.Length / 2 + s.Length % 2];
+            var buf = new sbyte[s.Length / 2 + s.Length % 2];
             Bcd.Encode(s,
                 buf);
             return buf;

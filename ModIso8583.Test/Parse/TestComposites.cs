@@ -3,14 +3,15 @@ using ModIso8583.Codecs;
 using Xunit;
 using System.Text;
 using ModIso8583.Parse;
+using ModIso8583.Util;
 
 namespace ModIso8583.Test.Parse
 {
     public class TestComposites
     {
         private string textData = "One  03Two00999X";
-        byte[] binaryData = new byte[]{(byte)'O', (byte)'n', (byte)'e', (byte)' ', (byte)' ', 3, (byte)'T', (byte)'w', (byte)'o',
-                    0, 9, (byte) 0x99, (byte)'X'};
+        sbyte[] binaryData = new sbyte[]{(sbyte)'O', (sbyte)'n', (sbyte)'e', (sbyte) ' ', (sbyte) ' ', 3, (sbyte) 'T', (sbyte) 'w', (sbyte) 'o',
+                    0, 9, unchecked((sbyte) 0x99), (sbyte) 'X'};
 
         [Fact]
         public void TestEncodeText()
@@ -34,9 +35,9 @@ namespace ModIso8583.Test.Parse
         {
             CompositeField f = new CompositeField()
                 .AddValue(new IsoValue(IsoType.ALPHA, "One", 5));
-            Assert.Equal(new byte[] { (byte)'O', (byte)'n', (byte)'e', 32, 32 }, f.EncodeBinaryField(f));
+            Assert.Equal(new sbyte[] { (sbyte)'O', (sbyte)'n', (sbyte)'e', 32, 32 }, f.EncodeBinaryField(f));
             f.AddValue(new IsoValue(IsoType.LLVAR, "Two"));
-            Assert.Equal(new byte[] { (byte)'O', (byte)'n', (byte)'e', (byte)' ', (byte)' ', 3, (byte)'T', (byte)'w', (byte)'o' },
+            Assert.Equal(new sbyte[] { (sbyte)'O', (sbyte)'n', (sbyte)'e', (sbyte)' ', (sbyte)' ', 3, (sbyte)'T', (sbyte)'w', (sbyte)'o' },
                     f.EncodeBinaryField(f));
             f.AddValue(new IsoValue(IsoType.NUMERIC, 999L, 5));
             f.AddValue(new IsoValue(IsoType.ALPHA, "X", 1));

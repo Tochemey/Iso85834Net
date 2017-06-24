@@ -35,12 +35,12 @@ namespace ModIso8583.Test
                 "No field 7!");
             Assert.Equal("000123",
                 m.GetField(11).ToString()); // Wrong Trace
-            var buf = (byte[]) m.GetObjectValue(41);
-            byte[] exp =
+            var buf = (sbyte[]) m.GetObjectValue(41);
+            sbyte[] exp =
             {
-                0xab,
-                0xcd,
-                0xef,
+                unchecked((sbyte) 0xab),
+                unchecked((sbyte) 0xcd),
+                unchecked((sbyte) 0xef),
                 0,
                 0,
                 0,
@@ -53,12 +53,12 @@ namespace ModIso8583.Test
             Assert.Equal(exp,
                 buf); //"Field 41 wrong value"
 
-            buf = (byte[]) m.GetObjectValue(42);
-            exp = new byte[]
+            buf = (sbyte[]) m.GetObjectValue(42);
+            exp = new sbyte[]
             {
                 0x0a,
-                0xbc,
-                0xde,
+                unchecked((sbyte) 0xbc),
+                unchecked((sbyte) 0xde),
                 0
             };
             Assert.Equal(4,
@@ -68,34 +68,34 @@ namespace ModIso8583.Test
             Assert.True(((string) m.GetObjectValue(43)).StartsWith("Field of length 40",
                 StringComparison.Ordinal));
 
-            buf = (byte[]) m.GetObjectValue(62);
-            exp = new byte[]
+            buf = (sbyte[]) m.GetObjectValue(62);
+            exp = new sbyte[]
             {
                 1,
                 0x23,
                 0x45,
                 0x67,
-                0x89,
-                0xab,
-                0xcd,
-                0xef,
+                unchecked((sbyte) 0x89),
+                unchecked((sbyte) 0xab),
+                unchecked((sbyte) 0xcd),
+                unchecked((sbyte) 0xef),
                 0x62,
                 1,
                 0x23,
                 0x45,
                 0x67,
-                0x89,
-                0xab,
-                0xcd
+                unchecked((sbyte) 0x89),
+                unchecked((sbyte) 0xab),
+                unchecked((sbyte) 0xcd)
             };
             Assert.Equal(exp,
                 buf);
-            buf = (byte[]) m.GetObjectValue(64);
+            buf = (sbyte[]) m.GetObjectValue(64);
             exp[8] = 0x64;
             Assert.Equal(exp,
                 buf);
-            buf = (byte[]) m.GetObjectValue(63);
-            exp = new byte[]
+            buf = (sbyte[]) m.GetObjectValue(63);
+            exp = new sbyte[]
             {
                 0,
                 0x12,
@@ -106,7 +106,7 @@ namespace ModIso8583.Test
             };
             Assert.Equal(exp,
                 buf);
-            buf = (byte[]) m.GetObjectValue(65);
+            buf = (sbyte[]) m.GetObjectValue(65);
             exp[5] = 0x65;
             Assert.Equal(exp,
                 buf);
@@ -121,17 +121,17 @@ namespace ModIso8583.Test
             Assert.False(ascii.Binary || ascii.BinBitmap);
             Assert.True(bin.Binary);
             //HEXencode the binary message, headers should be similar to the ASCII version
-            byte[] v = bin.WriteData();
+            sbyte[] v = bin.WriteData();
             var hexBin = HexCodec.HexEncode(v, 0, v.Length);
-            var hexAscii = Encoding.UTF8.GetString(ascii.WriteData()).ToUpper(CultureInfo.CurrentCulture);
+            var hexAscii = ascii.WriteData().SbyteString(Encoding.Default).ToUpper(CultureInfo.CurrentCulture);
 
             Assert.Equal("0600", hexBin.Substring(0, 4));
 
             //Should be the same up to the field 42 (first 80 chars)
             Assert.Equal(hexAscii.Substring(0, 88), hexBin.Substring(0, 88));
-            Assert.Equal(ascii.GetObjectValue(43), Encoding.UTF8.GetString(v, 44, 40).Trim());
+            Assert.Equal(ascii.GetObjectValue(43), v.SbyteString(44, 40, Encoding.Default).Trim());
             //Parse both messages
-            byte[] asciiBuf = ascii.WriteData();
+            sbyte[] asciiBuf = ascii.WriteData();
             IsoMessage ascii2 = mfactAscii.ParseMessage(asciiBuf, 0);
             TestParsed(ascii2);
             Assert.Equal(ascii.GetObjectValue(7).ToString(), ascii2.GetObjectValue(7).ToString());

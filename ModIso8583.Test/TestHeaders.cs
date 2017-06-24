@@ -21,11 +21,11 @@ namespace ModIso8583.Test
         {
             IsoMessage m = mf.NewMessage(0x280);
             Assert.NotNull(m.BinIsoHeader);
-            byte[] buf = m.WriteData();
+            sbyte[] buf = m.WriteData();
             Assert.Equal(4 + 4 + 16 + 2, buf.Length);
             for (int i = 0; i < 4; i++)
             {
-                Assert.Equal(buf[i], (byte)0xff);
+                Assert.Equal(buf[i], unchecked((sbyte)0xff));
             }
             Assert.Equal(buf[4], 0x30);
             Assert.Equal(buf[5], 0x32);
@@ -38,7 +38,7 @@ namespace ModIso8583.Test
             Assert.NotNull(buf);
             for (int i = 0; i < 4; i++)
             {
-                Assert.Equal(buf[i], (byte)0xff);
+                Assert.Equal(buf[i], unchecked((sbyte)0xff));
             }
             Assert.Equal(0x280, m.Type);
             Assert.True(m.HasField(3));

@@ -17,7 +17,7 @@ namespace ModIso8583.Test.Parse
             binfact.SetConfigPath(issue38xml);
         }
 
-        private void CheckString(byte[] txt, byte[] bin, int field)
+        private void CheckString(sbyte[] txt, sbyte[] bin, int field)
         {
             IsoMessage t = txtfact.ParseMessage(txt, 0);
             IsoMessage b = binfact.ParseMessage(bin, 0);
@@ -29,16 +29,16 @@ namespace ModIso8583.Test.Parse
             Assert.True(valueb.IsEmpty());
         }
 
-        private void CheckBin(byte[] txt,
-            byte[] bin,
+        private void CheckBin(sbyte[] txt,
+            sbyte[] bin,
             int field)
         {
             IsoMessage t = txtfact.ParseMessage(txt, 0);
             IsoMessage b = binfact.ParseMessage(bin, 0);
             Assert.True(t.HasField(field));
             Assert.True(b.HasField(field));
-            Assert.Equal(0, ((byte[])t.GetObjectValue(field)).Length);
-            Assert.Equal(0, ((byte[])b.GetObjectValue(field)).Length);
+            Assert.Equal(0, ((sbyte[])t.GetObjectValue(field)).Length);
+            Assert.Equal(0, ((sbyte[])b.GetObjectValue(field)).Length);
         }
 
         [Fact]
@@ -76,8 +76,8 @@ namespace ModIso8583.Test.Parse
         {
             IsoMessage t = txtfact.NewMessage(0x100);
             IsoMessage b = binfact.NewMessage(0x100);
-            t.SetValue(5, new byte[0], IsoType.LLBIN, 0);
-            b.SetValue(5, new byte[0], IsoType.LLBIN, 0);
+            t.SetValue(5, new sbyte[0], IsoType.LLBIN, 0);
+            b.SetValue(5, new sbyte[0], IsoType.LLBIN, 0);
             CheckBin(t.WriteData(), b.WriteData(), 5);
         }
 
@@ -86,8 +86,8 @@ namespace ModIso8583.Test.Parse
         {
             IsoMessage t = txtfact.NewMessage(0x100);
             IsoMessage b = binfact.NewMessage(0x100);
-            t.SetValue(6, new byte[0], IsoType.LLLBIN, 0);
-            b.SetValue(6, new byte[0], IsoType.LLLBIN, 0);
+            t.SetValue(6, new sbyte[0], IsoType.LLLBIN, 0);
+            b.SetValue(6, new sbyte[0], IsoType.LLLBIN, 0);
             CheckBin(t.WriteData(), b.WriteData(), 6);
         }
 
@@ -96,8 +96,8 @@ namespace ModIso8583.Test.Parse
         {
             IsoMessage t = txtfact.NewMessage(0x100);
             IsoMessage b = binfact.NewMessage(0x100);
-            t.SetValue(7, new byte[0], IsoType.LLLLBIN, 0);
-            b.SetValue(7, new byte[0], IsoType.LLLLBIN, 0);
+            t.SetValue(7, new sbyte[0], IsoType.LLLLBIN, 0);
+            b.SetValue(7, new sbyte[0], IsoType.LLLLBIN, 0);
             CheckBin(t.WriteData(), b.WriteData(), 7);
         }
     }

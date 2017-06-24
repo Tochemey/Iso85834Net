@@ -2,6 +2,7 @@
 using System.IO;
 using System.Numerics;
 using System.Text;
+using C5;
 using ModIso8583.Util;
 
 namespace ModIso8583
@@ -38,10 +39,10 @@ namespace ModIso8583
                 case IsoType.LLLLBIN:
                     if (Encoder == null)
                     {
-                        if (value.GetType() == typeof(byte[]))
+                        if (value.GetType() == typeof(sbyte[]))
                         {
                             var obj = value;
-                            Length = ((byte[]) obj).Length;
+                            Length = ((sbyte[]) obj).Length;
                         }
                         else { Length = value.ToString().Length / 2 + value.ToString().Length % 2; }
                     }
@@ -98,7 +99,7 @@ namespace ModIso8583
                             if (customBinaryField != null) Length = customBinaryField.EncodeBinaryField(Value).Length;
                         }
                         else { Length = Encoder.EncodeField(Value).Length; }
-                        Length = Encoder?.EncodeField(Value).Length ?? ((byte[]) val).Length;
+                        Length = Encoder?.EncodeField(Value).Length ?? ((sbyte[]) val).Length;
                     }
                     if (t == IsoType.LLBIN && Length > 99) throw new ArgumentException("LLBIN can only hold values up to 99 chars");
                     if (t == IsoType.LLLBIN && Length > 999) throw new ArgumentException("LLLBIN can only hold values up to 999 chars");
@@ -149,9 +150,9 @@ namespace ModIso8583
             switch (Type)
             {
                 case IsoType.BINARY:
-                    if (Value is byte[])
+                    if (Value is sbyte[])
                     {
-                        var v = (byte[]) Value;
+                        var v = (sbyte[]) Value;
                         return Type.Format(Encoder == null ? HexCodec.HexEncode(v,
                                 0,
                                 v.Length) : Encoder.EncodeField(Value),
@@ -165,9 +166,9 @@ namespace ModIso8583
                 case IsoType.LLBIN:
                 case IsoType.LLLBIN:
                 case IsoType.LLLLBIN:
-                    if (Value is byte[])
+                    if (Value is sbyte[])
                     {
-                        var v = (byte[]) Value;
+                        var v = (sbyte[]) Value;
                         return Encoder == null ? HexCodec.HexEncode(v,
                             0,
                             v.Length) : Encoder.EncodeField(Value);
@@ -187,6 +188,7 @@ namespace ModIso8583
             bool binary,
             bool forceStringEncoding)
         {
+            var sbytes = new ArrayList<sbyte>();
             int digits;
             switch (type)
             {
@@ -208,14 +210,14 @@ namespace ModIso8583
                 switch (digits)
                 {
                     case 4:
-                        outs.WriteByte((byte) (((l % 10000 / 1000) << 4) | (l % 1000 / 100)));
+                        sbytes.Add((sbyte) (((l % 10000 / 1000) << 4) | (l % 1000 / 100)));
                         break;
                     case 3:
-                        outs.WriteByte((byte) (l / 100)); //00 to 09 automatically in BCD
+                        sbytes.Add((sbyte) (l / 100)); //00 to 09 automatically in BCD
                         break;
                 }
                 //BCD encode the rest of the length
-                outs.WriteByte((byte) (((l % 100 / 10) << 4) | (l % 10)));
+                sbytes.Add((sbyte) (((l % 100 / 10) << 4) | (l % 10)));
             }
             else if (forceStringEncoding)
             {
@@ -233,10 +235,11 @@ namespace ModIso8583
                         lhead = "000" + lhead;
                         break;
                 }
-                var bytes = Encoding?.GetBytes(lhead) ?? Encoding.ASCII.GetBytes(lhead);
-                outs.Write(bytes,
-                    0,
-                    bytes.Length);
+                var bytes = lhead.GetSbytes(Encoding);
+                //outs.Write(bytes,
+                //    0,
+                //    bytes.Length);
+                foreach (var @sbyte in bytes) sbytes.Add(@sbyte);
             }
             else
             {
@@ -244,17 +247,20 @@ namespace ModIso8583
                 switch (digits)
                 {
                     case 4:
-                        outs.WriteByte((byte) (l / 1000 + 48));
-                        outs.WriteByte((byte) (l % 1000 / 100 + 48));
+                        sbytes.Add((sbyte) (l / 1000 + 48));
+                        sbytes.Add((sbyte) (l % 1000 / 100 + 48));
                         break;
                     case 3:
-                        outs.WriteByte((byte) (l / 100 + 48));
+                        sbytes.Add((sbyte) (l / 100 + 48));
                         break;
                 }
-                if (l >= 10) outs.WriteByte((byte) (l % 100 / 10 + 48));
-                else outs.WriteByte(48);
-                outs.WriteByte((byte) (l % 10 + 48));
+                if (l >= 10) sbytes.Add((sbyte) (l % 100 / 10 + 48));
+                else sbytes.Add(48);
+                sbytes.Add((sbyte) (l % 10 + 48));
             }
+            outs.Write(sbytes.ToArray().ToUnsignedBytes(),
+                0,
+                sbytes.Count);
         }
 
         public void Write(Stream outs,
@@ -285,14 +291,14 @@ namespace ModIso8583
                     if (binary)
                     {
                         //numeric types in binary are coded like this
-                        byte[] buf = null;
+                        sbyte[] buf = null;
                         switch (Type)
                         {
                             case IsoType.NUMERIC:
-                                buf = new byte[Length / 2 + Length % 2];
+                                buf = new sbyte[Length / 2 + Length % 2];
                                 break;
                             case IsoType.AMOUNT:
-                                buf = new byte[6];
+                                buf = new sbyte[6];
                                 break;
                             case IsoType.DATE10:
                             case IsoType.DATE4:
@@ -300,7 +306,7 @@ namespace ModIso8583
                             case IsoType.TIME:
                             case IsoType.DATE12:
                             case IsoType.DATE14:
-                                buf = new byte[Length / 2];
+                                buf = new sbyte[Length / 2];
                                 break;
                         }
                         //Encode in BCD if it's one of these types
@@ -308,9 +314,10 @@ namespace ModIso8583
                         {
                             Bcd.Encode(ToString(),
                                 buf);
-                            outs.Write(buf,
+                            outs.Write(buf.ToUnsignedBytes(),
                                 0,
                                 buf.Length);
+
                             return;
                         }
                     }
@@ -319,18 +326,20 @@ namespace ModIso8583
             if (binary && (Type == IsoType.BINARY || Type == IsoType.LLBIN || Type == IsoType.LLLBIN || Type == IsoType.LLLLBIN))
             {
                 var missing = 0;
-                if (Value is byte[])
+                if (Value is sbyte[])
                 {
-                    var bytes = (byte[]) Value;
-                    outs.Write(bytes,
+                    var bytes = (sbyte[]) Value;
+
+                    outs.Write(bytes.ToUnsignedBytes(),
                         0,
                         bytes.Length);
+
                     missing = Length - bytes.Length;
                 }
                 else if (Encoder is ICustomBinaryField)
                 {
                     var binval = ((ICustomBinaryField) Encoder).EncodeBinaryField(Value);
-                    outs.Write(binval,
+                    outs.Write(binval.ToUnsignedBytes(),
                         0,
                         binval.Length);
                     missing = Length - binval.Length;
@@ -338,9 +347,10 @@ namespace ModIso8583
                 else
                 {
                     var binval = HexCodec.HexDecode(Value.ToString());
-                    outs.Write(binval,
+                    outs.Write(binval.ToUnsignedBytes(),
                         0,
                         binval.Length);
+
                     missing = Length - binval.Length;
                 }
 
@@ -349,8 +359,8 @@ namespace ModIso8583
             }
             else
             {
-                var bytes = Encoding?.GetBytes(ToString()) ?? Encoding.ASCII.GetBytes(ToString());
-                outs.Write(bytes,
+                var bytes = ToString().GetSbytes(Encoding);
+                outs.Write(bytes.ToUnsignedBytes(),
                     0,
                     bytes.Length);
             }

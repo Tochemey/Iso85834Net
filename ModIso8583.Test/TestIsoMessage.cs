@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Text;
+using ModIso8583.Util;
 using Xunit;
 
 namespace ModIso8583.Test
@@ -9,8 +10,10 @@ namespace ModIso8583.Test
     {
         public TestIsoMessage()
         {
-            mf = new MessageFactory<IsoMessage>();
-            mf.Encoding = Encoding.UTF8;
+            mf = new MessageFactory<IsoMessage>
+            {
+                Encoding = Encoding.Default
+            };
             mf.SetCustomField(48,
                 new CustomField48());
             mf.SetConfigPath(@"/Resources/config.xml");
@@ -106,7 +109,9 @@ namespace ModIso8583.Test
         public void TestParsing()
         {
             byte[] buf = File.ReadAllBytes(AppDomain.CurrentDomain.BaseDirectory + @"/Resources/parse1.txt");
-            IsoMessage iso = mf.ParseMessage(buf, mf.GetIsoHeader(0x210).Length);
+            sbyte[] sbytes = buf.ToSbytes();
+            int len = mf.GetIsoHeader(0x210).Length;
+            IsoMessage iso = mf.ParseMessage(sbytes, len);
             Assert.Equal(0x210, iso.Type);
         }
     }

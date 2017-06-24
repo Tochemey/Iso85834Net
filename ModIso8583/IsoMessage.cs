@@ -1,51 +1,50 @@
 ﻿using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
-using ModIso8583.Util;
 using C5;
+using ModIso8583.Util;
 
 namespace ModIso8583
 {
     public class IsoMessage
     {
-        private static readonly byte[] Hex = Encoding.UTF8.GetBytes(new[]
+        private static readonly sbyte[] Hex =
         {
-            '0',
-            '1',
-            '2',
-            '3',
-            '4',
-            '5',
-            '6',
-            '7',
-            '8',
-            '9',
-            'A',
-            'B',
-            'C',
-            'D',
-            'E',
-            'F'
-        });
+            (sbyte) '0',
+            (sbyte) '1',
+            (sbyte) '2',
+            (sbyte) '3',
+            (sbyte) '4',
+            (sbyte) '5',
+            (sbyte) '6',
+            (sbyte) '7',
+            (sbyte) '8',
+            (sbyte) '9',
+            (sbyte) 'A',
+            (sbyte) 'B',
+            (sbyte) 'C',
+            (sbyte) 'D',
+            (sbyte) 'E',
+            (sbyte) 'F'
+        };
 
         /// <summary>
         ///     This is where values are stored
         /// </summary>
         private readonly IsoValue[] _fields = new IsoValue[129];
 
-        public bool ForceStringEncoding { get; set; } = false;
-
         public IsoMessage() { }
 
         public IsoMessage(string header) { IsoHeader = header; }
 
-        public IsoMessage(byte[] binaryHeader) { BinIsoHeader = binaryHeader; }
+        public IsoMessage(sbyte[] binaryHeader) { BinIsoHeader = binaryHeader; }
 
-        public byte[] BinIsoHeader { get; set; }
+        public bool ForceStringEncoding { get; set; } = false;
+
+        public sbyte[] BinIsoHeader { get; set; }
 
         /// <summary>
         ///     Stores the optional ISO header.
@@ -231,38 +230,38 @@ namespace ModIso8583
             if (lengthBytes > 4) throw new ArgumentException("The length header can have at most 4 bytes");
 
             var data = WriteData();
-            if (lengthBytes > 0)
+            var binaryWriter = new BinaryWriter(outs);
+            using (binaryWriter)
             {
-                var l = data.Length;
-                if (Etx > -1) l++;
-                var buf = new byte[lengthBytes];
-                var pos = 0;
-                if (lengthBytes == 4)
+                if (lengthBytes > 0)
                 {
-                    buf[0] = (byte) ((l & 0xff000000) >> 24);
-                    pos++;
+                    var l = data.Length;
+                    if (Etx > -1) l++;
+                    var buf = new sbyte[lengthBytes];
+                    var pos = 0;
+                    if (lengthBytes == 4)
+                    {
+                        buf[0] = (sbyte) ((l & 0xff000000) >> 24);
+                        pos++;
+                    }
+                    if (lengthBytes > 2)
+                    {
+                        buf[pos] = (sbyte) ((l & 0xff0000) >> 16);
+                        pos++;
+                    }
+                    if (lengthBytes > 1)
+                    {
+                        buf[pos] = (sbyte) ((l & 0xff00) >> 8);
+                        pos++;
+                    }
+                    buf[pos] = (sbyte) (l & 0xff);
+                    foreach (var @sbyte in buf) binaryWriter.Write(@sbyte);
                 }
-                if (lengthBytes > 2)
-                {
-                    buf[pos] = (byte) ((l & 0xff0000) >> 16);
-                    pos++;
-                }
-                if (lengthBytes > 1)
-                {
-                    buf[pos] = (byte) ((l & 0xff00) >> 8);
-                    pos++;
-                }
-                buf[pos] = (byte) (l & 0xff);
-                outs.Write(buf,
-                    0,
-                    buf.Length);
+                foreach (var @sbyte in data) binaryWriter.Write(@sbyte);
+                //ETX
+                if (Etx > -1) binaryWriter.Write((sbyte) Etx);
+                binaryWriter.BaseStream.Flush();
             }
-            outs.Write(data,
-                0,
-                data.Length);
-            //ETX
-            if (Etx > -1) outs.WriteByte((byte) Etx);
-            outs.Flush();
         }
 
         /// <summary>
@@ -279,15 +278,17 @@ namespace ModIso8583
                     {
                         //Extend to 128 if needed
                         bs.Length = 128;
-                        bs.Set(0, true);
-
+                        bs.Set(0,
+                            true);
                     }
-                    bs.Set(i - 1, true);
+                    bs.Set(i - 1,
+                        true);
                 }
-                    
+
             if (Forceb2)
             {
-                bs.Set(0, true);
+                bs.Set(0,
+                    true);
             }
             else if (bs.Length > 64)
             {
@@ -295,7 +296,8 @@ namespace ModIso8583
                 var b2 = new BitArray(128);
                 b2.Or(bs);
                 bs = b2;
-                bs.Set(0, true);
+                bs.Set(0,
+                    true);
             }
             return bs;
         }
@@ -304,16 +306,19 @@ namespace ModIso8583
         ///     Writes the message to a memory stream and returns a byte array with the result.
         /// </summary>
         /// <returns></returns>
-        public byte[] WriteData()
+        public sbyte[] WriteData()
         {
+            var sbyteList = new ArrayList<sbyte>();
             var stream = new MemoryStream();
             if (IsoHeader != null)
                 try
                 {
-                    var bytes = Encoding.GetBytes(IsoHeader);
-                    stream.Write(bytes,
-                        0,
-                        bytes.Length);
+                    //var bytes = Encoding.GetBytes(IsoHeader);
+                    //stream.Write(bytes,
+                    //    0,
+                    //    bytes.Length);
+                    var bytes = IsoHeader.GetSbytes(Encoding);
+                    foreach (var @sbyte in bytes) sbyteList.Add(@sbyte);
                 }
                 catch (IOException)
                 {
@@ -322,9 +327,10 @@ namespace ModIso8583
             else if (BinIsoHeader != null)
                 try
                 {
-                    stream.Write(BinIsoHeader,
-                        0,
-                        BinIsoHeader.Length);
+                    //stream.Write(BinIsoHeader,
+                    //    0,
+                    //    BinIsoHeader.Length);
+                    foreach (var @sbyte in BinIsoHeader) sbyteList.Add(@sbyte);
                 }
                 catch (IOException)
                 {
@@ -334,18 +340,19 @@ namespace ModIso8583
             //Message Type
             if (Binary)
             {
-                stream.WriteByte((byte) ((Type & 0xff00) >> 8));
-                stream.WriteByte((byte) (Type & 0xff));
+                sbyteList.Add((sbyte) ((Type & 0xff00) >> 8));
+                sbyteList.Add((sbyte) (Type & 0xff));
             }
             else
             {
                 try
                 {
                     var x = Type.ToString("x4");
-                    byte[] bytes = Encoding.GetBytes(x);
-                    stream.Write(bytes,
-                        0,
-                        bytes.Length);
+                    var bytes = x.GetSbytes(Encoding); /*Encoding.GetBytes(x);*/
+                    //stream.Write(bytes,
+                    //    0,
+                    //    bytes.Length);
+                    foreach (var @sbyte in bytes) sbyteList.Add(@sbyte);
                 }
                 catch (IOException)
                 {
@@ -365,18 +372,19 @@ namespace ModIso8583
                     if (bits.Get(i)) b |= pos;
                     pos >>= 1;
                     if (pos != 0) continue;
-                    stream.WriteByte((byte) b);
+                    //stream.WriteByte((byte) b);
+                    sbyteList.Add((sbyte) b);
                     pos = 128;
                     b = 0;
                 }
             }
             else
             {
-                MemoryStream stream2 = new MemoryStream();
+                var sbyteList2 = new ArrayList<sbyte>();
                 if (ForceStringEncoding)
                 {
-                    stream2 = stream;
-                    stream = new MemoryStream();
+                    sbyteList2 = sbyteList;
+                    sbyteList = new ArrayList<sbyte>();
                 }
                 var pos = 0;
                 var lim = bits.Length / 4;
@@ -387,19 +395,22 @@ namespace ModIso8583
                     if (bits.Get(pos++)) nibble |= 4;
                     if (bits.Get(pos++)) nibble |= 2;
                     if (bits.Get(pos++)) nibble |= 1;
-                    stream.WriteByte(Hex[nibble]);
+                    //stream.WriteByte(Hex[nibble]);
+                    sbyteList.Add(Hex[nibble]);
                 }
 
                 if (ForceStringEncoding)
                 {
-                    var hb = Encoding.ASCII.GetString(stream.ToArray());
-                    stream = stream2;
+                    var hb = sbyteList.ToArray().SbyteString(Encoding.Default);
+                    sbyteList = sbyteList2;
                     try
                     {
-                        var bytes = Encoding.GetBytes(hb);
-                        stream.Write(bytes,
-                            0,
-                            bytes.Length);
+                        var sbytes = hb.GetSbytes(Encoding);
+
+                        //stream.Write(bytes,
+                        //    0,
+                        //    bytes.Length);
+                        foreach (var @sbyte in sbytes) sbyteList.Add(@sbyte);
                     }
                     catch (IOException)
                     {
@@ -407,6 +418,11 @@ namespace ModIso8583
                     }
                 }
             }
+
+            var byteArray = sbyteList.ToArray().ToUnsignedBytes();
+            stream.Write(byteArray,
+                0,
+                byteArray.Length);
 
             //Fields
             for (var i = 2; i < 129; i++)
@@ -426,7 +442,7 @@ namespace ModIso8583
             }
             Debug.Assert(stream != null,
                 "stream != null");
-            return stream.ToArray();
+            return stream.ToArray().ToSbytes();
         }
 
         /// <summary>
@@ -440,23 +456,26 @@ namespace ModIso8583
             if (lengthBytes > 4) throw new ArgumentException("The length header can have at most 4 bytes");
             var data = WriteData();
             var stream = new MemoryStream(lengthBytes + data.Length + (Etx > -1 ? 1 : 0));
-            if (lengthBytes > 0)
+            var binaryWriter = new BinaryWriter(stream);
+            using (binaryWriter)
             {
-                var l = data.Length;
-                if (Etx > -1) l++;
-                if (lengthBytes == 4) stream.WriteByte((byte) ((l & 0xff000000) >> 24));
-                if (lengthBytes > 2) stream.WriteByte((byte) ((l & 0xff0000) >> 16));
-                if (lengthBytes > 1) stream.WriteByte((byte) ((l & 0xff00) >> 8));
-                stream.WriteByte((byte) (l & 0xff));
-            }
-            stream.Write(data,
-                0,
-                data.Length);
-            //ETX
-            if (Etx > -1) stream.WriteByte((byte) Etx);
+                if (lengthBytes > 0)
+                {
+                    var l = data.Length;
+                    if (Etx > -1) l++;
+                    if (lengthBytes == 4) binaryWriter.Write((sbyte) ((l & 0xff000000) >> 24));
+                    if (lengthBytes > 2) binaryWriter.Write((sbyte) ((l & 0xff0000) >> 16));
+                    if (lengthBytes > 1) binaryWriter.Write((sbyte) ((l & 0xff00) >> 8));
+                    binaryWriter.Write((sbyte) (l & 0xff));
+                }
 
-            //todo flip the stream
-            return stream;
+                foreach (var @sbyte in data) binaryWriter.Write(@sbyte);
+                //ETX
+                if (Etx > -1) binaryWriter.Write((sbyte) Etx);
+
+                //todo flip the stream
+                return binaryWriter.BaseStream;
+            }
         }
 
         public string DebugString()
@@ -479,9 +498,9 @@ namespace ModIso8583
                 if (bs.Get(pos++)) nibble |= 4;
                 if (bs.Get(pos++)) nibble |= 2;
                 if (bs.Get(pos++)) nibble |= 1;
-                var string0 = Encoding.ASCII.GetString(Hex,
-                    nibble,
-                    1);
+                var string0 = Hex.SbyteString(nibble,
+                    1,
+                    Encoding);
                 sb.Append(string0);
             }
 

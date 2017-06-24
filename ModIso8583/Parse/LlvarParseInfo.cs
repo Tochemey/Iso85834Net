@@ -1,4 +1,5 @@
 ﻿using System;
+using ModIso8583.Util;
 
 namespace ModIso8583.Parse
 {
@@ -9,7 +10,7 @@ namespace ModIso8583.Parse
         { }
 
         public override IsoValue Parse(int field,
-            byte[] buf,
+            sbyte[] buf,
             int pos,
             ICustomField custom)
         {
@@ -24,9 +25,9 @@ namespace ModIso8583.Parse
             string v;
             try
             {
-                v = len == 0 ? "" : Encoding.GetString(buf,
-                    pos + 2,
-                    len);
+                v = len == 0 ? "" : buf.SbyteString(pos + 2,
+                    len,
+                    Encoding);
             }
             catch (Exception) { throw new Exception($"Insufficient data for LLVAR header, field {field} pos {pos}"); }
 
@@ -34,9 +35,9 @@ namespace ModIso8583.Parse
             //buffer, there are probably some extended characters. So we create a String from
             //the rest of the buffer, and then cut it to the specified length.
             if (v.Length != len)
-                v = Encoding.GetString(buf,
-                    pos + 2,
-                    buf.Length - pos - 2).Substring(0,
+                v = buf.SbyteString(pos + 2,
+                    buf.Length - pos - 2,
+                    Encoding).Substring(0,
                     len);
 
             if (custom == null)
@@ -56,15 +57,17 @@ namespace ModIso8583.Parse
         }
 
         public override IsoValue ParseBinary(int field,
-            byte[] buf,
+            sbyte[] buf,
             int pos,
             ICustomField custom)
         {
+            var sbytes = buf;
+
             if (pos < 0) throw new Exception($"Invalid bin LLVAR field {field} pos {pos}");
 
             if (pos + 1 > buf.Length) throw new Exception($"Insufficient data for bin LLVAR header, field {field} pos {pos}");
 
-            var len = ((buf[pos] & 0xf0) >> 4) * 10 + (buf[pos] & 0x0f);
+            var len = ((sbytes[pos] & 0xf0) >> 4) * 10 + (sbytes[pos] & 0x0f);
 
             if (len < 0) throw new Exception($"Invalid bin LLVAR length {len}, field {field} pos {pos}");
 
@@ -72,18 +75,18 @@ namespace ModIso8583.Parse
 
             if (custom == null)
                 return new IsoValue(IsoType,
-                    Encoding.GetString(buf,
-                        pos + 1,
-                        len));
+                    buf.SbyteString(pos + 1,
+                        len,
+                        Encoding));
 
-            var dec = custom.DecodeField(Encoding.GetString(buf,
-                pos + 1,
-                len));
+            var dec = custom.DecodeField(buf.SbyteString(pos + 1,
+                len,
+                Encoding));
 
             return dec == null ? new IsoValue(IsoType,
-                Encoding.GetString(buf,
-                    pos + 1,
-                    len)) : new IsoValue(IsoType,
+                buf.SbyteString(pos + 1,
+                    len,
+                    Encoding)) : new IsoValue(IsoType,
                 dec,
                 custom);
         }

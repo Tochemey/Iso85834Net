@@ -25,18 +25,18 @@ namespace ModIso8583.Test
             var v = parser.Parse(4,
                 new[]
                 {
-                    (byte) 240,
-                    (byte) 240,
-                    (byte) 240,
-                    (byte) 241,
-                    (byte) 242,
-                    (byte) 243,
-                    (byte) 244,
-                    (byte) 245,
-                    (byte) 246,
-                    (byte) 247,
-                    (byte) 248,
-                    (byte) 249
+                    unchecked((sbyte) 240),
+                    unchecked((sbyte) 240),
+                    unchecked((sbyte) 240),
+                    unchecked((sbyte) 241),
+                    unchecked((sbyte) 242),
+                    unchecked((sbyte) 243),
+                    unchecked((sbyte) 244),
+                    unchecked((sbyte) 245),
+                    unchecked((sbyte) 246),
+                    unchecked((sbyte) 247),
+                    unchecked((sbyte) 248),
+                    unchecked((sbyte) 249)
                 },
                 0,
                 null);
@@ -52,7 +52,7 @@ namespace ModIso8583.Test
             llvar.Write(bout,
                 false,
                 false);
-            var buf = bout.ToArray();
+            var buf = bout.ToArray().ToSbytes();
             Assert.Equal(50,
                 buf[0]);
             Assert.Equal(49,
@@ -91,7 +91,7 @@ namespace ModIso8583.Test
                     (byte) 249,
                     (byte) 245,
                     (byte) 249
-                },
+                }.ToSbytes(),
                 0,
                 null);
             var val = (DateTime) v.Value;
@@ -118,7 +118,7 @@ namespace ModIso8583.Test
                     (byte) 241,
                     (byte) 242,
                     (byte) 245
-                },
+                }.ToSbytes(),
                 0,
                 null);
             var val = (DateTime) v.Value;
@@ -144,7 +144,7 @@ namespace ModIso8583.Test
                     (byte) 247,
                     (byte) 241,
                     (byte) 242
-                },
+                }.ToSbytes(),
                 0,
                 null);
             var val = (DateTime) v.Value;
@@ -162,10 +162,10 @@ namespace ModIso8583.Test
             llvar.Write(bout,
                 false,
                 true);
-            var buf = bout.ToArray();
-            Assert.Equal((byte) 242,
+            var buf = bout.ToArray().ToSbytes();
+            Assert.Equal(unchecked((sbyte) 242),
                 buf[0]);
-            Assert.Equal((byte) 241,
+            Assert.Equal(unchecked((sbyte) 241),
                 buf[1]);
             var parser = new LlvarParseInfo
             {
@@ -225,13 +225,13 @@ namespace ModIso8583.Test
             var enc = msg.WriteData();
             Assert.Equal(12,
                 enc.Length);
-            Assert.Equal((byte) 241,
+            Assert.Equal(unchecked((sbyte) 241),
                 enc[0]);
-            Assert.Equal((byte) 241,
+            Assert.Equal(unchecked((sbyte) 241),
                 enc[1]);
-            Assert.Equal((byte) 240,
+            Assert.Equal(unchecked((sbyte) 240),
                 enc[2]);
-            Assert.Equal((byte) 240,
+            Assert.Equal(unchecked((sbyte) 240),
                 enc[3]);
             var mf = new MessageFactory<IsoMessage>();
             var pmap = new HashDictionary<int, FieldParseInfo>();
@@ -274,7 +274,7 @@ namespace ModIso8583.Test
                     (byte) 240,
                     (byte) 241,
                     (byte) 193
-                },
+                }.ToSbytes(),
                 0,
                 null);
             var string0 = Encoding.GetEncoding(1047).GetString(stringA);
@@ -294,11 +294,11 @@ namespace ModIso8583.Test
                     242,
                     67,
                     49
-                },
+                }.ToSbytes(),
                 0,
                 null);
-            Assert.Equal(stringA,
-                (byte[]) field.Value);
+            Assert.Equal(stringA.ToSbytes(),
+                (sbyte[]) field.Value);
 
             var llbin = new LlbinParseInfo
             {
@@ -312,11 +312,11 @@ namespace ModIso8583.Test
                     242,
                     67,
                     49
-                },
+                }.ToSbytes(),
                 0,
                 null);
-            Assert.Equal(stringA,
-                (byte[]) field.Value);
+            Assert.Equal(stringA.ToSbytes(),
+                (sbyte[]) field.Value);
         }
 
         [Fact]
@@ -336,7 +336,7 @@ namespace ModIso8583.Test
                     (byte) 244,
                     (byte) 245,
                     (byte) 246
-                },
+                }.ToSbytes(),
                 0,
                 null);
             var val = (TimeSpan) v.Value;

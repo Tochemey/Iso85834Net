@@ -1,9 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using C5;
 using ModIso8583.Parse;
+using ModIso8583.Util;
 
 namespace ModIso8583.Codecs
 {
@@ -18,7 +18,7 @@ namespace ModIso8583.Codecs
         public object DecodeField(string value)
         {
             var vals = new ArrayList<IsoValue>(parsers.Count);
-            var buf = Encoding.ASCII.GetBytes(value);
+            var buf = value.GetSbytes();
             var pos = 0;
             try
             {
@@ -77,7 +77,7 @@ namespace ModIso8583.Codecs
             catch (IOException) { return string.Empty; }
         }
 
-        public object DecodeBinaryField(byte[] buf,
+        public object DecodeBinaryField(sbyte[] buf,
             int offset,
             int length)
         {
@@ -118,7 +118,7 @@ namespace ModIso8583.Codecs
             catch (Exception) { return null; }
         }
 
-        public byte[] EncodeBinaryField(object val)
+        public sbyte[] EncodeBinaryField(object val)
         {
             var stream = new MemoryStream();
             try
@@ -133,7 +133,7 @@ namespace ModIso8583.Codecs
             {
                 //shouldn't happen
             }
-            return stream.ToArray();
+            return stream.ToArray().ToSbytes();
         }
 
         public CompositeField AddValue(IsoValue value)

@@ -398,7 +398,7 @@ namespace ModIso8583.Util
         }
 
         /// <summary>
-        /// Gets the card BIN
+        ///     Gets the card BIN
         /// </summary>
         /// <param name="cardNumber">the card number</param>
         /// <returns></returns>
@@ -689,6 +689,14 @@ namespace ModIso8583.Util
         }
 
         public static byte[] GetBytes(this string check) { return Encoding.UTF8.GetBytes(check); }
+
+        public static sbyte[] GetSbytes(this string check,
+            Encoding encoding = null)
+        {
+            var bytes = encoding == null ? Encoding.Default.GetBytes(check) : encoding.GetBytes(check);
+            return Array.ConvertAll(bytes,
+                b => unchecked((sbyte) b));
+        }
 
         #region Private Routines
 

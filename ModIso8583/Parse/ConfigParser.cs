@@ -78,7 +78,7 @@ namespace ModIso8583.Parse
                         }
                         if (binHeader)
                             mfact.SetBinaryIsoHeader(type,
-                                HexCodec.HexDecode(header));
+                                HexCodec.HexDecode(header).ToUnsignedBytes());
                         else
                             mfact.SetIsoHeader(type,
                                 header);
