@@ -67,17 +67,17 @@ namespace ModIso8583.Parse
             int pos,
             ICustomField custom)
         {
-            var sbytes = buf;
             if (pos < 0) throw new Exception($"Invalid bin LLLLBIN field {field} pos {pos}");
             if (pos + 2 > buf.Length) throw new Exception($"Insufficient LLLLBIN header field {field}");
 
-            var l = (sbytes[pos] & 0xf0) * 1000 + (sbytes[pos] & 0x0f) * 100 + ((sbytes[pos + 1] & 0xf0) >> 4) * 10 + (sbytes[pos + 1] & 0x0f);
+            int l = ((buf[pos] & 0xf0) * 1000) + ((buf[pos] & 0x0f) * 100)
+                    + (((buf[pos + 1] & 0xf0) >> 4) * 10) + (buf[pos + 1] & 0x0f);
 
             if (l < 0) throw new Exception($"Invalid LLLLBIN length {l} field {field} pos {pos}");
             if (l + pos + 2 > buf.Length) throw new Exception($"Insufficient data for bin LLLLBIN field {field}, pos {pos} requires {l}, only {buf.Length - pos + 1} available");
 
             var v = new sbyte[l];
-            Array.Copy(sbytes,
+            Array.Copy(buf,
                 pos + 2,
                 v,
                 0,

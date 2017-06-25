@@ -28,7 +28,7 @@ namespace ModIso8583.Parse
             {
                 v = len == 0 ? "" : buf.SbyteString(pos + 4,
                     len,
-                    Encoding.Default);
+                    Encoding);
             }
             catch (Exception) { throw new Exception($"Insufficient data for LLLLVAR header, field {field} pos {pos}"); }
 

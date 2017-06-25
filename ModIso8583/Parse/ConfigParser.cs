@@ -313,7 +313,8 @@ namespace ModIso8583.Parse
 
                     mfact.SetParseMap(type,
                         parseMap);
-                    guides.Add(type,
+                    if (guides.Contains(type)) guides[type] = parseMap;
+                    else guides.Add(type,
                         parseMap);
                 }
             }
@@ -335,13 +336,16 @@ namespace ModIso8583.Parse
                         var typedef = f.GetAttribute("type");
                         if ("exclude".Equals(typedef)) child.Remove(num);
                         else
+                        {
                             child.Add(num,
                                 GetParser(f,
                                     mfact));
+                        }
                     }
                     mfact.SetParseMap(type,
                         child);
-                    guides.Add(type,
+                    if (guides.Contains(type)) guides[type] = child;
+                    else guides.Add(type,
                         child);
                 }
         }

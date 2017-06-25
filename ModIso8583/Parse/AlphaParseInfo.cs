@@ -29,24 +29,16 @@ namespace ModIso8583.Parse
                         Encoding);
                     return new IsoValue(IsoType,
                         v,
-                        //Encoding.GetString(buf,
-                        //    pos,
-                        //    Length),
                         Length);
                 }
 
                 v = buf.SbyteString(pos,
                     Length,
                     Encoding);
-                //var decoded = custom.DecodeField(Encoding.GetString(buf,
-                //    pos,
-                //    Length));
+
                 var decoded = custom.DecodeField(v);
                 return decoded == null ? new IsoValue(IsoType,
                     v,
-                    //Encoding.GetString(buf,
-                    //    pos,
-                    //    Length),
                     Length) : new IsoValue(IsoType,
                     decoded,
                     Length,

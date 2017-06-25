@@ -21,9 +21,6 @@ namespace ModIso8583.Parse
             int year;
             if (ForceStringDecoding)
             {
-                //year = int.Parse(Encoding.GetString(buf,
-                //    pos,
-                //    2));
                 year = Convert.ToInt32(buf.SbyteString(pos,
                         2,
                         Encoding),
@@ -57,36 +54,18 @@ namespace ModIso8583.Parse
                     hour,
                     min,
                     sec);
-
-                //calendar = new DateTime(year,
-                //    int.Parse(Encoding.GetString(buf,
-                //        pos,
-                //        2)),
-                //    int.Parse(Encoding.GetString(buf,
-                //        pos + 2,
-                //        2)),
-                //    int.Parse(Encoding.GetString(buf,
-                //        pos + 4,
-                //        2)),
-                //    int.Parse(Encoding.GetString(buf,
-                //        pos + 6,
-                //        2)),
-                //    int.Parse(Encoding.GetString(buf,
-                //        pos + 8,
-                //        2)));
             }
             else
             {
-                var sbytes = buf;
-                year = (sbytes[pos] - 48) * 10 + sbytes[pos + 1] - 48;
+                year = (buf[pos] - 48) * 10 + buf[pos + 1] - 48;
                 if (year > 50) year = 1900 + year;
                 else year = 2000 + year;
                 calendar = new DateTime(year,
-                    (sbytes[pos + 2] - 48) * 10 + sbytes[pos + 3] - 48,
-                    (sbytes[pos + 4] - 48) * 10 + sbytes[pos + 5] - 48,
-                    (sbytes[pos + 6] - 48) * 10 + sbytes[pos + 7] - 48,
-                    (sbytes[pos + 8] - 48) * 10 + sbytes[pos + 9] - 48,
-                    (sbytes[pos + 10] - 48) * 10 + sbytes[pos + 11] - 48);
+                    (buf[pos + 2] - 48) * 10 + buf[pos + 3] - 48,
+                    (buf[pos + 4] - 48) * 10 + buf[pos + 5] - 48,
+                    (buf[pos + 6] - 48) * 10 + buf[pos + 7] - 48,
+                    (buf[pos + 8] - 48) * 10 + buf[pos + 9] - 48,
+                    (buf[pos + 10] - 48) * 10 + buf[pos + 11] - 48);
             }
 
             calendar = calendar.AddMilliseconds(0);

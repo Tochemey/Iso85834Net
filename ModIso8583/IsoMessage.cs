@@ -74,7 +74,7 @@ namespace ModIso8583
 
         public bool BinBitmap { get; set; }
 
-        public Encoding Encoding { get; set; } = Encoding.UTF8;
+        public Encoding Encoding { get; set; } = Encoding.Default;
 
         /// <summary>
         ///     Returns the stored object value in a specified field. Fields
@@ -451,31 +451,27 @@ namespace ModIso8583
         /// </summary>
         /// <param name="lengthBytes"></param>
         /// <returns></returns>
-        public Stream WriteToBuffer(int lengthBytes)
+        public byte[] WriteToBuffer(int lengthBytes)
         {
             if (lengthBytes > 4) throw new ArgumentException("The length header can have at most 4 bytes");
             var data = WriteData();
-            var stream = new MemoryStream(lengthBytes + data.Length + (Etx > -1 ? 1 : 0));
-            var binaryWriter = new BinaryWriter(stream);
-            using (binaryWriter)
+            var stream = new ArrayList<sbyte>(lengthBytes + data.Length + (Etx > -1 ? 1 : 0));
+            if (lengthBytes > 0)
             {
-                if (lengthBytes > 0)
-                {
-                    var l = data.Length;
-                    if (Etx > -1) l++;
-                    if (lengthBytes == 4) binaryWriter.Write((sbyte) ((l & 0xff000000) >> 24));
-                    if (lengthBytes > 2) binaryWriter.Write((sbyte) ((l & 0xff0000) >> 16));
-                    if (lengthBytes > 1) binaryWriter.Write((sbyte) ((l & 0xff00) >> 8));
-                    binaryWriter.Write((sbyte) (l & 0xff));
-                }
-
-                foreach (var @sbyte in data) binaryWriter.Write(@sbyte);
-                //ETX
-                if (Etx > -1) binaryWriter.Write((sbyte) Etx);
-
-                //todo flip the stream
-                return binaryWriter.BaseStream;
+                var l = data.Length;
+                if (Etx > -1) l++;
+                if (lengthBytes == 4) stream.Add((sbyte) ((l & 0xff000000) >> 24));
+                if (lengthBytes > 2) stream.Add((sbyte) ((l & 0xff0000) >> 16));
+                if (lengthBytes > 1) stream.Add((sbyte) ((l & 0xff00) >> 8));
+                stream.Add((sbyte) (l & 0xff));
             }
+
+            foreach (var @sbyte in data) stream.Add(@sbyte);
+            //ETX
+            if (Etx > -1) stream.Add((sbyte) Etx);
+
+            //todo flip the stream
+            return stream.ToArray().ToUnsignedBytes();
         }
 
         public string DebugString()

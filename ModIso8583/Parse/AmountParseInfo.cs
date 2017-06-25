@@ -20,9 +20,6 @@ namespace ModIso8583.Parse
             if (pos < 0) throw new Exception($"Invalid AMOUNT field {field} position {pos}");
             if (pos + 12 > buf.Length) throw new Exception($"Insufficient data for AMOUNT field {field}, pos {pos}");
 
-            //var v = Encoding.GetString(buf,
-            //    pos,
-            //    12);
             var v = buf.SbyteString(pos,
                 12,
                 Encoding);
@@ -44,17 +41,18 @@ namespace ModIso8583.Parse
             int pos,
             ICustomField custom)
         {
-            var sbytes = buf;
-            var digits = new char[13];
+            char[] digits = new char[13];
             digits[10] = '.';
-            var start = 0;
-            for (var i = pos; i < pos + 6; i++)
+            int start = 0;
+            for (int i = pos; i < pos + 6; i++)
             {
-                digits[start++] = (char) (((sbytes[i] & 0xf0) >> 4) + 48);
-                digits[start++] = (char) ((sbytes[i] & 0x0f) + 48);
-                if (start == 10) start++;
+                digits[start++] = (char)(((buf[i] & 0xf0) >> 4) + 48);
+                digits[start++] = (char)((buf[i] & 0x0f) + 48);
+                if (start == 10)
+                {
+                    start++;
+                }
             }
-
             try
             {
                 return new IsoValue(IsoType.AMOUNT,

@@ -17,8 +17,6 @@ namespace ModIso8583.Parse
             if (pos < 0) throw new Exception($"Invalid DATE10 field {field} position {pos}");
             if (pos + 10 > buf.Length) throw new Exception($"Insufficient data for DATE10 field {field}, pos {pos}");
 
-            var sbytes = buf;
-
             DateTime calendar;
             if (ForceStringDecoding)
             {
@@ -48,38 +46,16 @@ namespace ModIso8583.Parse
                     hour,
                     min,
                     sec);
-
-                //calendar = new DateTime(DateTime.Now.Year,
-                //    int.Parse(Encoding.GetString(buf,
-                //        pos,
-                //        2)),
-                //    int.Parse(Encoding.GetString(buf,
-                //        pos + 2,
-                //        2)),
-                //    int.Parse(Encoding.GetString(buf,
-                //        pos + 4,
-                //        2)),
-                //    int.Parse(Encoding.GetString(buf,
-                //        pos + 6,
-                //        2)),
-                //    int.Parse(Encoding.GetString(buf,
-                //        pos + 8,
-                //        2)));
             }
             else
             {
-                //calendar = new DateTime(DateTime.Now.Year,
-                //    (buf[pos] - 48) * 10 + buf[pos + 1] - 48,
-                //    (buf[pos + 2] - 48) * 10 + buf[pos + 3] - 48,
-                //    (buf[pos + 4] - 48) * 10 + buf[pos + 5] - 48,
-                //    (buf[pos + 6] - 48) * 10 + buf[pos + 7] - 48,
-                //    (buf[pos + 8] - 48) * 10 + buf[pos + 9] - 48);
                 calendar = new DateTime(DateTime.Now.Year,
-                    (sbytes[pos] - 48) * 10 + sbytes[pos + 1] - 48,
-                    (sbytes[pos + 2] - 48) * 10 + sbytes[pos + 3] - 48,
-                    (sbytes[pos + 4] - 48) * 10 + sbytes[pos + 5] - 48,
-                    (sbytes[pos + 6] - 48) * 10 + sbytes[pos + 7] - 48,
-                    (sbytes[pos + 8] - 48) * 10 + sbytes[pos + 9] - 48);
+                    (buf[pos] - 48) * 10 + buf[pos + 1] - 48,
+                    (buf[pos + 2] - 48) * 10 + buf[pos + 3] - 48,
+                    (buf[pos + 4] - 48) * 10 + buf[pos + 5] - 48,
+                    (buf[pos + 6] - 48) * 10 + buf[pos + 7] - 48,
+                    (buf[pos + 8] - 48) * 10 + buf[pos + 9] - 48);
+
             }
 
             calendar = calendar.AddMilliseconds(0);
@@ -99,10 +75,9 @@ namespace ModIso8583.Parse
         {
             if (pos < 0) throw new Exception($"Invalid DATE10 field {field} position {pos}");
             if (pos + 5 > buf.Length) throw new Exception($"Insufficient data for DATE10 field {field}, pos {pos}");
-            var sbytes = buf;
             var tens = new int[5];
             var start = 0;
-            for (var i = pos; i < pos + tens.Length; i++) tens[start++] = ((sbytes[i] & 0xf0) >> 4) * 10 + (sbytes[i] & 0x0f);
+            for (var i = pos; i < pos + tens.Length; i++) tens[start++] = ((buf[i] & 0xf0) >> 4) * 10 + (buf[i] & 0x0f);
 
             var calendar = new DateTime(DateTime.Now.Year,
                 tens[0],

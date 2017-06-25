@@ -339,9 +339,9 @@ namespace ModIso8583.Test
                 }.ToSbytes(),
                 0,
                 null);
-            var val = (TimeSpan) v.Value;
+            var val = (DateTime) v.Value;
             Assert.Equal("21:34:56",
-                val.ToString("hh\\:mm\\:ss"));
+                val.ToString("HH:mm:ss"));
         }
     }
 }

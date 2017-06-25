@@ -111,7 +111,7 @@ namespace ModIso8583
         public ICustomField Encoder { get; }
         public IsoType Type { get; }
         public int Length { get; }
-        public Encoding Encoding { get; set; } = Encoding.UTF8;
+        public Encoding Encoding { get; set; } = Encoding.Default;
         public object Value { get; }
 
         public object Clone() { return MemberwiseClone(); }
@@ -236,9 +236,6 @@ namespace ModIso8583
                         break;
                 }
                 var bytes = lhead.GetSbytes(Encoding);
-                //outs.Write(bytes,
-                //    0,
-                //    bytes.Length);
                 foreach (var @sbyte in bytes) sbytes.Add(@sbyte);
             }
             else

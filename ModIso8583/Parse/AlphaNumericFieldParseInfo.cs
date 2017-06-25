@@ -23,21 +23,14 @@ namespace ModIso8583.Parse
             if (pos + Length > buf.Length) throw new Exception($"Insufficient data for {IsoType} field {field} of length {Length}, pos {pos}");
             try
             {
-                //var v = Encoding.GetString(buf,
-                //    pos,
-                //    Length);
                 var v = buf.SbyteString(pos,
                     Length,
                     Encoding);
 
                 if (v.Length != Length)
-                    //v = Encoding.GetString(buf,
-                    //    pos,
-                    //    buf.Length - pos).Substring(0,
-                    //    Length);
                     v = buf.SbyteString(pos,
                         buf.Length - pos,
-                        Encoding.Default).Substring(0,
+                        Encoding).Substring(0,
                         Length);
                 if (custom == null)
                     return new IsoValue(IsoType,

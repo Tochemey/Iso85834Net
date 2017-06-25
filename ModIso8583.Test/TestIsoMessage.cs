@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Text;
+using C5;
 using ModIso8583.Util;
 using Xunit;
 
@@ -12,7 +13,7 @@ namespace ModIso8583.Test
         {
             mf = new MessageFactory<IsoMessage>
             {
-                Encoding = Encoding.Default
+                Encoding = Encoding.UTF8
             };
             mf.SetCustomField(48,
                 new CustomField48());
@@ -20,6 +21,14 @@ namespace ModIso8583.Test
         }
 
         private readonly MessageFactory<IsoMessage> mf;
+
+        private void TestFields(IsoMessage m,
+            ArrayList<int> fields)
+        {
+            for (var i = 2; i < 128; i++)
+                if (fields.Contains(i)) Assert.True(m.HasField(i));
+                else Assert.False(m.HasField(i));
+        }
 
         [Fact]
         public void TestCreation()
@@ -108,11 +117,94 @@ namespace ModIso8583.Test
         [Fact]
         public void TestParsing()
         {
-            byte[] buf = File.ReadAllBytes(AppDomain.CurrentDomain.BaseDirectory + @"/Resources/parse1.txt");
-            sbyte[] sbytes = buf.ToSbytes();
-            int len = mf.GetIsoHeader(0x210).Length;
-            IsoMessage iso = mf.ParseMessage(sbytes, len);
-            Assert.Equal(0x210, iso.Type);
+            var read = File.ReadAllBytes(AppDomain.CurrentDomain.BaseDirectory + @"/Resources/parse1.txt");
+            var buf = read.ToSbytes();
+            var len = mf.GetIsoHeader(0x210).Length;
+            var iso = mf.ParseMessage(buf,
+                len);
+            Assert.Equal(0x210,
+                iso.Type);
+            var b2 = iso.WriteData();
+
+            //Remove leftover newline and stuff from the original buffer
+            var b3 = new sbyte[b2.Length];
+            Array.Copy(buf,
+                0,
+                b3,
+                0,
+                b3.Length);
+            Assert.Equal(b3,
+                b2);
+
+            //Test it contains the correct fields
+            var fields = new ArrayList<int>
+            {
+                3,
+                4,
+                7,
+                11,
+                12,
+                13,
+                15,
+                17,
+                32,
+                35,
+                37,
+                38,
+                39,
+                41,
+                43,
+                49,
+                60,
+                61,
+                100,
+                102,
+                126
+            };
+
+            TestFields(iso,
+                fields);
+            //Again, but now with forced encoding
+            mf.ForceStringEncoding = true;
+            iso = mf.ParseMessage(buf,
+                mf.GetIsoHeader(0x210).Length);
+            Assert.Equal(0x210,
+                iso.Type);
+            TestFields(iso,
+                fields);
+        }
+
+        [Fact]
+        public void TestTemplating()
+        {
+            IsoMessage iso1 = mf.NewMessage(0x200);
+            IsoMessage iso2 = mf.NewMessage(0x200);
+            Assert.NotSame(iso1, iso2);
+            Assert.Equal(iso1.GetObjectValue(3), iso2.GetObjectValue(3));
+            Assert.NotSame(iso1.GetField(3), iso2.GetField(3));
+            Assert.NotSame(iso1.GetField(48), iso2.GetField(48));
+            CustomField48 cf48_1 = (CustomField48) iso1.GetObjectValue(48);
+            int origv = cf48_1.V2;
+            cf48_1.V2 = (origv + 1000);
+            CustomField48 cf48_2 = (CustomField48) iso2.GetObjectValue(48);
+            Assert.Same(cf48_1, cf48_2);
+            Assert.Equal(cf48_2.V2, origv + 1000);
+        }
+
+        [Fact]
+        public void TestSimpleFieldSetter()
+        {
+            IsoMessage iso = mf.NewMessage(0x200);
+            IsoValue f3 = iso.GetField(3);
+            iso.UpdateValue(3, "999999");
+            Assert.Equal("999999", iso.GetObjectValue(3));
+            IsoValue nf3 = iso.GetField(3);
+            Assert.NotSame(f3, nf3);
+            Assert.Equal(f3.Type, nf3.Type);
+            Assert.Equal(f3.Length, nf3.Length);
+            Assert.Same(f3.Encoder, nf3.Encoder);
+            Assert.Throws(typeof(ArgumentException), () => iso.UpdateValue(4, "INVALID!"))
+            ;
         }
     }
 }

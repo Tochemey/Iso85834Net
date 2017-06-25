@@ -60,30 +60,23 @@ namespace ModIso8583.Parse
             int pos,
             int digits)
         {
-            var sbytes = buf;
             if (ForceStringDecoding)
             {
-                //var string0 = Encoding.GetString(buf,
-                //    pos,
-                //    digits);
                 var string0 = buf.SbyteString(pos,
                     digits,
                     Encoding);
-                return int.Parse(string0);
+                return Convert.ToInt32(string0, 10);
             }
             switch (digits)
             {
-                //case 2:
-                //    return ((buf[pos] - 48) * 10) + (buf[pos + 1] - 48);
-                //case 3:
-                //    return ((buf[pos] - 48) * 100) + ((buf[pos + 1] - 48) * 10)
-                //           + (buf[pos + 2] - 48);
-                //case 4:
-                //    return ((buf[pos] - 48) * 1000) + ((buf[pos + 1] - 48) * 100)
-                //           + ((buf[pos + 2] - 48) * 10) + (buf[pos + 3] - 48);
-                case 2: return (sbytes[pos] - 48) * 10 + (sbytes[pos + 1] - 48);
-                case 3: return (sbytes[pos] - 48) * 100 + (sbytes[pos + 1] - 48) * 10 + (sbytes[pos + 2] - 48);
-                case 4: return (sbytes[pos] - 48) * 1000 + (sbytes[pos + 1] - 48) * 100 + (sbytes[pos + 2] - 48) * 10 + (sbytes[pos + 3] - 48);
+                case 2:
+                    return ((buf[pos] - 48) * 10) + (buf[pos + 1] - 48);
+                case 3:
+                    return ((buf[pos] - 48) * 100) + ((buf[pos + 1] - 48) * 10)
+                           + (buf[pos + 2] - 48);
+                case 4:
+                    return ((buf[pos] - 48) * 1000) + ((buf[pos + 1] - 48) * 100)
+                           + ((buf[pos + 2] - 48) * 10) + (buf[pos + 3] - 48);
             }
             return -1;
         }

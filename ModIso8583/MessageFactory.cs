@@ -275,7 +275,10 @@ namespace ModIso8583
             }
             m.Encoding = _encoding;
             int type;
-            if (UseBinary) { type = ((buf[isoHeaderLength] & 0xff) << 8) | (buf[isoHeaderLength + 1] & 0xff); }
+            if (UseBinary)
+            {
+                type = ((buf[isoHeaderLength] & 0xff) << 8) | (buf[isoHeaderLength + 1] & 0xff);
+            }
             else if (ForceStringEncoding)
             {
                 var string0 = buf.SbyteString(isoHeaderLength,
@@ -284,7 +287,13 @@ namespace ModIso8583
                 type = Convert.ToInt32(string0,
                     16);
             }
-            else { type = ((buf[isoHeaderLength] - 48) << 12) | ((buf[isoHeaderLength + 1] - 48) << 8) | ((buf[isoHeaderLength + 2] - 48) << 4) | (buf[isoHeaderLength + 3] - 48); }
+            else
+            {
+                type = ((buf[isoHeaderLength] - 48) << 12) 
+                    | ((buf[isoHeaderLength + 1] - 48) << 8) 
+                    | ((buf[isoHeaderLength + 2] - 48) << 4) 
+                    | (buf[isoHeaderLength + 3] - 48);
+            }
             m.Type = type;
             //Parse the bitmap (primary first)
             var bs = new BitArray(64);
@@ -306,7 +315,9 @@ namespace ModIso8583
                 if (bs.Get(0))
                 {
                     bs.Length = 128;
-                    if (buf.Length < minlength + 8) throw new Exception($"Insufficient length for secondary bitmap : {minlength}");
+                    if (buf.Length < minlength + 8)
+                        throw new Exception($"Insufficient length for secondary bitmap : {minlength}");
+
                     for (var i = 8 + bitmapStart; i < 16 + bitmapStart; i++)
                     {
                         var bit = 128;
@@ -454,7 +465,9 @@ namespace ModIso8583
                         i + 1);
                     abandon = true;
                 }
+
             if (abandon) throw new Exception("ISO8583 MessageFactory cannot parse fields");
+
             //Now we parse each field
             if (UseBinary)
                 foreach (var i in index)
@@ -472,14 +485,20 @@ namespace ModIso8583
                     else
                     {
                         var decoder = fpi.Decoder ?? GetCustomField(i);
+
                         var val = fpi.ParseBinary(i,
                             buf,
                             pos,
                             decoder);
+
                         m.SetField(i,
                             val);
+
                         if (val == null) continue;
-                        if (val.Type == IsoType.NUMERIC || val.Type == IsoType.DATE10 || val.Type == IsoType.DATE4 || val.Type == IsoType.DATE12 || val.Type == IsoType.DATE14 || val.Type == IsoType.DATE_EXP || val.Type == IsoType.AMOUNT || val.Type == IsoType.TIME) pos += val.Length / 2 + val.Length % 2;
+                        if (val.Type == IsoType.NUMERIC || val.Type == IsoType.DATE10 || val.Type == IsoType.DATE4 || val.Type == IsoType.DATE12 || val.Type == IsoType.DATE14 || val.Type == IsoType.DATE_EXP || val.Type == IsoType.AMOUNT || val.Type == IsoType.TIME)
+                        {
+                            pos += val.Length / 2 + val.Length % 2;
+                        }
                         else pos += val.Length;
                         switch (val.Type)
                         {
@@ -518,7 +537,7 @@ namespace ModIso8583
                             m.SetField(i,
                                 val);
                             //To get the correct next position, we need to get the number of bytes, not chars
-                            pos += Encoding.GetBytes(val.ToString()).Length;
+                            pos += val.ToString().GetSbytes(fpi.Encoding).Length;
                             switch (val.Type)
                             {
                                 case IsoType.LLVAR:
