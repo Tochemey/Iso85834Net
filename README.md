@@ -69,7 +69,7 @@ In these cases you can implement a CustomField, which is an interface that defin
 
 Sometimes there are fields that contain several sub-fields or separate pieces of data. Iso85834Net will only parse the field for you, but you still have to parse those pieces of data from the field when you parse a message, and/or encode several pieces of data into a field when creating a message.
 
-Iso85834Net can help with this process, by means of the custom field encoders. To use this feature, first you need to implement the ICustomField interface. You can see how it is done in the following test classes **_TestParsing.cs_** and **_TestIsoMessage.cs_** using the _CustomField48.cs_** class.
+Iso85834Net can help with this process, by means of the custom field encoders. To use this feature, first you need to implement the ICustomField interface. You can see how it is done in the following test classes **_TestParsing.cs_** and **_TestIsoMessage.cs_** using the **_CustomField48.cs_** class.
 
 ### Easy way to configure ISO 8583 messages templates
 
