@@ -66,7 +66,7 @@ namespace ModIso8583
         /// <summary>
         ///     Indicates if the factory should create binary messages and also parse binary messages.
         /// </summary>
-        public bool UseBinary { get; set; }
+        public bool UseBinaryMessages { get; set; }
 
         /// <summary>
         /// </summary>
@@ -145,7 +145,7 @@ namespace ModIso8583
             var m = keyPresent ? CreateIsoMessageWithBinaryHeader(val) : CreateIsoMessage(valStr);
             m.Type = type;
             m.Etx = Etx;
-            m.Binary = UseBinary;
+            m.Binary = UseBinaryMessages;
             m.Forceb2 = Forceb2;
             m.BinBitmap = UseBinaryBitmap;
             m.Encoding = Encoding;
@@ -253,8 +253,8 @@ namespace ModIso8583
             int isoHeaderLength,
             bool binaryIsoHeader = false)
         {
-            var minlength = isoHeaderLength + (UseBinary ? 2 : 4) + (UseBinaryBitmap || UseBinary ? 8 : 16);
-            if (buf.Length < minlength) throw new Exception("Insufficient buffer length, needs to be at least " + minlength);
+            var minlength = isoHeaderLength + (UseBinaryMessages ? 2 : 4) + (UseBinaryBitmap || UseBinaryMessages ? 8 : 16);
+            if (buf.Length < minlength) throw new ParseException("Insufficient buffer length, needs to be at least " + minlength);
             T m;
             if (binaryIsoHeader && isoHeaderLength > 0)
             {
@@ -275,7 +275,7 @@ namespace ModIso8583
             }
             m.Encoding = _encoding;
             int type;
-            if (UseBinary)
+            if (UseBinaryMessages)
             {
                 type = ((buf[isoHeaderLength] & 0xff) << 8) | (buf[isoHeaderLength + 1] & 0xff);
             }
@@ -298,9 +298,9 @@ namespace ModIso8583
             //Parse the bitmap (primary first)
             var bs = new BitArray(64);
             var pos = 0;
-            if (UseBinary || UseBinaryBitmap)
+            if (UseBinaryMessages || UseBinaryBitmap)
             {
-                var bitmapStart = isoHeaderLength + (UseBinary ? 2 : 4);
+                var bitmapStart = isoHeaderLength + (UseBinaryMessages ? 2 : 4);
                 for (var i = bitmapStart; i < 8 + bitmapStart; i++)
                 {
                     var bit = 128;
@@ -316,7 +316,7 @@ namespace ModIso8583
                 {
                     bs.Length = 128;
                     if (buf.Length < minlength + 8)
-                        throw new Exception($"Insufficient length for secondary bitmap : {minlength}");
+                        throw new ParseException($"Insufficient length for secondary bitmap : {minlength}");
 
                     for (var i = 8 + bitmapStart; i < 16 + bitmapStart; i++)
                     {
@@ -391,7 +391,7 @@ namespace ModIso8583
                     if (bs.Get(0))
                     {
                         bs.Length = 128;
-                        if (buf.Length < minlength + 16) throw new Exception($"Insufficient length for secondary bitmap :{minlength}");
+                        if (buf.Length < minlength + 16) throw new ParseException($"Insufficient length for secondary bitmap :{minlength}");
                         if (ForceStringEncoding)
                         {
                             var bb = buf.SbyteString(isoHeaderLength + 20,
@@ -441,9 +441,9 @@ namespace ModIso8583
                     }
                     else { pos = minlength; }
                 }
-                catch (Exception e)
+                catch (FormatException e)
                 {
-                    var exception = new Exception($"Invalid ISO8583 bitmap: Cause {e}");
+                    var exception = new ParseException($"Invalid ISO8583 bitmap: Cause {e}");
                     throw exception;
                 }
             }
@@ -466,10 +466,10 @@ namespace ModIso8583
                     abandon = true;
                 }
 
-            if (abandon) throw new Exception("ISO8583 MessageFactory cannot parse fields");
+            if (abandon) throw new ParseException("ISO8583 MessageFactory cannot parse fields");
 
             //Now we parse each field
-            if (UseBinary)
+            if (UseBinaryMessages)
                 foreach (var i in index)
                 {
                     var fpi = parseGuide[i];
@@ -555,7 +555,7 @@ namespace ModIso8583
                             }
                         }
                 }
-            m.Binary = UseBinary;
+            m.Binary = UseBinaryMessages;
             m.BinBitmap = UseBinaryBitmap;
             return m;
         }

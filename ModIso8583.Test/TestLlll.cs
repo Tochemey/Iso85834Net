@@ -1,4 +1,5 @@
-﻿using Xunit;
+﻿using ModIso8583.Util;
+using Xunit;
 
 namespace ModIso8583.Test
 {
@@ -34,6 +35,21 @@ namespace ModIso8583.Test
             m.SetValue(3, new sbyte[] { unchecked((sbyte)0xff) }, IsoType.LLLLBIN, 0);
             Assert.Equal(new sbyte[]{2, 0, (sbyte) 0x60, 0, 0, 0, 0, 0, 0, 0,
                 0, 2, (sbyte)'X', (sbyte)'X', 0, 1, unchecked((sbyte)0xff)}, m.WriteData());
+        }
+
+        [Fact]
+        public void TestParsing()
+        {
+            IsoMessage m = mfact.ParseMessage("010060000000000000000001X0002FF".GetSbytes(), 0);
+            Assert.NotNull(m);
+            Assert.Equal("X", m.GetObjectValue(2));
+            Assert.Equal(new sbyte[] { unchecked((sbyte)0xff) }, (sbyte[])m.GetObjectValue(3));
+            mfact.UseBinaryMessages =(true);
+            m = mfact.ParseMessage(new byte[]{1, 0, (byte) 0x60, 0, 0, 0, 0, 0, 0, 0,
+                0, 2, (byte)'X', (byte)'X', 0, 1, (byte)0xff}.ToSbytes(), 0);
+            Assert.NotNull(m);
+            Assert.Equal("XX", m.GetObjectValue(2));
+            Assert.Equal(new sbyte[] { unchecked((sbyte)0xff) }, (sbyte[])m.GetObjectValue(3));
         }
     }
 }

@@ -157,6 +157,8 @@
     <Compile Include="TestIsoMessage.cs" />
     <Compile Include="TestIssue4.cs" />
     <Compile Include="TestLlll.cs" />
+    <Compile Include="TestLlllPatch.cs" />
+    <Compile Include="TestParsing.cs" />
     <Compile Include="Util\TestBcd.cs" />
     <Compile Include="Util\TestHexCodec.cs" />
     <Compile Include="TestEbcdic.cs" />

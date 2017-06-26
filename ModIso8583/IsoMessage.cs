@@ -224,44 +224,40 @@ namespace ModIso8583
         /// </summary>
         /// <param name="outs">The stream to write the message to.</param>
         /// <param name="lengthBytes">The size of the message length header. Valid ranges are 0 to 4.</param>
-        public void Write(Stream outs,
+        public void Write(ArrayList<sbyte> outs,
             int lengthBytes)
         {
             if (lengthBytes > 4) throw new ArgumentException("The length header can have at most 4 bytes");
 
             var data = WriteData();
-            var binaryWriter = new BinaryWriter(outs);
-            using (binaryWriter)
+
+            if (lengthBytes > 0)
             {
-                if (lengthBytes > 0)
+                var l = data.Length;
+                if (Etx > -1) l++;
+                var buf = new sbyte[lengthBytes];
+                var pos = 0;
+                if (lengthBytes == 4)
                 {
-                    var l = data.Length;
-                    if (Etx > -1) l++;
-                    var buf = new sbyte[lengthBytes];
-                    var pos = 0;
-                    if (lengthBytes == 4)
-                    {
-                        buf[0] = (sbyte) ((l & 0xff000000) >> 24);
-                        pos++;
-                    }
-                    if (lengthBytes > 2)
-                    {
-                        buf[pos] = (sbyte) ((l & 0xff0000) >> 16);
-                        pos++;
-                    }
-                    if (lengthBytes > 1)
-                    {
-                        buf[pos] = (sbyte) ((l & 0xff00) >> 8);
-                        pos++;
-                    }
-                    buf[pos] = (sbyte) (l & 0xff);
-                    foreach (var @sbyte in buf) binaryWriter.Write(@sbyte);
+                    buf[0] = (sbyte) ((l & 0xff000000) >> 24);
+                    pos++;
                 }
-                foreach (var @sbyte in data) binaryWriter.Write(@sbyte);
-                //ETX
-                if (Etx > -1) binaryWriter.Write((sbyte) Etx);
-                binaryWriter.BaseStream.Flush();
+                if (lengthBytes > 2)
+                {
+                    buf[pos] = (sbyte) ((l & 0xff0000) >> 16);
+                    pos++;
+                }
+                if (lengthBytes > 1)
+                {
+                    buf[pos] = (sbyte) ((l & 0xff00) >> 8);
+                    pos++;
+                }
+                buf[pos] = (sbyte) (l & 0xff);
+                foreach (var @sbyte in buf) outs.Add(@sbyte);
             }
+            foreach (var @sbyte in data) outs.Add(@sbyte);
+            //ETX
+            if (Etx > -1) outs.Add((sbyte) Etx);
         }
 
         /// <summary>
@@ -313,10 +309,6 @@ namespace ModIso8583
             if (IsoHeader != null)
                 try
                 {
-                    //var bytes = Encoding.GetBytes(IsoHeader);
-                    //stream.Write(bytes,
-                    //    0,
-                    //    bytes.Length);
                     var bytes = IsoHeader.GetSbytes(Encoding);
                     foreach (var @sbyte in bytes) sbyteList.Add(@sbyte);
                 }
@@ -327,9 +319,6 @@ namespace ModIso8583
             else if (BinIsoHeader != null)
                 try
                 {
-                    //stream.Write(BinIsoHeader,
-                    //    0,
-                    //    BinIsoHeader.Length);
                     foreach (var @sbyte in BinIsoHeader) sbyteList.Add(@sbyte);
                 }
                 catch (IOException)
@@ -348,10 +337,7 @@ namespace ModIso8583
                 try
                 {
                     var x = Type.ToString("x4");
-                    var bytes = x.GetSbytes(Encoding); /*Encoding.GetBytes(x);*/
-                    //stream.Write(bytes,
-                    //    0,
-                    //    bytes.Length);
+                    var bytes = x.GetSbytes(Encoding);      
                     foreach (var @sbyte in bytes) sbyteList.Add(@sbyte);
                 }
                 catch (IOException)
@@ -372,7 +358,6 @@ namespace ModIso8583
                     if (bits.Get(i)) b |= pos;
                     pos >>= 1;
                     if (pos != 0) continue;
-                    //stream.WriteByte((byte) b);
                     sbyteList.Add((sbyte) b);
                     pos = 128;
                     b = 0;
@@ -395,7 +380,6 @@ namespace ModIso8583
                     if (bits.Get(pos++)) nibble |= 4;
                     if (bits.Get(pos++)) nibble |= 2;
                     if (bits.Get(pos++)) nibble |= 1;
-                    //stream.WriteByte(Hex[nibble]);
                     sbyteList.Add(Hex[nibble]);
                 }
 
@@ -406,10 +390,6 @@ namespace ModIso8583
                     try
                     {
                         var sbytes = hb.GetSbytes(Encoding);
-
-                        //stream.Write(bytes,
-                        //    0,
-                        //    bytes.Length);
                         foreach (var @sbyte in sbytes) sbyteList.Add(@sbyte);
                     }
                     catch (IOException)
@@ -451,7 +431,7 @@ namespace ModIso8583
         /// </summary>
         /// <param name="lengthBytes"></param>
         /// <returns></returns>
-        public byte[] WriteToBuffer(int lengthBytes)
+        public sbyte[] WriteToBuffer(int lengthBytes)
         {
             if (lengthBytes > 4) throw new ArgumentException("The length header can have at most 4 bytes");
             var data = WriteData();
@@ -470,8 +450,7 @@ namespace ModIso8583
             //ETX
             if (Etx > -1) stream.Add((sbyte) Etx);
 
-            //todo flip the stream
-            return stream.ToArray().ToUnsignedBytes();
+            return stream.ToArray();
         }
 
         public string DebugString()
@@ -506,9 +485,9 @@ namespace ModIso8583
                 var v = _fields[i];
                 if (v == null) continue;
                 var desc = v.ToString();
-                if (v.Type == IsoType.LLBIN || v.Type == IsoType.LLVAR) sb.Append(desc.Length.ToString("x2"));
-                else if (v.Type == IsoType.LLLBIN || v.Type == IsoType.LLLVAR) sb.Append(desc.Length.ToString("x3"));
-                else if (v.Type == IsoType.LLLLBIN || v.Type == IsoType.LLLLVAR) sb.Append(desc.Length.ToString("x4"));
+                if (v.Type == IsoType.LLBIN || v.Type == IsoType.LLVAR) sb.Append(desc.Length.ToString("D2"));
+                else if (v.Type == IsoType.LLLBIN || v.Type == IsoType.LLLVAR) sb.Append(desc.Length.ToString("D3"));
+                else if (v.Type == IsoType.LLLLBIN || v.Type == IsoType.LLLLVAR) sb.Append(desc.Length.ToString("D4"));
                 sb.Append(desc);
             }
             return sb.ToString();

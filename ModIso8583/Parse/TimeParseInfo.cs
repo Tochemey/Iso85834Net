@@ -14,8 +14,8 @@ namespace ModIso8583.Parse
             int pos,
             ICustomField custom)
         {
-            if (pos < 0) throw new Exception($"Invalid TIME field {field} pos {pos}");
-            if (pos + 6 > buf.Length) throw new Exception($"Insufficient data for TIME field {field}, pos {pos}");
+            if (pos < 0) throw new ParseException($"Invalid TIME field {field} pos {pos}");
+            if (pos + 6 > buf.Length) throw new ParseException($"Insufficient data for TIME field {field}, pos {pos}");
             DateTime calendar;
             if (ForceStringDecoding)
             {
@@ -59,8 +59,8 @@ namespace ModIso8583.Parse
             int pos,
             ICustomField custom)
         {
-            if (pos < 0) throw new Exception($"Invalid bin TIME field {field} pos {pos}");
-            if (pos + 3 > buf.Length) throw new Exception($"Insufficient data for bin TIME field {field}, pos {pos}");
+            if (pos < 0) throw new ParseException($"Invalid bin TIME field {field} pos {pos}");
+            if (pos + 3 > buf.Length) throw new ParseException($"Insufficient data for bin TIME field {field}, pos {pos}");
             var sbytes = buf;
             var tens = new int[3];
             var start = 0;
@@ -70,7 +70,11 @@ namespace ModIso8583.Parse
                 tens[0],
                 tens[1],
                 tens[2]);
-            //todo timespan to timezone
+
+            if (TimeZoneInfo != null)
+                calendar = TimeZoneInfo.ConvertTime(calendar,
+                    TimeZoneInfo);
+
             return new IsoValue(IsoType,
                 calendar);
         }

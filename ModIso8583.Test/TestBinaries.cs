@@ -18,7 +18,7 @@ namespace ModIso8583.Test
 
             mfactBin.Encoding = Encoding.UTF8;
             mfactBin.SetConfigPath(configXml);
-            mfactBin.UseBinary = true;
+            mfactBin.UseBinaryMessages = true;
             mfactBin.AssignDate = true;
         }
 

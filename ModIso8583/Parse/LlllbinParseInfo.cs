@@ -15,16 +15,16 @@ namespace ModIso8583.Parse
             int pos,
             ICustomField custom)
         {
-            if (pos < 0) throw new Exception($"Invalid LLLLBIN field {field} pos {pos}");
-            if (pos + 4 > buf.Length) throw new Exception($"Insufficient LLLLBIN header field {field}");
+            if (pos < 0) throw new ParseException($"Invalid LLLLBIN field {field} pos {pos}");
+            if (pos + 4 > buf.Length) throw new ParseException($"Insufficient LLLLBIN header field {field}");
 
             var l = DecodeLength(buf,
                 pos,
                 4);
 
-            if (l < 0) throw new Exception($"Invalid LLLLBIN length {l} field {field} pos {pos}");
+            if (l < 0) throw new ParseException($"Invalid LLLLBIN length {l} field {field} pos {pos}");
 
-            if (l + pos + 4 > buf.Length) throw new Exception($"Insufficient data for LLLLBIN field {field}, pos {pos}");
+            if (l + pos + 4 > buf.Length) throw new ParseException($"Insufficient data for LLLLBIN field {field}, pos {pos}");
             var binval = l == 0 ? new sbyte[0] : HexCodec.HexDecode(buf.SbyteString(pos + 4,
                 l,
                 Encoding.Default));
@@ -46,7 +46,7 @@ namespace ModIso8583.Parse
                         0,
                         custom);
                 }
-                catch (Exception) { throw new Exception($"Insufficient data for LLLLBIN field {field}, pos {pos}"); }
+                catch (Exception) { throw new ParseException($"Insufficient data for LLLLBIN field {field}, pos {pos}"); }
             try
             {
                 var dec = custom.DecodeField(l == 0 ? "" : buf.SbyteString(pos + 4,
@@ -59,7 +59,7 @@ namespace ModIso8583.Parse
                     l,
                     custom);
             }
-            catch (Exception) { throw new Exception($"Insufficient data for LLLLBIN field {field}, pos {pos}"); }
+            catch (Exception) { throw new ParseException($"Insufficient data for LLLLBIN field {field}, pos {pos}"); }
         }
 
         public override IsoValue ParseBinary(int field,
@@ -67,14 +67,14 @@ namespace ModIso8583.Parse
             int pos,
             ICustomField custom)
         {
-            if (pos < 0) throw new Exception($"Invalid bin LLLLBIN field {field} pos {pos}");
-            if (pos + 2 > buf.Length) throw new Exception($"Insufficient LLLLBIN header field {field}");
+            if (pos < 0) throw new ParseException($"Invalid bin LLLLBIN field {field} pos {pos}");
+            if (pos + 2 > buf.Length) throw new ParseException($"Insufficient LLLLBIN header field {field}");
 
             int l = ((buf[pos] & 0xf0) * 1000) + ((buf[pos] & 0x0f) * 100)
                     + (((buf[pos + 1] & 0xf0) >> 4) * 10) + (buf[pos + 1] & 0x0f);
 
-            if (l < 0) throw new Exception($"Invalid LLLLBIN length {l} field {field} pos {pos}");
-            if (l + pos + 2 > buf.Length) throw new Exception($"Insufficient data for bin LLLLBIN field {field}, pos {pos} requires {l}, only {buf.Length - pos + 1} available");
+            if (l < 0) throw new ParseException($"Invalid LLLLBIN length {l} field {field} pos {pos}");
+            if (l + pos + 2 > buf.Length) throw new ParseException($"Insufficient data for bin LLLLBIN field {field}, pos {pos} requires {l}, only {buf.Length - pos + 1} available");
 
             var v = new sbyte[l];
             Array.Copy(buf,
@@ -99,7 +99,7 @@ namespace ModIso8583.Parse
                         l,
                         custom);
                 }
-                catch (Exception) { throw new Exception($"Insufficient data for LLLLBIN field {field}, pos {pos}"); }
+                catch (Exception) { throw new ParseException($"Insufficient data for LLLLBIN field {field}, pos {pos}"); }
             {
                 var dec = custom.DecodeField(HexCodec.HexEncode(v,
                     0,

@@ -15,16 +15,16 @@ namespace ModIso8583.Parse
             int pos,
             ICustomField custom)
         {
-            if (pos < 0) throw new Exception($"Invalid LLLVAR field {field} pos {pos}");
-            if (pos + 3 > buf.Length) throw new Exception($"Insufficient data for LLLVAR header field {field} pos {pos}");
+            if (pos < 0) throw new ParseException($"Invalid LLLVAR field {field} pos {pos}");
+            if (pos + 3 > buf.Length) throw new ParseException($"Insufficient data for LLLVAR header field {field} pos {pos}");
 
             var len = DecodeLength(buf,
                 pos,
                 3);
 
-            if (len < 0) throw new Exception($"Invalid LLLVAR length {len}({buf.SbyteString(pos, 3, Encoding.Default)}) field {field} pos {pos}");
+            if (len < 0) throw new ParseException($"Invalid LLLVAR length {len}({buf.SbyteString(pos, 3, Encoding.Default)}) field {field} pos {pos}");
 
-            if (len + pos + 3 > buf.Length) throw new Exception($"Insufficient data for LLLVAR field {field}, pos {pos}");
+            if (len + pos + 3 > buf.Length) throw new ParseException($"Insufficient data for LLLVAR field {field}, pos {pos}");
 
             string v;
             try
@@ -33,7 +33,7 @@ namespace ModIso8583.Parse
                     len,
                     Encoding);
             }
-            catch (Exception) { throw new Exception($"Insufficient data for LLLVAR header, field {field} pos {pos}"); }
+            catch (Exception) { throw new ParseException($"Insufficient data for LLLVAR header, field {field} pos {pos}"); }
 
             //This is new: if the String's length is different from the specified length in the
             //buffer, there are probably some extended characters. So we create a String from
@@ -64,14 +64,14 @@ namespace ModIso8583.Parse
         {
             var sbytes = buf;
 
-            if (pos < 0) throw new Exception($"Invalid bin LLLVAR field {field} pos {pos}");
+            if (pos < 0) throw new ParseException($"Invalid bin LLLVAR field {field} pos {pos}");
 
-            if (pos + 2 > buf.Length) throw new Exception($"Insufficient data for bin LLLVAR header, field {field} pos {pos}");
+            if (pos + 2 > buf.Length) throw new ParseException($"Insufficient data for bin LLLVAR header, field {field} pos {pos}");
 
             var len = (sbytes[pos] & 0x0f) * 100 + ((sbytes[pos + 1] & 0xf0) >> 4) * 10 + (sbytes[pos + 1] & 0x0f);
-            if (len < 0) throw new Exception($"Invalid bin LLLVAR length {len}, field {field} pos {pos}");
+            if (len < 0) throw new ParseException($"Invalid bin LLLVAR length {len}, field {field} pos {pos}");
 
-            if (len + pos + 2 > buf.Length) throw new Exception($"Insufficient data for bin LLLVAR field {field}, pos {pos}");
+            if (len + pos + 2 > buf.Length) throw new ParseException($"Insufficient data for bin LLLVAR field {field}, pos {pos}");
 
             if (custom == null)
                 return new IsoValue(IsoType,

@@ -13,7 +13,7 @@ namespace ModIso8583.Test.Parse
         {
             string issue38xml = @"/Resources/issue38.xml";
             txtfact.SetConfigPath(issue38xml);
-            binfact.UseBinary = true;
+            binfact.UseBinaryMessages = true;
             binfact.SetConfigPath(issue38xml);
         }
 

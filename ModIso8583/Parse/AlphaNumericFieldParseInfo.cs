@@ -19,8 +19,8 @@ namespace ModIso8583.Parse
             int pos,
             ICustomField custom)
         {
-            if (pos < 0) throw new Exception($"Invalid ALPHA/NUM field {field} position {pos}");
-            if (pos + Length > buf.Length) throw new Exception($"Insufficient data for {IsoType} field {field} of length {Length}, pos {pos}");
+            if (pos < 0) throw new ParseException($"Invalid ALPHA/NUM field {field} position {pos}");
+            if (pos + Length > buf.Length) throw new ParseException($"Insufficient data for {IsoType} field {field} of length {Length}, pos {pos}");
             try
             {
                 var v = buf.SbyteString(pos,
@@ -44,7 +44,7 @@ namespace ModIso8583.Parse
                     Length,
                     custom);
             }
-            catch (Exception) { throw new Exception($"Insufficient data for {IsoType} field {field} of length {Length}, pos {pos}"); }
+            catch (Exception) { throw new ParseException($"Insufficient data for {IsoType} field {field} of length {Length}, pos {pos}"); }
         }
     }
 }

@@ -17,8 +17,8 @@ namespace ModIso8583.Parse
             int pos,
             ICustomField custom)
         {
-            if (pos < 0) throw new Exception($"Invalid DATE4 field {field} position {pos}");
-            if (pos + 4 > buf.Length) throw new Exception($"Insufficient data for DATE4 field {field}, pos {pos}");
+            if (pos < 0) throw new ParseException($"Invalid DATE4 field {field} position {pos}");
+            if (pos + 4 > buf.Length) throw new ParseException($"Insufficient data for DATE4 field {field}, pos {pos}");
 
             int year, month, day, minute, seconds, milliseconds;
 
@@ -71,7 +71,7 @@ namespace ModIso8583.Parse
             var tens = new int[2];
             var sbytes = buf;
             var start = 0;
-            if (buf.Length - pos < 2) throw new Exception($"Insufficient data to parse binary DATE4 field {field} pos {pos}");
+            if (buf.Length - pos < 2) throw new ParseException($"Insufficient data to parse binary DATE4 field {field} pos {pos}");
             for (var i = pos; i < pos + tens.Length; i++) tens[start++] = ((sbytes[i] & 0xf0) >> 4) * 10 + (sbytes[i] & 0x0f);
 
             var calendar = new DateTime(DateTime.Now.Year,

@@ -14,8 +14,8 @@ namespace ModIso8583.Parse
             int pos,
             ICustomField custom)
         {
-            if (pos < 0) throw new Exception($"Invalid DATE10 field {field} position {pos}");
-            if (pos + 10 > buf.Length) throw new Exception($"Insufficient data for DATE10 field {field}, pos {pos}");
+            if (pos < 0) throw new ParseException($"Invalid DATE10 field {field} position {pos}");
+            if (pos + 10 > buf.Length) throw new ParseException($"Insufficient data for DATE10 field {field}, pos {pos}");
 
             DateTime calendar;
             if (ForceStringDecoding)
@@ -73,8 +73,8 @@ namespace ModIso8583.Parse
             int pos,
             ICustomField custom)
         {
-            if (pos < 0) throw new Exception($"Invalid DATE10 field {field} position {pos}");
-            if (pos + 5 > buf.Length) throw new Exception($"Insufficient data for DATE10 field {field}, pos {pos}");
+            if (pos < 0) throw new ParseException($"Invalid DATE10 field {field} position {pos}");
+            if (pos + 5 > buf.Length) throw new ParseException($"Insufficient data for DATE10 field {field}, pos {pos}");
             var tens = new int[5];
             var start = 0;
             for (var i = pos; i < pos + tens.Length; i++) tens[start++] = ((buf[i] & 0xf0) >> 4) * 10 + (buf[i] & 0x0f);

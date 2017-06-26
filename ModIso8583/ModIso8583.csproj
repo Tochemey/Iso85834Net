@@ -8,7 +8,7 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>ModIso8583</RootNamespace>
-    <AssemblyName>ModIso8583</AssemblyName>
+    <AssemblyName>DotNetIso8583</AssemblyName>
     <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -92,6 +92,7 @@
     <Compile Include="Util\DateUtil.cs" />
     <Compile Include="Util\Enumm.cs" />
     <Compile Include="Util\HexCodec.cs" />
+    <Compile Include="Util\ParseException.cs" />
     <Compile Include="Util\StringUtil.cs" />
     <Compile Include="Impl\SimpleTraceGenerator.cs" />
   </ItemGroup>

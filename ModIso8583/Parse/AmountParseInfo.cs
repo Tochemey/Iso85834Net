@@ -17,8 +17,8 @@ namespace ModIso8583.Parse
             int pos,
             ICustomField custom)
         {
-            if (pos < 0) throw new Exception($"Invalid AMOUNT field {field} position {pos}");
-            if (pos + 12 > buf.Length) throw new Exception($"Insufficient data for AMOUNT field {field}, pos {pos}");
+            if (pos < 0) throw new ParseException($"Invalid AMOUNT field {field} position {pos}");
+            if (pos + 12 > buf.Length) throw new ParseException($"Insufficient data for AMOUNT field {field}, pos {pos}");
 
             var v = buf.SbyteString(pos,
                 12,
@@ -32,8 +32,8 @@ namespace ModIso8583.Parse
                     dec,
                     Length);
             }
-            catch (FormatException) { throw new FormatException($"Cannot read amount '{v}' field {field} pos {pos}"); }
-            catch (Exception) { throw new FormatException($"Insufficient data for AMOUNT field {field}, pos {pos}"); }
+            catch (FormatException) { throw new ParseException($"Cannot read amount '{v}' field {field} pos {pos}"); }
+            catch (Exception) { throw new ParseException($"Insufficient data for AMOUNT field {field}, pos {pos}"); }
         }
 
         public override IsoValue ParseBinary(int field,
@@ -58,8 +58,8 @@ namespace ModIso8583.Parse
                 return new IsoValue(IsoType.AMOUNT,
                     decimal.Parse(new string(digits)));
             }
-            catch (FormatException) { throw new FormatException($"Cannot read amount '{new string(digits)}' field {field} pos {pos}"); }
-            catch (Exception) { throw new FormatException($"Insufficient data for AMOUNT field {field}, pos {pos}"); }
+            catch (FormatException) { throw new ParseException($"Cannot read amount '{new string(digits)}' field {field} pos {pos}"); }
+            catch (Exception) { throw new ParseException($"Insufficient data for AMOUNT field {field}, pos {pos}"); }
         }
     }
 }

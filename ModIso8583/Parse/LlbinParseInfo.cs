@@ -15,18 +15,14 @@ namespace ModIso8583.Parse
             int pos,
             ICustomField custom)
         {
-            if (pos < 0) throw new Exception($"Invalid LLBIN field {field} position {pos}");
-            if (pos + 2 > buf.Length) throw new Exception($"Invalid LLBIN field {field} position {pos}");
+            if (pos < 0) throw new ParseException($"Invalid LLBIN field {field} position {pos}");
+            if (pos + 2 > buf.Length) throw new ParseException($"Invalid LLBIN field {field} position {pos}");
             var len = DecodeLength(buf,
                 pos,
                 2);
-            if (len < 0) throw new Exception($"Invalid LLBIN field {field} length {len} pos {pos}");
+            if (len < 0) throw new ParseException($"Invalid LLBIN field {field} length {len} pos {pos}");
 
-            if (len + pos + 2 > buf.Length) throw new Exception($"Insufficient data for LLBIN field {field}, pos {pos} (LEN states '{buf.SbyteString(pos, 2, Encoding.Default)}')");
-
-            //var binval = len == 0 ? new byte[0] : HexCodec.HexDecode(Encoding.ASCII.GetString(buf,
-            //    pos + 2,
-            //    len));
+            if (len + pos + 2 > buf.Length) throw new ParseException($"Insufficient data for LLBIN field {field}, pos {pos} (LEN states '{buf.SbyteString(pos, 2, Encoding.Default)}')");
 
             var binval = len == 0 ? new sbyte[0] : HexCodec.HexDecode(buf.SbyteString(pos + 2,
                 len,
@@ -51,7 +47,7 @@ namespace ModIso8583.Parse
                         0,
                         custom);
                 }
-                catch (Exception) { throw new Exception($"Insufficient data for LLBIN field {field}, pos {pos} (LEN states '{buf.SbyteString(pos, 2, Encoding.Default)}')"); }
+                catch (Exception) { throw new ParseException($"Insufficient data for LLBIN field {field}, pos {pos} (LEN states '{buf.SbyteString(pos, 2, Encoding.Default)}')"); }
             try
             {
                 var dec = custom.DecodeField(buf.SbyteString(pos + 2,
@@ -64,7 +60,7 @@ namespace ModIso8583.Parse
                     binval.Length,
                     custom);
             }
-            catch (Exception) { throw new Exception($"Insufficient data for LLBIN field {field}, pos {pos} (LEN states '{buf.SbyteString(pos, 2, Encoding.Default)}')"); }
+            catch (Exception) { throw new ParseException($"Insufficient data for LLBIN field {field}, pos {pos} (LEN states '{buf.SbyteString(pos, 2, Encoding.Default)}')"); }
         }
 
         public override IsoValue ParseBinary(int field,
@@ -72,14 +68,14 @@ namespace ModIso8583.Parse
             int pos,
             ICustomField custom)
         {
-            if (pos < 0) throw new Exception($"Invalid bin LLBIN field {field} position {pos}");
-            if (pos + 1 > buf.Length) throw new Exception($"Insufficient bin LLBIN header field {field}");
+            if (pos < 0) throw new ParseException($"Invalid bin LLBIN field {field} position {pos}");
+            if (pos + 1 > buf.Length) throw new ParseException($"Insufficient bin LLBIN header field {field}");
 
             var sbytes = buf;
 
             var l = ((sbytes[pos] & 0xf0) >> 4) * 10 + (sbytes[pos] & 0x0f);
-            if (l < 0) throw new Exception($"Invalid bin LLBIN length {l} pos {pos}");
-            if (l + pos + 1 > buf.Length) throw new Exception($"Insufficient data for bin LLBIN field {field}, pos {pos}: need {l}, only {buf.Length} available");
+            if (l < 0) throw new ParseException($"Invalid bin LLBIN length {l} pos {pos}");
+            if (l + pos + 1 > buf.Length) throw new ParseException($"Insufficient data for bin LLBIN field {field}, pos {pos}: need {l}, only {buf.Length} available");
             var v = new sbyte[l];
             Array.Copy(sbytes,
                 pos + 1,
@@ -102,7 +98,7 @@ namespace ModIso8583.Parse
                         l,
                         custom);
                 }
-                catch (Exception) { throw new Exception($"Insufficient data for LLBIN field {field}, pos {pos} length {l}"); }
+                catch (Exception) { throw new ParseException($"Insufficient data for LLBIN field {field}, pos {pos} length {l}"); }
             {
                 var dec = custom.DecodeField(HexCodec.HexEncode(v,
                     0,

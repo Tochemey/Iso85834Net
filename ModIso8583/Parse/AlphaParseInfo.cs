@@ -17,8 +17,8 @@ namespace ModIso8583.Parse
             int pos,
             ICustomField custom)
         {
-            if (pos < 0) throw new Exception($"Invalid bin ALPHA field {field} position {pos}");
-            if (pos + Length > buf.Length) throw new Exception($"Insufficient data for bin {IsoType} field {field} of length {Length}, pos {pos}");
+            if (pos < 0) throw new ParseException($"Invalid bin ALPHA field {field} position {pos}");
+            if (pos + Length > buf.Length) throw new ParseException($"Insufficient data for bin {IsoType} field {field} of length {Length}, pos {pos}");
             try
             {
                 string v;
@@ -44,7 +44,7 @@ namespace ModIso8583.Parse
                     Length,
                     custom);
             }
-            catch (Exception) { throw new Exception($"Insufficient data for {IsoType} field {field} of length {Length}, pos {pos}"); }
+            catch (Exception) { throw new ParseException($"Insufficient data for {IsoType} field {field} of length {Length}, pos {pos}"); }
         }
     }
 }

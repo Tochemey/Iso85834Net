@@ -14,8 +14,8 @@ namespace ModIso8583.Parse
             int pos,
             ICustomField custom)
         {
-            if (pos < 0) throw new Exception($"Invalid DATE12 field {field} position {pos}");
-            if (pos + 12 > buf.Length) throw new Exception($"Insufficient data for DATE12 field {field}, pos {pos}");
+            if (pos < 0) throw new ParseException($"Invalid DATE12 field {field} position {pos}");
+            if (pos + 12 > buf.Length) throw new ParseException($"Insufficient data for DATE12 field {field}, pos {pos}");
 
             DateTime calendar;
             int year;
@@ -84,8 +84,8 @@ namespace ModIso8583.Parse
             int pos,
             ICustomField custom)
         {
-            if (pos < 0) throw new Exception($"Invalid DATE12 field {field} position {pos}");
-            if (pos + 6 > buf.Length) throw new Exception($"Insufficient data for DATE12 field {field}, pos {pos}");
+            if (pos < 0) throw new ParseException($"Invalid DATE12 field {field} position {pos}");
+            if (pos + 6 > buf.Length) throw new ParseException($"Insufficient data for DATE12 field {field}, pos {pos}");
 
             var tens = new int[6];
             var start = 0;
@@ -100,6 +100,7 @@ namespace ModIso8583.Parse
                 tens[3],
                 tens[4],
                 tens[5]).AddMilliseconds(0);
+
             if (TimeZoneInfo != null)
                 calendar = TimeZoneInfo.ConvertTime(calendar,
                     TimeZoneInfo);

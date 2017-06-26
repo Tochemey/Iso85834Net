@@ -14,8 +14,8 @@ namespace ModIso8583.Parse
             int pos,
             ICustomField custom)
         {
-            if (pos < 0) throw new Exception($"Invalid bin NUMERIC field {field} pos {pos}");
-            if (pos + Length / 2 > buf.Length) throw new Exception($"Insufficient data for bin {IsoType} field {field} of length {Length}, pos {pos}");
+            if (pos < 0) throw new ParseException($"Invalid bin NUMERIC field {field} pos {pos}");
+            if (pos + Length / 2 > buf.Length) throw new ParseException($"Insufficient data for bin {IsoType} field {field} of length {Length}, pos {pos}");
 
             //A long covers up to 18 digits
             if (Length < 19)
@@ -32,7 +32,7 @@ namespace ModIso8583.Parse
                         Length),
                     Length);
             }
-            catch (Exception) { throw new Exception($"Insufficient data for bin {IsoType} field {field} of length {Length}, pos {pos}"); }
+            catch (Exception) { throw new ParseException($"Insufficient data for bin {IsoType} field {field} of length {Length}, pos {pos}"); }
         }
     }
 }

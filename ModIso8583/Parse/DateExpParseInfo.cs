@@ -14,8 +14,8 @@ namespace ModIso8583.Parse
             int pos,
             ICustomField custom)
         {
-            if (pos < 0) throw new Exception($"Invalid DATE_EXP field {field} position {pos}");
-            if (pos + 4 > buf.Length) throw new Exception($"Insufficient data for DATE_EXP field {field}, pos {pos}");
+            if (pos < 0) throw new ParseException($"Invalid DATE_EXP field {field} position {pos}");
+            if (pos + 4 > buf.Length) throw new ParseException($"Insufficient data for DATE_EXP field {field}, pos {pos}");
 
             int year, month;
             int hour, minute, seconds;
@@ -57,8 +57,8 @@ namespace ModIso8583.Parse
             int pos,
             ICustomField custom)
         {
-            if (pos < 0) throw new Exception($"Invalid DATE_EXP field {field} position {pos}");
-            if (pos + 2 > buf.Length) throw new Exception($"Insufficient data for DATE_EXP field {field} pos {pos}");
+            if (pos < 0) throw new ParseException($"Invalid DATE_EXP field {field} position {pos}");
+            if (pos + 2 > buf.Length) throw new ParseException($"Insufficient data for DATE_EXP field {field} pos {pos}");
 
             var tens = new int[2];
             var start = 0;

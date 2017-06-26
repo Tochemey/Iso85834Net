@@ -85,7 +85,7 @@ namespace ModIso8583.Test.Parse
             };
             mfact.SetParseMap(0x200,
                 parser);
-            mfact.UseBinary = true;
+            mfact.UseBinaryMessages = true;
 
             //Test encoding
             tmpl = mfact.NewMessage(0x200);
