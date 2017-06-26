@@ -1,4 +1,5 @@
 ﻿using System;
+using TimeZoneConverter;
 using Xunit;
 
 namespace ModIso8583.Test
@@ -11,7 +12,8 @@ namespace ModIso8583.Test
         public void TestDateFormats()
         {
             // UTC-06:00 in honor to Enrique Zamudio
-            var tz = TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time");
+            //var tz = TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time");
+            var tz = TZConvert.GetTimeZoneInfo("Central Standard Time");
             date = TimeZoneInfo.ConvertTime(date,
                 tz);
             
@@ -33,7 +35,7 @@ namespace ModIso8583.Test
             Assert.Equal("19730126033456", IsoType.DATE14.Format(date));
 
             //Now with GMT+1
-            TimeZoneInfo timeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById("W. Europe Standard Time");
+            TimeZoneInfo timeZoneInfo = TZConvert.GetTimeZoneInfo("W. Europe Standard Time");
             date = TimeZoneInfo.ConvertTime(date,
                 timeZoneInfo);
 
