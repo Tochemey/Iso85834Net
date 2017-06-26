@@ -198,10 +198,10 @@ This means that you can do this via code:
 You can also create a CompositeField, store several subfields inside it, and store it in any field inside an IsoMessage, specifying the same instance as the CustomField:
 
 ```c#
-    CompositeField f = new CompositeField().AddValue(new IsoValue<String>(IsoType.ALPHA, "one", 5))
-    .AddValue(new IsoValue<String>(IsoType.LLVAR, "two"))
-    .AddValue(new IsoValue<Long>(IsoType.NUMERIC, 123l, 6))
-    .AddValue(new IsoValue<String>(IsoType.ALPHA, "OK", 2));
+    CompositeField f = new CompositeField().AddValue(new IsoValueß(IsoType.ALPHA, "one", 5))
+    .AddValue(new IsoValue(IsoType.LLVAR, "two"))
+    .AddValue(new IsoValue(IsoType.NUMERIC, 123l, 6))
+    .AddValue(new IsoValue(IsoType.ALPHA, "OK", 2));
     message.SetValue(125, f, f, IsoType.LLLVAR, 0);
 ```
 When the message is encoded, field 125 will be "018one 03two000123OK".
