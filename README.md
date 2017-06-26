@@ -27,6 +27,13 @@ The fields in the message are numbered from 1 to 64. Field 1 is the secondary bi
 
 You can [check the ISO8583 guide](ISO8583) for more information; Wikipedia has [a very good article](http://en.wikipedia.org/wiki/ISO_8583) on the whole specification.
 
+## Usage
+
+The library is available on nuget package. You can get it via:
+
+```
+    PM> Install-Package Iso85834Net
+```
 
 ## How does Iso85834Net work?
 
