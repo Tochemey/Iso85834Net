@@ -101,6 +101,7 @@
     <Compile Include="Util\ParseException.cs" />
     <Compile Include="Util\StringUtil.cs" />
     <Compile Include="Impl\SimpleTraceGenerator.cs" />
+    <Compile Include="Util\OsUtil.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
