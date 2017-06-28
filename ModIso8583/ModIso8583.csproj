@@ -19,7 +19,7 @@
     <Summary>Iso85834Net is a Net/Mono implementation of the ISO 8583 protocol</Summary>
     <Title>Iso85834Net</Title>
     <PackageId>Iso85834Net</PackageId>
-    <PackageVersion>0.0.0.1</PackageVersion>
+    <PackageVersion>0.0.0.2</PackageVersion>
     <Authors>Arsene Tochemey GANDOTE</Authors>
     <Description>Iso85834Net is a library that helps parse/read and generate ISO 8583 messages. It does not handle sending or reading them over a network connection, but it does parse the data you have read and can generate the data you need to write over a network connection. </Description>
     <PackageTags>ISO8583 .NET C#</PackageTags>
