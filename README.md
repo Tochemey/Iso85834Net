@@ -25,7 +25,7 @@ The bitmap is 64 bits long and it is encoded as 16 hex characters or as 8 bytes 
 
 The fields in the message are numbered from 1 to 64. Field 1 is the secondary bitmap, if present. The secondary bitmap allows for the message to have fields from 65 to 128.
 
-You can [check the ISO8583 guide](ISO8583) for more information; Wikipedia has [a very good article](http://en.wikipedia.org/wiki/ISO_8583) on the whole specification.
+You can for more information; Wikipedia has [a very good article](http://en.wikipedia.org/wiki/ISO_8583) on the whole specification.
 
 ## Usage
 
@@ -205,3 +205,7 @@ You can also create a CompositeField, store several subfields inside it, and sto
     message.SetValue(125, f, f, IsoType.LLLVAR, 0);
 ```
 When the message is encoded, field 125 will be "018one 03two000123OK".
+
+## Resources
+* [j8583](http://j8583.sourceforge.net/)
+* [ISO 8583](http://en.wikipedia.org/wiki/ISO_8583)
