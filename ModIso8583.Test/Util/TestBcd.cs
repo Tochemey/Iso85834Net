@@ -1,4 +1,4 @@
-﻿using ModIso8583.Util;
+﻿using Iso85834Net.Util;
 using Xunit;
 
 namespace ModIso8583.Test.Util

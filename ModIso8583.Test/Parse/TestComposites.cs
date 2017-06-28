@@ -1,9 +1,9 @@
 ﻿using System;
-using ModIso8583.Codecs;
 using Xunit;
 using System.Text;
-using ModIso8583.Parse;
-using ModIso8583.Util;
+using Iso85834Net;
+using Iso85834Net.Codecs;
+using Iso85834Net.Parse;
 
 namespace ModIso8583.Test.Parse
 {

@@ -1,4 +1,4 @@
-﻿namespace ModIso8583
+﻿namespace Iso85834Net
 {
     /// <summary>
     ///     Defines the behavior needed to generate trace numbers. They have to

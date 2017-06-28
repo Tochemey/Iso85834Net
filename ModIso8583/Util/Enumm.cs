@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ModIso8583.Util
+namespace Iso85834Net.Util
 {
     public static class Enumm
     {

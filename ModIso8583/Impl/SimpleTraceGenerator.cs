@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ModIso8583.Impl
+namespace Iso85834Net.Impl
 {
     public class SimpleTraceGenerator : ITraceNumberGenerator
     {

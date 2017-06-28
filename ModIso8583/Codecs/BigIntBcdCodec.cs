@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Globalization;
 using System.Numerics;
-using ModIso8583.Util;
+using Iso85834Net.Util;
 
-namespace ModIso8583.Codecs
+namespace Iso85834Net.Codecs
 {
     /// <summary>
     ///     A custom field encoder/decoder to be used with LLBIN/LLLBIN fields

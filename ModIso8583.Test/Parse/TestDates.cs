@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Text;
-using ModIso8583.Parse;
 using Xunit;
 using System.IO;
 using FluentAssertions;
-using ModIso8583.Util;
+using Iso85834Net;
+using Iso85834Net.Parse;
+using Iso85834Net.Util;
 
 namespace ModIso8583.Test.Parse
 {

@@ -1,7 +1,7 @@
 ﻿using System;
-using ModIso8583.Util;
+using Iso85834Net.Util;
 
-namespace ModIso8583.Parse
+namespace Iso85834Net.Parse
 {
     /// <summary>
     ///     This is the class used to parse ALPHA fields.

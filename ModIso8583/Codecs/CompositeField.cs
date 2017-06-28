@@ -2,10 +2,10 @@
 using System.IO;
 using System.Text;
 using C5;
-using ModIso8583.Parse;
-using ModIso8583.Util;
+using Iso85834Net.Parse;
+using Iso85834Net.Util;
 
-namespace ModIso8583.Codecs
+namespace Iso85834Net.Codecs
 {
     /// <summary>
     ///     A codec to manage subfields inside a field of a certain type.

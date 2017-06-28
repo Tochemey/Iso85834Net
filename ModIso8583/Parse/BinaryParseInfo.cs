@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Text;
-using ModIso8583.Util;
+using Iso85834Net.Util;
 
-namespace ModIso8583.Parse
+namespace Iso85834Net.Parse
 {
     /// <summary>
     ///     This class is used to parse fields of type BINARY.

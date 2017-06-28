@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ModIso8583.Parse
+namespace Iso85834Net.Parse
 {
     public abstract class DateTimeParseInfo : FieldParseInfo
     {

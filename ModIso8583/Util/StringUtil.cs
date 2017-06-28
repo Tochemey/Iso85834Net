@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace ModIso8583.Util
+namespace Iso85834Net.Util
 {
     /// <summary>
     /// </summary>

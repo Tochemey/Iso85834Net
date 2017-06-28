@@ -1,4 +1,4 @@
-﻿namespace ModIso8583
+﻿namespace Iso85834Net
 {
     public interface ICustomBinaryField : ICustomField
     {

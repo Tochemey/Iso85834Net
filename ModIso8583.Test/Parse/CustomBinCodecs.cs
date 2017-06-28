@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Numerics;
 using C5;
-using ModIso8583.Codecs;
-using ModIso8583.Parse;
-using ModIso8583.Util;
+using Iso85834Net;
+using Iso85834Net.Codecs;
+using Iso85834Net.Parse;
+using Iso85834Net.Util;
 using Xunit;
 
 namespace ModIso8583.Test.Parse

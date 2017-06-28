@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ModIso8583
+namespace Iso85834Net
 {
     /// <summary>
     ///     IsoType

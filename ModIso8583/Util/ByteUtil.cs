@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Text;
 
-namespace ModIso8583.Util
+namespace Iso85834Net.Util
 {
     public static class ByteUtil
     {

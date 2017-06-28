@@ -8,7 +8,7 @@
     <ProjectGuid>{3DD089CF-6495-4274-A812-EB2277CBEDB8}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ModIso8583</RootNamespace>
+    <RootNamespace>Iso85834Net</RootNamespace>
     <AssemblyName>Iso85834Net</AssemblyName>
     <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>

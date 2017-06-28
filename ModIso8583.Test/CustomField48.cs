@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text;
+using Iso85834Net;
 
 namespace ModIso8583.Test
 {

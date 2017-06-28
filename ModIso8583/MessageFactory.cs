@@ -2,12 +2,12 @@
 using System.Collections;
 using System.Text;
 using C5;
-using ModIso8583.Parse;
-using ModIso8583.Util;
+using Iso85834Net.Parse;
+using Iso85834Net.Util;
 using Serilog;
 using Logger = Serilog.Core.Logger;
 
-namespace ModIso8583
+namespace Iso85834Net
 {
     /// <summary>
     ///     This class is used to create messages, either from scratch or from an existing String or byte

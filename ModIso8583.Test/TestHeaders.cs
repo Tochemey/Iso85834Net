@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using Iso85834Net;
 using Xunit;
 
 namespace ModIso8583.Test

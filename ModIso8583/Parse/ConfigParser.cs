@@ -5,13 +5,13 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using System.Xml;
 using C5;
-using ModIso8583.Codecs;
-using ModIso8583.Util;
+using Iso85834Net.Codecs;
+using Iso85834Net.Util;
 using Serilog;
 using Serilog.Events;
 using Logger = Serilog.Core.Logger;
 
-namespace ModIso8583.Parse
+namespace Iso85834Net.Parse
 {
     /// <summary>
     ///     This class is used to parse a XML configuration file and configure

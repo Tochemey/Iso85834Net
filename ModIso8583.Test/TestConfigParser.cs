@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Text;
-using ModIso8583.Codecs;
-using ModIso8583.Util;
 using Xunit;
 using System.IO;
+using Iso85834Net;
+using Iso85834Net.Codecs;
+using Iso85834Net.Util;
 
 namespace ModIso8583.Test
 {

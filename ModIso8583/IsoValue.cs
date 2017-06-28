@@ -3,9 +3,9 @@ using System.IO;
 using System.Numerics;
 using System.Text;
 using C5;
-using ModIso8583.Util;
+using Iso85834Net.Util;
 
-namespace ModIso8583
+namespace Iso85834Net
 {
     public class IsoValue : ICloneable
     {

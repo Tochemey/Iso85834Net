@@ -1,7 +1,8 @@
 ﻿using System;
 using System.IO;
-using ModIso8583.Parse;
-using ModIso8583.Util;
+using Iso85834Net;
+using Iso85834Net.Parse;
+using Iso85834Net.Util;
 using Xunit;
 
 namespace ModIso8583.Test
