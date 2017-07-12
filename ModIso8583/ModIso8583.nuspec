@@ -7,7 +7,6 @@
     <authors>Arsene T. GANDOTE</authors>
     <owners>Arsene T. GANDOTE</owners>
     <projectUrl>https://github.com/Tochemey/Iso85834Net</projectUrl>
-    <iconUrl/>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>Iso85834Net is a library that helps parse/read and generate ISO 8583 messages. It does not handle sending or reading them over a network connection, but it does parse the data you have read and can generate the data you need to write over a network connection.
     </description>
