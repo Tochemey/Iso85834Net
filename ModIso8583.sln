@@ -10,6 +10,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{0508E9FA-671F-4D92-B9D3-3FC1D23253D8}"
 	ProjectSection(SolutionItems) = preProject
 		README.md = README.md
+		ModIso8583\ModIso8583.nuspec = ModIso8583\ModIso8583.nuspec
 	EndProjectSection
 EndProject
 Global
