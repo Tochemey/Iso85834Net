@@ -1,0 +1,15 @@
+version: 0.0.0.{build}
+image: Visual Studio 2017
+configuration: Release
+platform: Any CPU
+init:
+- cmd: tzutil /s "Greenwich Standard Time"
+before_build:
+- cmd: nuget restore
+build:
+  publish_nuget: true
+  verbosity: minimal
+deploy:
+- provider: NuGet
+  api_key:
+    secure: Hfk1m9TrbiT98kf1/gtFPjVlQ5zBNTznGF4WpJe+0LIktuzOwvVV7KdJSRwuFZpZ
