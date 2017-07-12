@@ -19,7 +19,7 @@ namespace Iso85834Net.Parse
     /// </summary>
     public static class ConfigParser
     {
-        private static readonly Logger logger = new LoggerConfiguration().WriteTo.ColoredConsole().CreateLogger();
+        private static readonly Logger logger = new LoggerConfiguration().ReadFrom.AppSettings().CreateLogger();
 
         /// <summary>
         ///     Creates a message factory configured from the default file, which is n8583.xml

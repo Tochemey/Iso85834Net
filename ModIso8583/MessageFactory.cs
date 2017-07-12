@@ -22,7 +22,7 @@ namespace Iso85834Net
     /// </summary>
     public class MessageFactory<T> where T : IsoMessage
     {
-        private static readonly Logger logger = new LoggerConfiguration().WriteTo.ColoredConsole().CreateLogger();
+        private static readonly Logger logger = new LoggerConfiguration().ReadFrom.AppSettings().CreateLogger();
 
         /// <summary>
         /// </summary>
