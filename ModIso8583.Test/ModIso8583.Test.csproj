@@ -188,12 +188,6 @@
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ModIso8583\ModIso8583.csproj">
-      <Project>{3DD089CF-6495-4274-A812-EB2277CBEDB8}</Project>
-      <Name>ModIso8583</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <Content Include="Resources\composites.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -224,6 +218,12 @@
     <Content Include="Resources\parse1.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ModIso8583\ModIso8583.csproj">
+      <Project>{3DD089CF-6495-4274-A812-EB2277CBEDB8}</Project>
+      <Name>ModIso8583</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
