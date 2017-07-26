@@ -53,7 +53,10 @@ namespace Iso85834Net.Codecs
                 };
                 return f;
             }
-            catch (Exception) { return null; }
+            catch (Exception)
+            {
+                return null;
+            }
         }
 
         public string EncodeField(object val)
@@ -74,7 +77,10 @@ namespace Iso85834Net.Codecs
                 if (encoding == null) return Encoding.UTF8.GetString(buf);
                 return encoding.GetString(buf);
             }
-            catch (IOException) { return string.Empty; }
+            catch (IOException)
+            {
+                return string.Empty;
+            }
         }
 
         public object DecodeBinaryField(sbyte[] buf,
@@ -92,7 +98,9 @@ namespace Iso85834Net.Codecs
                         pos,
                         fpi.Decoder);
                     if (v == null) continue;
-                    if (v.Type == IsoType.NUMERIC || v.Type == IsoType.DATE10 || v.Type == IsoType.DATE4 || v.Type == IsoType.DATE_EXP || v.Type == IsoType.AMOUNT || v.Type == IsoType.TIME || v.Type == IsoType.DATE12 || v.Type == IsoType.DATE14) pos += v.Length / 2 + v.Length % 2;
+                    if (v.Type == IsoType.NUMERIC || v.Type == IsoType.DATE10 || v.Type == IsoType.DATE4 ||
+                        v.Type == IsoType.DATE_EXP || v.Type == IsoType.AMOUNT || v.Type == IsoType.TIME ||
+                        v.Type == IsoType.DATE12 || v.Type == IsoType.DATE14) pos += v.Length / 2 + v.Length % 2;
                     else pos += v.Length;
                     switch (v.Type)
                     {
@@ -115,7 +123,10 @@ namespace Iso85834Net.Codecs
                 };
                 return f;
             }
-            catch (Exception) { return null; }
+            catch (Exception)
+            {
+                return null;
+            }
         }
 
         public sbyte[] EncodeBinaryField(object val)
@@ -148,12 +159,14 @@ namespace Iso85834Net.Codecs
             IsoType t,
             int length)
         {
-            return AddValue(t.NeedsLength() ? new IsoValue(t,
-                val,
-                length,
-                encoder) : new IsoValue(t,
-                val,
-                encoder));
+            return AddValue(t.NeedsLength()
+                ? new IsoValue(t,
+                    val,
+                    length,
+                    encoder)
+                : new IsoValue(t,
+                    val,
+                    encoder));
         }
 
         public IsoValue GetField(int idx)
@@ -175,7 +188,10 @@ namespace Iso85834Net.Codecs
             return this;
         }
 
-        public ArrayList<FieldParseInfo> GetParsers() { return parsers; }
+        public ArrayList<FieldParseInfo> GetParsers()
+        {
+            return parsers;
+        }
 
         public override string ToString()
         {

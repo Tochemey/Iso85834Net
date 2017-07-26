@@ -7,7 +7,8 @@ namespace Iso85834Net.Parse
     {
         public DateExpParseInfo() : base(IsoType.DATE_EXP,
             4)
-        { }
+        {
+        }
 
         public override IsoValue Parse(int field,
             sbyte[] buf,
@@ -15,7 +16,8 @@ namespace Iso85834Net.Parse
             ICustomField custom)
         {
             if (pos < 0) throw new ParseException($"Invalid DATE_EXP field {field} position {pos}");
-            if (pos + 4 > buf.Length) throw new ParseException($"Insufficient data for DATE_EXP field {field}, pos {pos}");
+            if (pos + 4 > buf.Length)
+                throw new ParseException($"Insufficient data for DATE_EXP field {field}, pos {pos}");
 
             int year, month;
             int hour, minute, seconds;
@@ -58,7 +60,8 @@ namespace Iso85834Net.Parse
             ICustomField custom)
         {
             if (pos < 0) throw new ParseException($"Invalid DATE_EXP field {field} position {pos}");
-            if (pos + 2 > buf.Length) throw new ParseException($"Insufficient data for DATE_EXP field {field} pos {pos}");
+            if (pos + 2 > buf.Length)
+                throw new ParseException($"Insufficient data for DATE_EXP field {field} pos {pos}");
 
             var tens = new int[2];
             var start = 0;

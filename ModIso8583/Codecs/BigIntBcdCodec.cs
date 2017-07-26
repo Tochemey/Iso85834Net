@@ -17,7 +17,10 @@ namespace Iso85834Net.Codecs
                 10));
         }
 
-        public string EncodeField(object obj) { return obj.ToString(); }
+        public string EncodeField(object obj)
+        {
+            return obj.ToString();
+        }
 
         public object DecodeBinaryField(sbyte[] bytes,
             int offset,

@@ -12,6 +12,9 @@ namespace Iso85834Net.Util
             0,
             DateTimeKind.Utc);
 
-        public static long CurrentTimeMillis() { return (long) (DateTime.UtcNow - Jan1st1970).TotalMilliseconds; }
+        public static long CurrentTimeMillis()
+        {
+            return (long) (DateTime.UtcNow - Jan1st1970).TotalMilliseconds;
+        }
     }
 }

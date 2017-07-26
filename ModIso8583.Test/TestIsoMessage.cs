@@ -205,7 +205,7 @@ namespace ModIso8583.Test
             Assert.Equal(f3.Length, nf3.Length);
             Assert.Same(f3.Encoder, nf3.Encoder);
             Assert.Throws(typeof(ArgumentException), () => iso.UpdateValue(4, "INVALID!"))
-            ;
+                ;
         }
     }
 }

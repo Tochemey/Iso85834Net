@@ -9,7 +9,8 @@ namespace Iso85834Net.Parse
         public DateTimeParseInfo(IsoType isoType,
             int length) : base(isoType,
             length)
-        { }
+        {
+        }
 
         public TimeZoneInfo TimeZoneInfo { get; set; } = TimeZoneInfo.Local;
 

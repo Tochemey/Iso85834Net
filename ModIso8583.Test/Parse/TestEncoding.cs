@@ -25,7 +25,7 @@ namespace ModIso8583.Test.Parse
             if (OsUtil.IsLinux())
                 parser.Encoding = Encoding.UTF8;
 
-            IsoValue  field = parser.Parse(1, buf, 0, null);
+            IsoValue field = parser.Parse(1, buf, 0, null);
             Assert.Equal(field.Value, data.Substring(2));
             parser.Encoding = encoding;
             field = parser.Parse(1, buf, 0, null);

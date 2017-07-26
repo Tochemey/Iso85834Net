@@ -78,7 +78,7 @@ namespace ModIso8583.Test
             MessageFactory<IsoMessage> mfact = Config(configXml);
             IsoMessage m = mfact.ParseMessage("01000040000000000000016one  03two12345.".GetSbytes(), 0);
             Assert.NotNull(m);
-            CompositeField f = (CompositeField)m.GetObjectValue(10);
+            CompositeField f = (CompositeField) m.GetObjectValue(10);
             Assert.NotNull(f);
             Assert.Equal(4, f.Values.Count);
             Assert.Equal("one  ", f.GetObjectValue(0));
@@ -89,7 +89,7 @@ namespace ModIso8583.Test
             m = mfact.ParseMessage("01000040000000000000018ALPHA05LLVAR12345X".GetSbytes(), 0);
             Assert.NotNull(m);
             Assert.True(m.HasField(10));
-            f = (CompositeField)m.GetObjectValue(10);
+            f = (CompositeField) m.GetObjectValue(10);
             Assert.NotNull(f.GetField(0));
             Assert.NotNull(f.GetField(1));
             Assert.NotNull(f.GetField(2));
@@ -109,17 +109,17 @@ namespace ModIso8583.Test
             IsoMessage m = mfact.ParseMessage("01010040000000000000019ALPHA11F1F205F03F4X".GetSbytes(), 0);
             Assert.NotNull(m);
             Assert.True(m.HasField(10));
-            CompositeField f = (CompositeField)m.GetObjectValue(10);
+            CompositeField f = (CompositeField) m.GetObjectValue(10);
             Assert.NotNull(f.GetField(0));
             Assert.NotNull(f.GetField(1));
             Assert.NotNull(f.GetField(2));
             Assert.Null(f.GetField(3));
             Assert.Equal("ALPHA", f.GetObjectValue(0));
             Assert.Equal("X", f.GetObjectValue(2));
-            f = (CompositeField)f.GetObjectValue(1);
+            f = (CompositeField) f.GetObjectValue(1);
             Assert.Equal("F1", f.GetObjectValue(0));
             Assert.Equal("F2", f.GetObjectValue(1));
-            f = (CompositeField)f.GetObjectValue(2);
+            f = (CompositeField) f.GetObjectValue(2);
             Assert.Equal("F03", f.GetObjectValue(0));
             Assert.Equal("F4", f.GetObjectValue(1));
         }
@@ -136,7 +136,7 @@ namespace ModIso8583.Test
             Assert.False(m.HasField(2));
             Assert.False(m.HasField(3));
             Assert.False(m.HasField(4));
-            CompositeField f = (CompositeField)m.GetObjectValue(10);
+            CompositeField f = (CompositeField) m.GetObjectValue(10);
             Assert.NotNull(f);
             Assert.Equal(f.GetObjectValue(0), "abcde");
             Assert.Equal(f.GetObjectValue(1), "llvar");
@@ -155,14 +155,14 @@ namespace ModIso8583.Test
             Assert.False(m.HasField(2));
             Assert.False(m.HasField(3));
             Assert.False(m.HasField(4));
-            CompositeField f = (CompositeField)m.GetObjectValue(fnum);
+            CompositeField f = (CompositeField) m.GetObjectValue(fnum);
             Assert.Equal(f.GetObjectValue(0), "fghij");
             Assert.Equal(f.GetObjectValue(2), "67890");
             Assert.Equal(f.GetObjectValue(3), "Y");
-            f = (CompositeField)f.GetObjectValue(1);
+            f = (CompositeField) f.GetObjectValue(1);
             Assert.Equal(f.GetObjectValue(0), "KL");
             Assert.Equal(f.GetObjectValue(1), "mn");
-            f = (CompositeField)f.GetObjectValue(2);
+            f = (CompositeField) f.GetObjectValue(2);
             Assert.Equal(f.GetObjectValue(0), "123");
             Assert.Equal(f.GetObjectValue(1), "45");
         }
@@ -220,7 +220,6 @@ namespace ModIso8583.Test
             Assert.Equal("484", m.GetObjectValue(49));
             Assert.Equal("99", m.GetObjectValue(39));
             Assert.Equal("X", m.GetObjectValue(61));
-
         }
 
         [Fact]
@@ -239,7 +238,7 @@ namespace ModIso8583.Test
             Assert.Equal(IsoType.AMOUNT.Length(), field4.Length);
 
             // check nested field num 4 from composite field 62
-            CompositeField compositeField62 = (CompositeField)isoMessage.GetField(62).Value;
+            CompositeField compositeField62 = (CompositeField) isoMessage.GetField(62).Value;
             IsoValue nestedField4 = compositeField62.GetField(0); // first in list
             Assert.Equal(IsoType.ALPHA, nestedField4.Type);
             Assert.Equal(13, nestedField4.Length);

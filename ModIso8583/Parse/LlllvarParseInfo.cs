@@ -7,7 +7,8 @@ namespace Iso85834Net.Parse
     {
         public LlllvarParseInfo() : base(IsoType.LLLLVAR,
             0)
-        { }
+        {
+        }
 
         public override IsoValue Parse(int field,
             sbyte[] buf,
@@ -20,16 +21,22 @@ namespace Iso85834Net.Parse
                 pos,
                 4);
             if (len < 0) throw new ParseException($"Invalid LLLLVAR length {len}, field {field} pos {pos}");
-            if (len + pos + 4 > buf.Length) throw new ParseException($"Insufficient data for LLLLVAR field {field}, pos {pos}");
+            if (len + pos + 4 > buf.Length)
+                throw new ParseException($"Insufficient data for LLLLVAR field {field}, pos {pos}");
 
             string v;
             try
             {
-                v = len == 0 ? "" : buf.SbyteString(pos + 4,
-                    len,
-                    Encoding);
+                v = len == 0
+                    ? ""
+                    : buf.SbyteString(pos + 4,
+                        len,
+                        Encoding);
             }
-            catch (Exception) { throw new ParseException($"Insufficient data for LLLLVAR header, field {field} pos {pos}"); }
+            catch (Exception)
+            {
+                throw new ParseException($"Insufficient data for LLLLVAR header, field {field} pos {pos}");
+            }
 
             //This is new: if the String's length is different from the specified
             // length in the buffer, there are probably some extended characters.
@@ -45,12 +52,14 @@ namespace Iso85834Net.Parse
                     v,
                     len);
             var dec = custom.DecodeField(v);
-            return dec == null ? new IsoValue(IsoType,
-                v,
-                len) : new IsoValue(IsoType,
-                dec,
-                len,
-                custom);
+            return dec == null
+                ? new IsoValue(IsoType,
+                    v,
+                    len)
+                : new IsoValue(IsoType,
+                    dec,
+                    len,
+                    custom);
         }
 
         public override IsoValue ParseBinary(int field,
@@ -61,13 +70,16 @@ namespace Iso85834Net.Parse
             var sbytes = buf;
 
             if (pos < 0) throw new ParseException($"Invalid bin LLLLVAR field {field} pos {pos}");
-            if (pos + 2 > buf.Length) throw new ParseException($"Insufficient data for bin LLLLVAR header, field {field} pos {pos}");
+            if (pos + 2 > buf.Length)
+                throw new ParseException($"Insufficient data for bin LLLLVAR header, field {field} pos {pos}");
 
-            var len = ((sbytes[pos] & 0xf0) >> 4) * 1000 + (sbytes[pos] & 0x0f) * 100 + ((sbytes[pos + 1] & 0xf0) >> 4) * 10 + (sbytes[pos + 1] & 0x0f);
+            var len = ((sbytes[pos] & 0xf0) >> 4) * 1000 + (sbytes[pos] & 0x0f) * 100 +
+                      ((sbytes[pos + 1] & 0xf0) >> 4) * 10 + (sbytes[pos + 1] & 0x0f);
 
             if (len < 0) throw new ParseException($"Invalid bin LLLLVAR length {len}, field {field} pos {pos}");
 
-            if (len + pos + 2 > sbytes.Length) throw new ParseException($"Insufficient data for bin LLLLVAR field {field}, pos {pos}");
+            if (len + pos + 2 > sbytes.Length)
+                throw new ParseException($"Insufficient data for bin LLLLVAR field {field}, pos {pos}");
             if (custom == null)
                 return new IsoValue(IsoType,
                     buf.SbyteString(pos + 2,
@@ -76,12 +88,14 @@ namespace Iso85834Net.Parse
             var dec = custom.DecodeField(buf.SbyteString(pos + 2,
                 len,
                 Encoding));
-            return dec == null ? new IsoValue(IsoType,
-                buf.SbyteString(pos + 2,
-                    len,
-                    Encoding)) : new IsoValue(IsoType,
-                dec,
-                custom);
+            return dec == null
+                ? new IsoValue(IsoType,
+                    buf.SbyteString(pos + 2,
+                        len,
+                        Encoding))
+                : new IsoValue(IsoType,
+                    dec,
+                    custom);
         }
     }
 }

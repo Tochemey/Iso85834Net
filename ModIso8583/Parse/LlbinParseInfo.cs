@@ -8,7 +8,8 @@ namespace Iso85834Net.Parse
     {
         public LlbinParseInfo() : base(IsoType.LLBIN,
             0)
-        { }
+        {
+        }
 
         public override IsoValue Parse(int field,
             sbyte[] buf,
@@ -22,20 +23,25 @@ namespace Iso85834Net.Parse
                 2);
             if (len < 0) throw new ParseException($"Invalid LLBIN field {field} length {len} pos {pos}");
 
-            if (len + pos + 2 > buf.Length) throw new ParseException($"Insufficient data for LLBIN field {field}, pos {pos} (LEN states '{buf.SbyteString(pos, 2, Encoding.Default)}')");
+            if (len + pos + 2 > buf.Length)
+                throw new ParseException(
+                    $"Insufficient data for LLBIN field {field}, pos {pos} (LEN states '{buf.SbyteString(pos, 2, Encoding.Default)}')");
 
-            var binval = len == 0 ? new sbyte[0] : HexCodec.HexDecode(buf.SbyteString(pos + 2,
-                len,
-                Encoding.Default));
+            var binval = len == 0
+                ? new sbyte[0]
+                : HexCodec.HexDecode(buf.SbyteString(pos + 2,
+                    len,
+                    Encoding.Default));
 
             if (custom == null)
                 return new IsoValue(IsoType,
                     binval,
                     binval.Length);
-            if (custom is ICustomBinaryField)
+            var binaryField = custom as ICustomBinaryField;
+            if (binaryField != null)
                 try
                 {
-                    var dec = ((ICustomBinaryField) custom).DecodeBinaryField(buf,
+                    var dec = binaryField.DecodeBinaryField(buf,
                         pos + 2,
                         len);
                     if (dec == null)
@@ -47,20 +53,30 @@ namespace Iso85834Net.Parse
                         0,
                         custom);
                 }
-                catch (Exception) { throw new ParseException($"Insufficient data for LLBIN field {field}, pos {pos} (LEN states '{buf.SbyteString(pos, 2, Encoding.Default)}')"); }
+                catch (Exception)
+                {
+                    throw new ParseException(
+                        $"Insufficient data for LLBIN field {field}, pos {pos} (LEN states '{buf.SbyteString(pos, 2, Encoding.Default)}')");
+                }
             try
             {
                 var dec = custom.DecodeField(buf.SbyteString(pos + 2,
                     len,
                     Encoding.Default));
-                return dec == null ? new IsoValue(IsoType,
-                    binval,
-                    binval.Length) : new IsoValue(IsoType,
-                    dec,
-                    binval.Length,
-                    custom);
+                return dec == null
+                    ? new IsoValue(IsoType,
+                        binval,
+                        binval.Length)
+                    : new IsoValue(IsoType,
+                        dec,
+                        binval.Length,
+                        custom);
             }
-            catch (Exception) { throw new ParseException($"Insufficient data for LLBIN field {field}, pos {pos} (LEN states '{buf.SbyteString(pos, 2, Encoding.Default)}')"); }
+            catch (Exception)
+            {
+                throw new ParseException(
+                    $"Insufficient data for LLBIN field {field}, pos {pos} (LEN states '{buf.SbyteString(pos, 2, Encoding.Default)}')");
+            }
         }
 
         public override IsoValue ParseBinary(int field,
@@ -75,7 +91,9 @@ namespace Iso85834Net.Parse
 
             var l = ((sbytes[pos] & 0xf0) >> 4) * 10 + (sbytes[pos] & 0x0f);
             if (l < 0) throw new ParseException($"Invalid bin LLBIN length {l} pos {pos}");
-            if (l + pos + 1 > buf.Length) throw new ParseException($"Insufficient data for bin LLBIN field {field}, pos {pos}: need {l}, only {buf.Length} available");
+            if (l + pos + 1 > buf.Length)
+                throw new ParseException(
+                    $"Insufficient data for bin LLBIN field {field}, pos {pos}: need {l}, only {buf.Length} available");
             var v = new sbyte[l];
             Array.Copy(sbytes,
                 pos + 1,
@@ -91,22 +109,29 @@ namespace Iso85834Net.Parse
                     var dec = ((ICustomBinaryField) custom).DecodeBinaryField(sbytes,
                         pos + 1,
                         l);
-                    return dec == null ? new IsoValue(IsoType,
-                        v,
-                        v.Length) : new IsoValue(IsoType,
-                        dec,
-                        l,
-                        custom);
+                    return dec == null
+                        ? new IsoValue(IsoType,
+                            v,
+                            v.Length)
+                        : new IsoValue(IsoType,
+                            dec,
+                            l,
+                            custom);
                 }
-                catch (Exception) { throw new ParseException($"Insufficient data for LLBIN field {field}, pos {pos} length {l}"); }
+                catch (Exception)
+                {
+                    throw new ParseException($"Insufficient data for LLBIN field {field}, pos {pos} length {l}");
+                }
             {
                 var dec = custom.DecodeField(HexCodec.HexEncode(v,
                     0,
                     v.Length));
-                return dec == null ? new IsoValue(IsoType,
-                    v) : new IsoValue(IsoType,
-                    dec,
-                    custom);
+                return dec == null
+                    ? new IsoValue(IsoType,
+                        v)
+                    : new IsoValue(IsoType,
+                        dec,
+                        custom);
             }
         }
     }

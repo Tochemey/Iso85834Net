@@ -8,10 +8,11 @@ namespace Iso85834Net.Parse
     /// </summary>
     public abstract class AlphaNumericFieldParseInfo : FieldParseInfo
     {
-        public AlphaNumericFieldParseInfo(IsoType isoType,
+        protected AlphaNumericFieldParseInfo(IsoType isoType,
             int length) : base(isoType,
             length)
-        { }
+        {
+        }
 
         public override IsoValue Parse(int field,
             sbyte[] buf,
@@ -19,7 +20,9 @@ namespace Iso85834Net.Parse
             ICustomField custom)
         {
             if (pos < 0) throw new ParseException($"Invalid ALPHA/NUM field {field} position {pos}");
-            if (pos + Length > buf.Length) throw new ParseException($"Insufficient data for {IsoType} field {field} of length {Length}, pos {pos}");
+            if (pos + Length > buf.Length)
+                throw new ParseException(
+                    $"Insufficient data for {IsoType} field {field} of length {Length}, pos {pos}");
             try
             {
                 var v = buf.SbyteString(pos,
@@ -36,14 +39,20 @@ namespace Iso85834Net.Parse
                         v,
                         Length);
                 var decoded = custom.DecodeField(v);
-                return decoded == null ? new IsoValue(IsoType,
-                    v,
-                    Length) : new IsoValue(IsoType,
-                    decoded,
-                    Length,
-                    custom);
+                return decoded == null
+                    ? new IsoValue(IsoType,
+                        v,
+                        Length)
+                    : new IsoValue(IsoType,
+                        decoded,
+                        Length,
+                        custom);
             }
-            catch (Exception) { throw new ParseException($"Insufficient data for {IsoType} field {field} of length {Length}, pos {pos}"); }
+            catch (Exception)
+            {
+                throw new ParseException(
+                    $"Insufficient data for {IsoType} field {field} of length {Length}, pos {pos}");
+            }
         }
     }
 }

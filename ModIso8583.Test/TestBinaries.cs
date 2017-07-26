@@ -13,18 +13,18 @@ namespace ModIso8583.Test
         public TestBinaries()
         {
             string configXml = @"/Resources/config.xml";
-            mfactAscii.Encoding = Encoding.UTF8;
-            mfactAscii.SetConfigPath(configXml);
-            mfactAscii.AssignDate = true;
+            _mfactAscii.Encoding = Encoding.UTF8;
+            _mfactAscii.SetConfigPath(configXml);
+            _mfactAscii.AssignDate = true;
 
-            mfactBin.Encoding = Encoding.UTF8;
-            mfactBin.SetConfigPath(configXml);
-            mfactBin.UseBinaryMessages = true;
-            mfactBin.AssignDate = true;
+            _mfactBin.Encoding = Encoding.UTF8;
+            _mfactBin.SetConfigPath(configXml);
+            _mfactBin.UseBinaryMessages = true;
+            _mfactBin.AssignDate = true;
         }
 
-        private readonly MessageFactory<IsoMessage> mfactAscii = new MessageFactory<IsoMessage>();
-        private readonly MessageFactory<IsoMessage> mfactBin = new MessageFactory<IsoMessage>();
+        private readonly MessageFactory<IsoMessage> _mfactAscii = new MessageFactory<IsoMessage>();
+        private readonly MessageFactory<IsoMessage> _mfactBin = new MessageFactory<IsoMessage>();
 
         private void TestParsed(IsoMessage m)
         {
@@ -117,8 +117,8 @@ namespace ModIso8583.Test
         public void TestMessages()
         {
             //Create a message with both factories
-            var ascii = mfactAscii.NewMessage(0x600);
-            var bin = mfactBin.NewMessage(0x600);
+            var ascii = _mfactAscii.NewMessage(0x600);
+            var bin = _mfactBin.NewMessage(0x600);
             Assert.False(ascii.Binary || ascii.BinBitmap);
             Assert.True(bin.Binary);
             //HEXencode the binary message, headers should be similar to the ASCII version
@@ -133,10 +133,10 @@ namespace ModIso8583.Test
             Assert.Equal(ascii.GetObjectValue(43), v.SbyteString(44, 40, Encoding.Default).Trim());
             //Parse both messages
             sbyte[] asciiBuf = ascii.WriteData();
-            IsoMessage ascii2 = mfactAscii.ParseMessage(asciiBuf, 0);
+            IsoMessage ascii2 = _mfactAscii.ParseMessage(asciiBuf, 0);
             TestParsed(ascii2);
             Assert.Equal(ascii.GetObjectValue(7).ToString(), ascii2.GetObjectValue(7).ToString());
-            IsoMessage bin2 = mfactBin.ParseMessage(bin.WriteData(), 0);
+            IsoMessage bin2 = _mfactBin.ParseMessage(bin.WriteData(), 0);
             //Compare values, should be the same
             TestParsed(bin2);
             Assert.Equal(bin.GetObjectValue(7).ToString(), bin2.GetObjectValue(7).ToString());

@@ -9,7 +9,8 @@ namespace Iso85834Net.Impl
 
         public SimpleTraceGenerator(int initialValue)
         {
-            if (initialValue < 1 || initialValue > 999999) throw new ArgumentException("Initial value must be between 1 and 999999");
+            if (initialValue < 1 || initialValue > 999999)
+                throw new ArgumentException("Initial value must be between 1 and 999999");
             value = initialValue - 1;
         }
 

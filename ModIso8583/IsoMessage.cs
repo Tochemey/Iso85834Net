@@ -36,11 +36,19 @@ namespace Iso85834Net
         /// </summary>
         private readonly IsoValue[] _fields = new IsoValue[129];
 
-        public IsoMessage() { }
+        public IsoMessage()
+        {
+        }
 
-        public IsoMessage(string header) { IsoHeader = header; }
+        public IsoMessage(string header)
+        {
+            IsoHeader = header;
+        }
 
-        public IsoMessage(sbyte[] binaryHeader) { BinIsoHeader = binaryHeader; }
+        public IsoMessage(sbyte[] binaryHeader)
+        {
+            BinIsoHeader = binaryHeader;
+        }
 
         public bool ForceStringEncoding { get; set; } = false;
 
@@ -144,16 +152,21 @@ namespace Iso85834Net
             int length)
         {
             if (index < 2 || index > 128) throw new IndexOutOfRangeException("Field index must be between 2 and 128");
-            if (value == null) { _fields[index] = null; }
+            if (value == null)
+            {
+                _fields[index] = null;
+            }
             else
             {
                 IsoValue v;
-                v = t.NeedsLength() ? new IsoValue(t,
-                    value,
-                    length,
-                    encoder) : new IsoValue(t,
-                    value,
-                    encoder);
+                v = t.NeedsLength()
+                    ? new IsoValue(t,
+                        value,
+                        length,
+                        encoder)
+                    : new IsoValue(t,
+                        value,
+                        encoder);
                 v.Encoding = Encoding;
                 _fields[index] = v;
             }
@@ -193,7 +206,8 @@ namespace Iso85834Net
             object value)
         {
             var current = GetField(index);
-            if (current == null) throw new ArgumentException("Value-only field setter can only be used on existing fields");
+            if (current == null)
+                throw new ArgumentException("Value-only field setter can only be used on existing fields");
             SetValue(index,
                 value,
                 current.Encoder,
@@ -337,7 +351,7 @@ namespace Iso85834Net
                 try
                 {
                     var x = Type.ToString("x4");
-                    var bytes = x.GetSbytes(Encoding);      
+                    var bytes = x.GetSbytes(Encoding);
                     foreach (var @sbyte in bytes) sbyteList.Add(@sbyte);
                 }
                 catch (IOException)

@@ -11,7 +11,8 @@ namespace Iso85834Net.Parse
     {
         public BinaryParseInfo(int len) : base(IsoType.BINARY,
             len)
-        { }
+        {
+        }
 
         public override IsoValue Parse(int field,
             sbyte[] buf,
@@ -20,7 +21,8 @@ namespace Iso85834Net.Parse
         {
             if (pos < 0) throw new ParseException($"Invalid BINARY field {field} position {pos}");
 
-            if (pos + Length * 2 > buf.Length) throw new ParseException($"Insufficient data for BINARY field {field} of length {Length}, pos {pos}");
+            if (pos + Length * 2 > buf.Length)
+                throw new ParseException($"Insufficient data for BINARY field {field} of length {Length}, pos {pos}");
 
             var s = buf.SbyteString(pos,
                 Length * 2,
@@ -43,12 +45,14 @@ namespace Iso85834Net.Parse
             //    pos,
             //    Length * 2));
             var dec = custom.DecodeField(s);
-            return dec == null ? new IsoValue(IsoType,
-                binval,
-                binval.Length) : new IsoValue(IsoType,
-                dec,
-                Length,
-                custom);
+            return dec == null
+                ? new IsoValue(IsoType,
+                    binval,
+                    binval.Length)
+                : new IsoValue(IsoType,
+                    dec,
+                    Length,
+                    custom);
         }
 
         public override IsoValue ParseBinary(int field,
@@ -57,7 +61,8 @@ namespace Iso85834Net.Parse
             ICustomField custom)
         {
             if (pos < 0) throw new ParseException($"Invalid BINARY field {field} position {pos}");
-            if (pos + Length > buf.Length) throw new ParseException($"Insufficient data for BINARY field {field} of length {Length}, pos {pos}");
+            if (pos + Length > buf.Length)
+                throw new ParseException($"Insufficient data for BINARY field {field} of length {Length}, pos {pos}");
             var v = new sbyte[Length];
             var sbytes = buf;
             Array.Copy(sbytes,
@@ -72,12 +77,14 @@ namespace Iso85834Net.Parse
             var dec = custom.DecodeField(HexCodec.HexEncode(v,
                 0,
                 v.Length));
-            return dec == null ? new IsoValue(IsoType,
-                v,
-                Length) : new IsoValue(IsoType,
-                dec,
-                Length,
-                custom);
+            return dec == null
+                ? new IsoValue(IsoType,
+                    v,
+                    Length)
+                : new IsoValue(IsoType,
+                    dec,
+                    Length,
+                    custom);
         }
     }
 }

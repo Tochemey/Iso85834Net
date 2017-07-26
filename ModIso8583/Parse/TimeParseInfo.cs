@@ -7,7 +7,8 @@ namespace Iso85834Net.Parse
     {
         public TimeParseInfo() : base(IsoType.TIME,
             6)
-        { }
+        {
+        }
 
         public override IsoValue Parse(int field,
             sbyte[] buf,
@@ -60,7 +61,8 @@ namespace Iso85834Net.Parse
             ICustomField custom)
         {
             if (pos < 0) throw new ParseException($"Invalid bin TIME field {field} pos {pos}");
-            if (pos + 3 > buf.Length) throw new ParseException($"Insufficient data for bin TIME field {field}, pos {pos}");
+            if (pos + 3 > buf.Length)
+                throw new ParseException($"Insufficient data for bin TIME field {field}, pos {pos}");
             var sbytes = buf;
             var tens = new int[3];
             var start = 0;

@@ -38,8 +38,8 @@ namespace ModIso8583.Test.Parse
             IsoMessage b = binfact.ParseMessage(bin, 0);
             Assert.True(t.HasField(field));
             Assert.True(b.HasField(field));
-            Assert.Equal(0, ((sbyte[])t.GetObjectValue(field)).Length);
-            Assert.Equal(0, ((sbyte[])b.GetObjectValue(field)).Length);
+            Assert.Equal(0, ((sbyte[]) t.GetObjectValue(field)).Length);
+            Assert.Equal(0, ((sbyte[]) b.GetObjectValue(field)).Length);
         }
 
         [Fact]

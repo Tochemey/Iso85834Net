@@ -74,7 +74,9 @@ namespace ModIso8583.Test
         public void TestIncompleteVarFieldData()
         {
             Assert.Throws(typeof(ParseException),
-                () => mf.ParseMessage("0210B23A80012EA0801800000000140000046500000000000030000428130547468771125946042804280811051234".GetSbytes(),
+                () => mf.ParseMessage(
+                    "0210B23A80012EA0801800000000140000046500000000000030000428130547468771125946042804280811051234"
+                        .GetSbytes(),
                     0));
         }
 
@@ -140,7 +142,9 @@ namespace ModIso8583.Test
         public void TestIncompleteVarFieldHeader()
         {
             Assert.Throws(typeof(ParseException),
-                () => mf.ParseMessage("0210B23A80012EA08018000000001400000465000000000000300004281305474687711259460428042808115".GetSbytes(),
+                () => mf.ParseMessage(
+                    "0210B23A80012EA08018000000001400000465000000000000300004281305474687711259460428042808115"
+                        .GetSbytes(),
                     0));
         }
 
@@ -285,7 +289,7 @@ namespace ModIso8583.Test
         public void TestBinaryNumberParsing()
         {
             NumericParseInfo npi = new NumericParseInfo(6);
-            IsoValue val = npi.ParseBinary(0, new byte[] { 0x12, 0x34, 0x56 }.ToSbytes(), 0, null);
+            IsoValue val = npi.ParseBinary(0, new byte[] {0x12, 0x34, 0x56}.ToSbytes(), 0, null);
             Assert.Equal(123456, Convert.ToInt32(val.Value));
         }
     }

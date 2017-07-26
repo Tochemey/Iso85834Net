@@ -13,11 +13,15 @@ namespace ModIso8583.Test
         {
             CustomField48 cf = null;
             if (value != null)
-                if (value.Length == 1 && value[0] == '|') { cf = new CustomField48(); }
+                if (value.Length == 1 && value[0] == '|')
+                {
+                    cf = new CustomField48();
+                }
                 else
                 {
                     var idx = value.LastIndexOf('|');
-                    if (idx < 0 || idx == value.Length - 1) throw new ArgumentException($"Invalid data '{value}' for field 48");
+                    if (idx < 0 || idx == value.Length - 1)
+                        throw new ArgumentException($"Invalid data '{value}' for field 48");
                     cf = new CustomField48
                     {
                         V1 = value.Substring(0,

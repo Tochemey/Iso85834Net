@@ -56,7 +56,8 @@ namespace Iso85834Net.Parse
                 if (elem != null)
                 {
                     var type = ParseType(elem.GetAttribute("type"));
-                    if (type == -1) throw new IOException($"Invalid type {elem.GetAttribute("type")} for ISO8583 header: ");
+                    if (type == -1)
+                        throw new IOException($"Invalid type {elem.GetAttribute("type")} for ISO8583 header: ");
                     if (elem.ChildNodes == null || elem.ChildNodes.Count == 0)
                     {
                         if (elem.GetAttribute("ref") != null && !string.IsNullOrEmpty(elem.GetAttribute("ref")))
@@ -64,7 +65,10 @@ namespace Iso85834Net.Parse
                             if (refs == null) refs = new ArrayList<XmlElement>(nodes.Count - i);
                             refs.Add(elem);
                         }
-                        else { throw new IOException("Invalid ISO8583 header element"); }
+                        else
+                        {
+                            throw new IOException("Invalid ISO8583 header element");
+                        }
                     }
                     else
                     {
@@ -74,7 +78,8 @@ namespace Iso85834Net.Parse
                         {
                             var binary = binHeader ? "binary" : string.Empty;
 
-                            logger.Debug($"Adding {binary} ISO8583 header for type {elem.GetAttribute("type")} : {header}");
+                            logger.Debug(
+                                $"Adding {binary} ISO8583 header for type {elem.GetAttribute("type")} : {header}");
                         }
                         if (binHeader)
                             mfact.SetBinaryIsoHeader(type,
@@ -91,12 +96,16 @@ namespace Iso85834Net.Parse
                 {
                     if (elem == null) continue;
                     var type = ParseType(elem.GetAttribute("type"));
-                    if (type == -1) throw new IOException("Invalid type for ISO8583 header: " + elem.GetAttribute("type"));
+                    if (type == -1)
+                        throw new IOException("Invalid type for ISO8583 header: " + elem.GetAttribute("type"));
                     if (elem.GetAttribute("ref") == null || elem.GetAttribute("ref").IsEmpty()) continue;
                     var t2 = ParseType(elem.GetAttribute("ref"));
-                    if (t2 == -1) throw new IOException("Invalid type reference " + elem.GetAttribute("ref") + " for ISO8583 header " + type);
+                    if (t2 == -1)
+                        throw new IOException("Invalid type reference " + elem.GetAttribute("ref") +
+                                              " for ISO8583 header " + type);
                     var h = mfact.GetIsoHeader(t2);
-                    if (h == null) throw new ArgumentException("Header def " + type + " refers to nonexistent header " + t2);
+                    if (h == null)
+                        throw new ArgumentException("Header def " + type + " refers to nonexistent header " + t2);
                     if (logger.IsEnabled(LogEventLevel.Debug))
                         logger.Debug("Adding ISO8583 header for type {Type}: {H} (copied from {Ref})",
                             elem.GetAttribute("type"),
@@ -117,7 +126,8 @@ namespace Iso85834Net.Parse
                 var elem = (XmlElement) nodes.Item(i);
                 if (elem == null) continue;
                 var type = ParseType(elem.GetAttribute("type"));
-                if (type == -1) throw new IOException("Invalid ISO8583 type for template: " + elem.GetAttribute("type"));
+                if (type == -1)
+                    throw new IOException("Invalid ISO8583 type for template: " + elem.GetAttribute("type"));
                 if (elem.GetAttribute("extends") != null && !elem.GetAttribute("extends").IsEmpty())
                 {
                     if (subs == null) subs = new ArrayList<XmlElement>(nodes.Count - i);
@@ -148,9 +158,13 @@ namespace Iso85834Net.Parse
                 {
                     var type = ParseType(elem.GetAttribute("type"));
                     var @ref = ParseType(elem.GetAttribute("extends"));
-                    if (@ref == -1) throw new ArgumentException("Message template " + elem.GetAttribute("type") + " extends invalid template " + elem.GetAttribute("extends"));
+                    if (@ref == -1)
+                        throw new ArgumentException("Message template " + elem.GetAttribute("type") +
+                                                    " extends invalid template " + elem.GetAttribute("extends"));
                     IsoMessage tref = mfact.GetMessageTemplate(@ref);
-                    if (tref == null) throw new ArgumentException("Message template " + elem.GetAttribute("type") + " extends nonexistent template " + elem.GetAttribute("extends"));
+                    if (tref == null)
+                        throw new ArgumentException("Message template " + elem.GetAttribute("type") +
+                                                    " extends nonexistent template " + elem.GetAttribute("extends"));
                     var m = (T) new IsoMessage();
                     m.Type = type;
                     m.Encoding = mfact.Encoding;
@@ -222,12 +236,14 @@ namespace Iso85834Net.Parse
                 }
                 Debug.Assert(itype != null,
                     "itype != null");
-                return itype.Value.NeedsLength() ? new IsoValue(itype.Value,
-                    cf,
-                    length,
-                    cf) : new IsoValue(itype.Value,
-                    cf,
-                    cf);
+                return itype.Value.NeedsLength()
+                    ? new IsoValue(itype.Value,
+                        cf,
+                        length,
+                        cf)
+                    : new IsoValue(itype.Value,
+                        cf,
+                        cf);
             }
             var v = f.ChildNodes.Count == 0 ? string.Empty : f.ChildNodes.Item(0).Value;
             var customField = toplevel ? mfact.GetCustomField(num) : null;
@@ -235,19 +251,23 @@ namespace Iso85834Net.Parse
             {
                 Debug.Assert(itype != null,
                     "itype != null");
-                return itype.Value.NeedsLength() ? new IsoValue(itype.Value,
-                    customField.DecodeField(v),
-                    length,
-                    customField) : new IsoValue(itype.Value,
-                    customField.DecodeField(v),
-                    customField);
+                return itype.Value.NeedsLength()
+                    ? new IsoValue(itype.Value,
+                        customField.DecodeField(v),
+                        length,
+                        customField)
+                    : new IsoValue(itype.Value,
+                        customField.DecodeField(v),
+                        customField);
             }
             Debug.Assert(itype != null,
                 "itype != null");
-            return itype.Value.NeedsLength() ? new IsoValue(itype.Value,
-                v,
-                length) : new IsoValue(itype.Value,
-                v);
+            return itype.Value.NeedsLength()
+                ? new IsoValue(itype.Value,
+                    v,
+                    length)
+                : new IsoValue(itype.Value,
+                    v);
         }
 
         private static FieldParseInfo GetParser<T>(XmlElement f,
@@ -290,7 +310,8 @@ namespace Iso85834Net.Parse
                 if (elem != null)
                 {
                     var type = ParseType(elem.GetAttribute("type"));
-                    if (type == -1) throw new IOException("Invalid ISO8583 type for parse guide: " + elem.GetAttribute("type"));
+                    if (type == -1)
+                        throw new IOException("Invalid ISO8583 type for parse guide: " + elem.GetAttribute("type"));
                     if (elem.GetAttribute("extends") != null && !elem.GetAttribute("extends").IsEmpty())
                     {
                         if (subs == null) subs = new ArrayList<XmlElement>(nodes.Count - i);
@@ -314,8 +335,9 @@ namespace Iso85834Net.Parse
                     mfact.SetParseMap(type,
                         parseMap);
                     if (guides.Contains(type)) guides[type] = parseMap;
-                    else guides.Add(type,
-                        parseMap);
+                    else
+                        guides.Add(type,
+                            parseMap);
                 }
             }
             if (subs != null)
@@ -323,9 +345,13 @@ namespace Iso85834Net.Parse
                 {
                     var type = ParseType(elem.GetAttribute("type"));
                     var @ref = ParseType(elem.GetAttribute("extends"));
-                    if (@ref == -1) throw new ArgumentException("Message template " + elem.GetAttribute("type") + " extends invalid template " + elem.GetAttribute("extends"));
+                    if (@ref == -1)
+                        throw new ArgumentException("Message template " + elem.GetAttribute("type") +
+                                                    " extends invalid template " + elem.GetAttribute("extends"));
                     var parent = guides[@ref];
-                    if (parent == null) throw new ArgumentException("Parsing guide " + elem.GetAttribute("type") + " extends nonexistent guide " + elem.GetAttribute("extends"));
+                    if (parent == null)
+                        throw new ArgumentException("Parsing guide " + elem.GetAttribute("type") +
+                                                    " extends nonexistent guide " + elem.GetAttribute("extends"));
                     var child = new HashDictionary<int, FieldParseInfo>();
                     child.AddAll(parent);
                     var fields = GetDirectChildrenByTagName(elem,
@@ -345,8 +371,9 @@ namespace Iso85834Net.Parse
                     mfact.SetParseMap(type,
                         child);
                     if (guides.Contains(type)) guides[type] = child;
-                    else guides.Add(type,
-                        child);
+                    else
+                        guides.Add(type,
+                            child);
                 }
         }
 
@@ -380,7 +407,8 @@ namespace Iso85834Net.Parse
                 xmlDoc.Load(source);
                 var root = xmlDoc.DocumentElement;
 
-                if (root == null || !root.Name.Equals("n8583-config")) throw new Exception("Invalid ISO8583 config file. XML file does not contain any root element.");
+                if (root == null || !root.Name.Equals("n8583-config"))
+                    throw new Exception("Invalid ISO8583 config file. XML file does not contain any root element.");
 
                 ParseHeaders(root.GetElementsByTagName("header"),
                     mfact);
@@ -390,7 +418,10 @@ namespace Iso85834Net.Parse
                 ParseGuides(root.GetElementsByTagName("parse"),
                     mfact);
             }
-            catch (Exception e) { logger.Error($"ISO8583 Cannot parse XML configuration {e}"); }
+            catch (Exception e)
+            {
+                logger.Error($"ISO8583 Cannot parse XML configuration {e}");
+            }
         }
 
         /// <summary>

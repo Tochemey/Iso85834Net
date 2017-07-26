@@ -71,7 +71,7 @@ namespace ModIso8583.Test
             mfp.UseBinaryBitmap = true;
             ConfigParser.ConfigureFromClasspathConfig(mfp, @"/Resources/issue4.xml");
 
-            var buf2 = binReader.ReadBytes((int)(memStream.Length - memStream.Position));
+            var buf2 = binReader.ReadBytes((int) (memStream.Length - memStream.Position));
             bm = mfp.ParseMessage(buf2.ToSbytes(), 0);
             Assert.True(bm.BinBitmap, "Parsed message should have binary bitmap flag set");
             Assert.False(bm.Binary);

@@ -9,9 +9,15 @@ namespace Iso85834Net.Codecs
     /// </summary>
     public class LongBcdCodec : ICustomBinaryField
     {
-        public object DecodeField(string val) { return long.Parse(val); }
+        public object DecodeField(string val)
+        {
+            return long.Parse(val);
+        }
 
-        public string EncodeField(object obj) { return Convert.ToString(obj); }
+        public string EncodeField(object obj)
+        {
+            return Convert.ToString(obj);
+        }
 
         public object DecodeBinaryField(sbyte[] bytes,
             int offset,

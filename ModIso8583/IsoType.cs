@@ -179,7 +179,9 @@ namespace Iso85834Net
             {
                 var c = new char[length];
                 var x = value.ToCharArray();
-                if (x.Length > length) throw new ArgumentException("Numeric value is larger than intended length: " + value + " LEN " + length);
+                if (x.Length > length)
+                    throw new ArgumentException("Numeric value is larger than intended length: " + value + " LEN " +
+                                                length);
                 var lim = c.Length - x.Length;
                 for (var i = 0; i < lim; i++) c[i] = '0';
                 Array.Copy(x,
@@ -248,14 +250,18 @@ namespace Iso85834Net
             {
                 var x = value.ToString().PadLeft(length,
                     '0');
-                if (x.Length > length) throw new ArgumentException("Numeric value is larger than intended length: " + value + " LEN " + length);
+                if (x.Length > length)
+                    throw new ArgumentException("Numeric value is larger than intended length: " + value + " LEN " +
+                                                length);
                 return x;
             }
-            if (isoType == IsoType.ALPHA || isoType == IsoType.LLVAR || isoType == IsoType.LLLVAR || isoType == IsoType.LLLLVAR)
+            if (isoType == IsoType.ALPHA || isoType == IsoType.LLVAR || isoType == IsoType.LLLVAR ||
+                isoType == IsoType.LLLLVAR)
                 return isoType.Format(Convert.ToString(value),
                     length);
             if (isoType == IsoType.AMOUNT) return value.ToString("0000000000") + "00";
-            if (isoType == IsoType.BINARY || isoType == IsoType.LLBIN || isoType == IsoType.LLLBIN || isoType == IsoType.LLLLBIN)
+            if (isoType == IsoType.BINARY || isoType == IsoType.LLBIN || isoType == IsoType.LLLBIN ||
+                isoType == IsoType.LLLLBIN)
             {
                 //TODO
             }
@@ -284,10 +290,12 @@ namespace Iso85834Net
             if (isoType == IsoType.NUMERIC)
                 return isoType.Format(Convert.ToInt64(value),
                     length);
-            if (isoType == IsoType.ALPHA || isoType == IsoType.LLVAR || isoType == IsoType.LLLVAR || isoType == IsoType.LLLLVAR)
+            if (isoType == IsoType.ALPHA || isoType == IsoType.LLVAR || isoType == IsoType.LLLVAR ||
+                isoType == IsoType.LLLLVAR)
                 return isoType.Format(Convert.ToString(value),
                     length);
-            if (isoType == IsoType.BINARY || isoType == IsoType.LLBIN || isoType == IsoType.LLLBIN || isoType == IsoType.LLLLBIN)
+            if (isoType == IsoType.BINARY || isoType == IsoType.LLBIN || isoType == IsoType.LLLBIN ||
+                isoType == IsoType.LLLLBIN)
             {
                 //TODO
             }

@@ -7,7 +7,8 @@ namespace Iso85834Net.Parse
     {
         public NumericParseInfo(int len) : base(IsoType.NUMERIC,
             len)
-        { }
+        {
+        }
 
         public override IsoValue ParseBinary(int field,
             sbyte[] buf,
@@ -15,7 +16,9 @@ namespace Iso85834Net.Parse
             ICustomField custom)
         {
             if (pos < 0) throw new ParseException($"Invalid bin NUMERIC field {field} pos {pos}");
-            if (pos + Length / 2 > buf.Length) throw new ParseException($"Insufficient data for bin {IsoType} field {field} of length {Length}, pos {pos}");
+            if (pos + Length / 2 > buf.Length)
+                throw new ParseException(
+                    $"Insufficient data for bin {IsoType} field {field} of length {Length}, pos {pos}");
 
             //A long covers up to 18 digits
             if (Length < 19)
@@ -32,7 +35,11 @@ namespace Iso85834Net.Parse
                         Length),
                     Length);
             }
-            catch (Exception) { throw new ParseException($"Insufficient data for bin {IsoType} field {field} of length {Length}, pos {pos}"); }
+            catch (Exception)
+            {
+                throw new ParseException(
+                    $"Insufficient data for bin {IsoType} field {field} of length {Length}, pos {pos}");
+            }
         }
     }
 }

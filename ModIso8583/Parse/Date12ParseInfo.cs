@@ -7,7 +7,8 @@ namespace Iso85834Net.Parse
     {
         public Date12ParseInfo() : base(IsoType.DATE12,
             12)
-        { }
+        {
+        }
 
         public override IsoValue Parse(int field,
             sbyte[] buf,
@@ -15,7 +16,8 @@ namespace Iso85834Net.Parse
             ICustomField custom)
         {
             if (pos < 0) throw new ParseException($"Invalid DATE12 field {field} position {pos}");
-            if (pos + 12 > buf.Length) throw new ParseException($"Insufficient data for DATE12 field {field}, pos {pos}");
+            if (pos + 12 > buf.Length)
+                throw new ParseException($"Insufficient data for DATE12 field {field}, pos {pos}");
 
             DateTime calendar;
             int year;
@@ -85,7 +87,8 @@ namespace Iso85834Net.Parse
             ICustomField custom)
         {
             if (pos < 0) throw new ParseException($"Invalid DATE12 field {field} position {pos}");
-            if (pos + 6 > buf.Length) throw new ParseException($"Insufficient data for DATE12 field {field}, pos {pos}");
+            if (pos + 6 > buf.Length)
+                throw new ParseException($"Insufficient data for DATE12 field {field}, pos {pos}");
 
             var tens = new int[6];
             var start = 0;

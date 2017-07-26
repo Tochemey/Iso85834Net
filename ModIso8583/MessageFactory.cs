@@ -49,7 +49,8 @@ namespace Iso85834Net
         /// <summary>
         ///     Stores the information needed to parse messages sorted by type
         /// </summary>
-        protected HashDictionary<int, HashDictionary<int, FieldParseInfo>> ParseMap = new HashDictionary<int, HashDictionary<int, FieldParseInfo>>();
+        protected HashDictionary<int, HashDictionary<int, FieldParseInfo>> ParseMap =
+            new HashDictionary<int, HashDictionary<int, FieldParseInfo>>();
 
         /// <summary>
         ///     Stores the field numbers to be parsed, in order of appearance.
@@ -82,7 +83,8 @@ namespace Iso85834Net
             set
             {
                 _forceStringEncoding = value;
-                foreach (var mapValue in ParseMap.Values) foreach (var parser in mapValue.Values) parser.ForceStringDecoding = value;
+                foreach (var mapValue in ParseMap.Values)
+                foreach (var parser in mapValue.Values) parser.ForceStringDecoding = value;
             }
         }
 
@@ -94,7 +96,8 @@ namespace Iso85834Net
                 _encoding = value;
                 if (_encoding == null) throw new ArgumentException("Cannot set null encoding.");
 
-                if (!ParseMap.IsEmpty) foreach (var mapValue in ParseMap.Values) foreach (var fpi in mapValue.Values) fpi.Encoding = value;
+                if (!ParseMap.IsEmpty)
+                    foreach (var mapValue in ParseMap.Values) foreach (var fpi in mapValue.Values) fpi.Encoding = value;
 
                 if (_typeTemplates.IsEmpty) return;
 
@@ -117,11 +120,20 @@ namespace Iso85834Net
                 value);
         }
 
-        public ICustomField GetCustomField(int index) { return _customFields.Contains(index) ? _customFields[index] : null; }
+        public ICustomField GetCustomField(int index)
+        {
+            return _customFields.Contains(index) ? _customFields[index] : null;
+        }
 
-        protected T CreateIsoMessageWithBinaryHeader(sbyte[] binHeader) { return (T) new IsoMessage(binHeader); }
+        protected T CreateIsoMessageWithBinaryHeader(sbyte[] binHeader)
+        {
+            return (T) new IsoMessage(binHeader);
+        }
 
-        protected T CreateIsoMessage(string isoHeader) { return (T) new IsoMessage(isoHeader); }
+        protected T CreateIsoMessage(string isoHeader)
+        {
+            return (T) new IsoMessage(isoHeader);
+        }
 
         /// <summary>
         ///     Creates a new message of the specified type, with optional trace and date values as well
@@ -229,7 +241,7 @@ namespace Iso85834Net
                     return;
                 }
             }
-            logger.Warning("Field {Field} for message type {MessageType} is not for dates, cannot set timezone",
+            logger.Warning("Field {@Field} for message type {@MessageType} is not for dates, cannot set timezone",
                 field,
                 messageType);
         }
@@ -253,8 +265,10 @@ namespace Iso85834Net
             int isoHeaderLength,
             bool binaryIsoHeader = false)
         {
-            var minlength = isoHeaderLength + (UseBinaryMessages ? 2 : 4) + (UseBinaryBitmap || UseBinaryMessages ? 8 : 16);
-            if (buf.Length < minlength) throw new ParseException("Insufficient buffer length, needs to be at least " + minlength);
+            var minlength = isoHeaderLength + (UseBinaryMessages ? 2 : 4) +
+                            (UseBinaryBitmap || UseBinaryMessages ? 8 : 16);
+            if (buf.Length < minlength)
+                throw new ParseException("Insufficient buffer length, needs to be at least " + minlength);
             T m;
             if (binaryIsoHeader && isoHeaderLength > 0)
             {
@@ -289,10 +303,10 @@ namespace Iso85834Net
             }
             else
             {
-                type = ((buf[isoHeaderLength] - 48) << 12) 
-                    | ((buf[isoHeaderLength + 1] - 48) << 8) 
-                    | ((buf[isoHeaderLength + 2] - 48) << 4) 
-                    | (buf[isoHeaderLength + 3] - 48);
+                type = ((buf[isoHeaderLength] - 48) << 12)
+                       | ((buf[isoHeaderLength + 1] - 48) << 8)
+                       | ((buf[isoHeaderLength + 2] - 48) << 4)
+                       | (buf[isoHeaderLength + 3] - 48);
             }
             m.Type = type;
             //Parse the bitmap (primary first)
@@ -330,7 +344,10 @@ namespace Iso85834Net
                     }
                     pos = minlength + 8;
                 }
-                else { pos = minlength; }
+                else
+                {
+                    pos = minlength;
+                }
             }
             else
             {
@@ -351,7 +368,10 @@ namespace Iso85834Net
                             4 + isoHeaderLength,
                             16);
                     }
-                    else { bitmapBuffer = buf; }
+                    else
+                    {
+                        bitmapBuffer = buf;
+                    }
                     for (var i = isoHeaderLength + 4; i < isoHeaderLength + 20; i++)
                         if (bitmapBuffer[i] >= '0' && bitmapBuffer[i] <= '9')
                         {
@@ -391,7 +411,8 @@ namespace Iso85834Net
                     if (bs.Get(0))
                     {
                         bs.Length = 128;
-                        if (buf.Length < minlength + 16) throw new ParseException($"Insufficient length for secondary bitmap :{minlength}");
+                        if (buf.Length < minlength + 16)
+                            throw new ParseException($"Insufficient length for secondary bitmap :{minlength}");
                         if (ForceStringEncoding)
                         {
                             var bb = buf.SbyteString(isoHeaderLength + 20,
@@ -439,7 +460,10 @@ namespace Iso85834Net
                             }
                         pos = 16 + minlength;
                     }
-                    else { pos = minlength; }
+                    else
+                    {
+                        pos = minlength;
+                    }
                 }
                 catch (FormatException e)
                 {
@@ -453,8 +477,10 @@ namespace Iso85834Net
             var index = ParseOrder[type];
             if (index == null)
             {
-                logger.Error($"ISO8583 MessageFactory has no parsing guide for message type {type:X} [{buf.SbyteString(0, buf.Length, _encoding)}]");
-                throw new Exception($"ISO8583 MessageFactory has no parsing guide for message type {type:X} [{buf.SbyteString(0, buf.Length, _encoding)}]");
+                logger.Error(
+                    $"ISO8583 MessageFactory has no parsing guide for message type {type:X} [{buf.SbyteString(0, buf.Length, _encoding)}]");
+                throw new Exception(
+                    $"ISO8583 MessageFactory has no parsing guide for message type {type:X} [{buf.SbyteString(0, buf.Length, _encoding)}]");
             }
             //First we check if the message contains fields not specified in the parsing template
             var abandon = false;
@@ -476,7 +502,7 @@ namespace Iso85834Net
                     if (!bs.Get(i - 1)) continue;
                     if (IgnoreLast && pos >= buf.Length && i == index[index.Count - 1])
                     {
-                        logger.Warning("Field {Index} is not really in the message even though it's in the bitmap",
+                        logger.Warning("Field {@Index} is not really in the message even though it's in the bitmap",
                             i);
 
                         bs.Set(i - 1,
@@ -495,7 +521,9 @@ namespace Iso85834Net
                             val);
 
                         if (val == null) continue;
-                        if (val.Type == IsoType.NUMERIC || val.Type == IsoType.DATE10 || val.Type == IsoType.DATE4 || val.Type == IsoType.DATE12 || val.Type == IsoType.DATE14 || val.Type == IsoType.DATE_EXP || val.Type == IsoType.AMOUNT || val.Type == IsoType.TIME)
+                        if (val.Type == IsoType.NUMERIC || val.Type == IsoType.DATE10 || val.Type == IsoType.DATE4 ||
+                            val.Type == IsoType.DATE12 || val.Type == IsoType.DATE14 || val.Type == IsoType.DATE_EXP ||
+                            val.Type == IsoType.AMOUNT || val.Type == IsoType.TIME)
                         {
                             pos += val.Length / 2 + val.Length % 2;
                         }
@@ -522,7 +550,8 @@ namespace Iso85834Net
                     if (bs.Get(i - 1))
                         if (IgnoreLast && pos >= buf.Length && i == index[index.Count - 1])
                         {
-                            logger.Warning("Field {FieldId} is not really in the message even though it's in the bitmap",
+                            logger.Warning(
+                                "Field {@FieldId} is not really in the message even though it's in the bitmap",
                                 i);
                             bs.Set(i - 1,
                                 false);
@@ -578,7 +607,10 @@ namespace Iso85834Net
         public void SetIsoHeader(int type,
             string val)
         {
-            if (string.IsNullOrEmpty(val)) { _isoHeaders.Remove(type); }
+            if (string.IsNullOrEmpty(val))
+            {
+                _isoHeaders.Remove(type);
+            }
             else
             {
                 if (_isoHeaders.Contains(type)) _isoHeaders[type] = val;
@@ -608,7 +640,10 @@ namespace Iso85834Net
         public void SetBinaryIsoHeader(int type,
             byte[] val)
         {
-            if (val == null) { _binIsoHeaders.Remove(type); }
+            if (val == null)
+            {
+                _binIsoHeaders.Remove(type);
+            }
             else
             {
                 if (_binIsoHeaders.Contains(type)) _binIsoHeaders[type] = val.ToSbytes();

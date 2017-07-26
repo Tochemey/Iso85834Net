@@ -184,7 +184,8 @@ namespace ModIso8583.Test
         [Fact]
         public void TestMessage()
         {
-            var trama = HexCodec.HexDecode("f1f8f1f42030010002000000f0f0f0f0f0f0f0f1f5f9f5f5f1f3f0f6f1f2f1f1f2f9f0f8f8f3f1f8f0f0");
+            var trama = HexCodec.HexDecode(
+                "f1f8f1f42030010002000000f0f0f0f0f0f0f0f1f5f9f5f5f1f3f0f6f1f2f1f1f2f9f0f8f8f3f1f8f0f0");
             var mfact = new MessageFactory<IsoMessage>
             {
                 UseBinaryBitmap = true

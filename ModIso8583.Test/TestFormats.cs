@@ -17,7 +17,7 @@ namespace ModIso8583.Test
             var tz = TZConvert.GetTimeZoneInfo("Central Standard Time");
             date = TimeZoneInfo.ConvertTime(date,
                 tz);
-            
+
             Assert.Equal("0125213456", IsoType.DATE10.Format(date));
             Assert.Equal("0125", IsoType.DATE4.Format(date));
             Assert.Equal("7301", IsoType.DATE_EXP.Format(date));

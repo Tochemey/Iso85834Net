@@ -10,7 +10,7 @@ namespace Iso85834Net.Parse
     /// </summary>
     public abstract class FieldParseInfo
     {
-        public FieldParseInfo(IsoType isoType,
+        protected FieldParseInfo(IsoType isoType,
             int length)
         {
             IsoType = isoType;

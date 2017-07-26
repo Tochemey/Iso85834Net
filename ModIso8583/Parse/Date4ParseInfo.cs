@@ -10,7 +10,8 @@ namespace Iso85834Net.Parse
     {
         public Date4ParseInfo() : base(IsoType.DATE4,
             4)
-        { }
+        {
+        }
 
         public override IsoValue Parse(int field,
             sbyte[] buf,
@@ -71,8 +72,10 @@ namespace Iso85834Net.Parse
             var tens = new int[2];
             var sbytes = buf;
             var start = 0;
-            if (buf.Length - pos < 2) throw new ParseException($"Insufficient data to parse binary DATE4 field {field} pos {pos}");
-            for (var i = pos; i < pos + tens.Length; i++) tens[start++] = ((sbytes[i] & 0xf0) >> 4) * 10 + (sbytes[i] & 0x0f);
+            if (buf.Length - pos < 2)
+                throw new ParseException($"Insufficient data to parse binary DATE4 field {field} pos {pos}");
+            for (var i = pos; i < pos + tens.Length; i++)
+                tens[start++] = ((sbytes[i] & 0xf0) >> 4) * 10 + (sbytes[i] & 0x0f);
 
             var calendar = new DateTime(DateTime.Now.Year,
                 tens[0],

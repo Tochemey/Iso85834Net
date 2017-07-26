@@ -9,21 +9,22 @@ namespace ModIso8583.Test.Util
         public void TestEncoding()
         {
             sbyte[] buf = new sbyte[2];
-            buf[0] = 1; buf[1] = 1;
+            buf[0] = 1;
+            buf[1] = 1;
             Bcd.Encode("00", buf);
-            Assert.Equal(new byte[] { 0, 1 }.ToSbytes(), buf);
+            Assert.Equal(new byte[] {0, 1}.ToSbytes(), buf);
             Bcd.Encode("79", buf);
-            Assert.Equal(new byte[] { 0x79, 1 }.ToSbytes(), buf);
+            Assert.Equal(new byte[] {0x79, 1}.ToSbytes(), buf);
             Bcd.Encode("80", buf);
-            Assert.Equal(new byte[] { (byte)0x80, 1 }.ToSbytes(), buf);
+            Assert.Equal(new byte[] {(byte) 0x80, 1}.ToSbytes(), buf);
             Bcd.Encode("99", buf);
-            Assert.Equal(new byte[] { (byte)0x99, 1 }.ToSbytes(), buf);
+            Assert.Equal(new byte[] {(byte) 0x99, 1}.ToSbytes(), buf);
             Bcd.Encode("100", buf);
-            Assert.Equal(new byte[] { 1, 0 }.ToSbytes(), buf);
+            Assert.Equal(new byte[] {1, 0}.ToSbytes(), buf);
             Bcd.Encode("779", buf);
-            Assert.Equal(new byte[] { 7, 0x79 }.ToSbytes(), buf);
+            Assert.Equal(new byte[] {7, 0x79}.ToSbytes(), buf);
             Bcd.Encode("999", buf);
-            Assert.Equal(new byte[] { 9, (byte)0x99 }.ToSbytes(), buf);
+            Assert.Equal(new byte[] {9, (byte) 0x99}.ToSbytes(), buf);
         }
 
         [Fact]
@@ -48,9 +49,6 @@ namespace ModIso8583.Test.Util
             Assert.Equal(199, Bcd.DecodeToLong(buf, 0, 4));
             buf[0] = 9;
             Assert.Equal(999, Bcd.DecodeToLong(buf, 0, 4));
-
         }
-
-
     }
 }

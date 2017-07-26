@@ -8,8 +8,9 @@ namespace Iso85834Net.Util
         /// check the version of OS at runtime
         /// </summary>
         /// <returns><c>true</c>, if linux was ised, <c>false</c> otherwise.</returns>
-        public static bool IsLinux(){
-            int p = (int)Environment.OSVersion.Platform;
+        public static bool IsLinux()
+        {
+            int p = (int) Environment.OSVersion.Platform;
             return (p == 4) || (p == 6) || (p == 128);
         }
     }

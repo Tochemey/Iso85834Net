@@ -7,7 +7,8 @@ namespace Iso85834Net.Parse
     {
         public LlvarParseInfo() : base(IsoType.LLVAR,
             0)
-        { }
+        {
+        }
 
         public override IsoValue Parse(int field,
             sbyte[] buf,
@@ -20,16 +21,22 @@ namespace Iso85834Net.Parse
                 pos,
                 2);
             if (len < 0) throw new ParseException($"Invalid LLVAR length {len}, field {field} pos {pos}");
-            if (len + pos + 2 > buf.Length) throw new ParseException($"Insufficient data for LLVAR field {field}, pos {pos}");
+            if (len + pos + 2 > buf.Length)
+                throw new ParseException($"Insufficient data for LLVAR field {field}, pos {pos}");
 
             string v;
             try
             {
-                v = len == 0 ? "" : buf.SbyteString(pos + 2,
-                    len,
-                    Encoding);
+                v = len == 0
+                    ? ""
+                    : buf.SbyteString(pos + 2,
+                        len,
+                        Encoding);
             }
-            catch (Exception) { throw new ParseException($"Insufficient data for LLVAR header, field {field} pos {pos}"); }
+            catch (Exception)
+            {
+                throw new ParseException($"Insufficient data for LLVAR header, field {field} pos {pos}");
+            }
 
             //This is new: if the String's length is different from the specified length in the
             //buffer, there are probably some extended characters. So we create a String from
@@ -48,12 +55,14 @@ namespace Iso85834Net.Parse
             var decoded = custom.DecodeField(v);
 
             //If decode fails, return string; otherwise use the decoded object and its codec
-            return decoded == null ? new IsoValue(IsoType,
-                v,
-                len) : new IsoValue(IsoType,
-                decoded,
-                len,
-                custom);
+            return decoded == null
+                ? new IsoValue(IsoType,
+                    v,
+                    len)
+                : new IsoValue(IsoType,
+                    decoded,
+                    len,
+                    custom);
         }
 
         public override IsoValue ParseBinary(int field,
@@ -65,13 +74,15 @@ namespace Iso85834Net.Parse
 
             if (pos < 0) throw new ParseException($"Invalid bin LLVAR field {field} pos {pos}");
 
-            if (pos + 1 > buf.Length) throw new ParseException($"Insufficient data for bin LLVAR header, field {field} pos {pos}");
+            if (pos + 1 > buf.Length)
+                throw new ParseException($"Insufficient data for bin LLVAR header, field {field} pos {pos}");
 
             var len = ((sbytes[pos] & 0xf0) >> 4) * 10 + (sbytes[pos] & 0x0f);
 
             if (len < 0) throw new ParseException($"Invalid bin LLVAR length {len}, field {field} pos {pos}");
 
-            if (len + pos + 1 > buf.Length) throw new ParseException($"Insufficient data for bin LLVAR field {field}, pos {pos}");
+            if (len + pos + 1 > buf.Length)
+                throw new ParseException($"Insufficient data for bin LLVAR field {field}, pos {pos}");
 
             if (custom == null)
                 return new IsoValue(IsoType,
@@ -83,12 +94,14 @@ namespace Iso85834Net.Parse
                 len,
                 Encoding));
 
-            return dec == null ? new IsoValue(IsoType,
-                buf.SbyteString(pos + 1,
-                    len,
-                    Encoding)) : new IsoValue(IsoType,
-                dec,
-                custom);
+            return dec == null
+                ? new IsoValue(IsoType,
+                    buf.SbyteString(pos + 1,
+                        len,
+                        Encoding))
+                : new IsoValue(IsoType,
+                    dec,
+                    custom);
         }
     }
 }

@@ -53,7 +53,10 @@ namespace Iso85834Net.Util
                 if (c >= 'A' && c <= 'F') c -= 55;
                 else if (c >= '0' && c <= '9') c -= 48;
                 else if (c >= 'a' && c <= 'f') c -= 87;
-                if (nibble == 0) { holder = c << 4; }
+                if (nibble == 0)
+                {
+                    holder = c << 4;
+                }
                 else
                 {
                     holder |= c;
