@@ -1,5 +1,7 @@
 Iso85834Net
 =============
+[![Build status](https://ci.appveyor.com/api/projects/status/umrwthqeckv93fcp?svg=true)](https://ci.appveyor.com/project/Tochemey/iso85834net)
+
 
 ## Introduction
 
@@ -198,7 +200,7 @@ This means that you can do this via code:
 You can also create a CompositeField, store several subfields inside it, and store it in any field inside an IsoMessage, specifying the same instance as the CustomField:
 
 ```c#
-    CompositeField f = new CompositeField().AddValue(new IsoValueß(IsoType.ALPHA, "one", 5))
+    CompositeField f = new CompositeField().AddValue(new IsoValue(IsoType.ALPHA, "one", 5))
     .AddValue(new IsoValue(IsoType.LLVAR, "two"))
     .AddValue(new IsoValue(IsoType.NUMERIC, 123l, 6))
     .AddValue(new IsoValue(IsoType.ALPHA, "OK", 2));
